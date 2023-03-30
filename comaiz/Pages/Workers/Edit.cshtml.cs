@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using comaiz.Data;
 using comaiz.Models;
 
-namespace comaiz.Pages.Clients
+namespace comaiz.Pages.Workers
 {
     public class EditModel : PageModel
     {
@@ -21,21 +21,21 @@ namespace comaiz.Pages.Clients
         }
 
         [BindProperty]
-        public Client Client { get; set; } = default!;
+        public Worker Worker { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Clients == null)
+            if (id == null || _context.Workers == null)
             {
                 return NotFound();
             }
 
-            var client =  await _context.Clients.FirstOrDefaultAsync(m => m.Id == id);
-            if (client == null)
+            var worker =  await _context.Workers.FirstOrDefaultAsync(m => m.Id == id);
+            if (worker == null)
             {
                 return NotFound();
             }
-            Client = client;
+            Worker = worker;
             return Page();
         }
 
@@ -48,7 +48,7 @@ namespace comaiz.Pages.Clients
                 return Page();
             }
 
-            _context.Attach(Client).State = EntityState.Modified;
+            _context.Attach(Worker).State = EntityState.Modified;
 
             try
             {
@@ -56,7 +56,7 @@ namespace comaiz.Pages.Clients
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ClientExists(Client.Id))
+                if (!WorkerExists(Worker.Id))
                 {
                     return NotFound();
                 }
@@ -69,9 +69,9 @@ namespace comaiz.Pages.Clients
             return RedirectToPage("./Index");
         }
 
-        private bool ClientExists(int id)
+        private bool WorkerExists(int id)
         {
-          return (_context.Clients?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Workers?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

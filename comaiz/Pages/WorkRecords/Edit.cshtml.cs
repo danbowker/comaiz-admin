@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using comaiz.Data;
 using comaiz.Models;
 
-namespace comaiz.Pages.Clients
+namespace comaiz.Pages.WorkRecords
 {
     public class EditModel : PageModel
     {
@@ -21,21 +21,21 @@ namespace comaiz.Pages.Clients
         }
 
         [BindProperty]
-        public Client Client { get; set; } = default!;
+        public WorkRecord WorkRecord { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Clients == null)
+            if (id == null || _context.WorkRecords == null)
             {
                 return NotFound();
             }
 
-            var client =  await _context.Clients.FirstOrDefaultAsync(m => m.Id == id);
-            if (client == null)
+            var workrecord =  await _context.WorkRecords.FirstOrDefaultAsync(m => m.Id == id);
+            if (workrecord == null)
             {
                 return NotFound();
             }
-            Client = client;
+            WorkRecord = workrecord;
             return Page();
         }
 
@@ -48,7 +48,7 @@ namespace comaiz.Pages.Clients
                 return Page();
             }
 
-            _context.Attach(Client).State = EntityState.Modified;
+            _context.Attach(WorkRecord).State = EntityState.Modified;
 
             try
             {
@@ -56,7 +56,7 @@ namespace comaiz.Pages.Clients
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ClientExists(Client.Id))
+                if (!WorkRecordExists(WorkRecord.Id))
                 {
                     return NotFound();
                 }
@@ -69,9 +69,9 @@ namespace comaiz.Pages.Clients
             return RedirectToPage("./Index");
         }
 
-        private bool ClientExists(int id)
+        private bool WorkRecordExists(int id)
         {
-          return (_context.Clients?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.WorkRecords?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

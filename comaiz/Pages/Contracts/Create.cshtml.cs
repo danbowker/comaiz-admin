@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using comaiz.Data;
 using comaiz.Models;
 
-namespace comaiz.Pages.Clients
+namespace comaiz.Pages.Contracts
 {
     public class CreateModel : PageModel
     {
@@ -25,18 +25,18 @@ namespace comaiz.Pages.Clients
         }
 
         [BindProperty]
-        public Client Client { get; set; } = default!;
+        public Contract Contract { get; set; } = default!;
         
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
-          if (!ModelState.IsValid || _context.Clients == null || Client == null)
+          if (!ModelState.IsValid || _context.Contracts == null || Contract == null)
             {
                 return Page();
             }
 
-            _context.Clients.Add(Client);
+            _context.Contracts.Add(Contract);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

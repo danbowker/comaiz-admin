@@ -14,6 +14,20 @@ namespace comaiz.Data
         {
         }
 
-        public DbSet<comaiz.Models.Client> Client { get; set; } = default!;
+        public DbSet<comaiz.Models.Client> Clients { get; set; } = default!;
+
+        public DbSet<comaiz.Models.Contract>? Contracts { get; set; }
+
+        public DbSet<comaiz.Models.Worker>? Workers { get; set; }
+
+        public DbSet<comaiz.Models.WorkRecord>? WorkRecords { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Client>().ToTable("Client");
+            modelBuilder.Entity<Contract>().ToTable("Contract");
+            modelBuilder.Entity<Worker>().ToTable("Worker");
+            modelBuilder.Entity<WorkRecord>().ToTable("WorkRecord");
+        }
     }
 }

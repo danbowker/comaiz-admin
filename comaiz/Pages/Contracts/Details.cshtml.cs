@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using comaiz.Data;
 using comaiz.Models;
 
-namespace comaiz.Pages.Clients
+namespace comaiz.Pages.Contracts
 {
     public class DetailsModel : PageModel
     {
@@ -19,23 +19,23 @@ namespace comaiz.Pages.Clients
             _context = context;
         }
 
-      public Client Client { get; set; } = default!; 
+      public Contract Contract { get; set; } = default!; 
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Clients == null)
+            if (id == null || _context.Contracts == null)
             {
                 return NotFound();
             }
 
-            var client = await _context.Clients.FirstOrDefaultAsync(m => m.Id == id);
-            if (client == null)
+            var contract = await _context.Contracts.FirstOrDefaultAsync(m => m.Id == id);
+            if (contract == null)
             {
                 return NotFound();
             }
             else 
             {
-                Client = client;
+                Contract = contract;
             }
             return Page();
         }

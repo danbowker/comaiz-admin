@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using comaiz.Data;
 using comaiz.Models;
 
-namespace comaiz.Pages.Clients
+namespace comaiz.Pages.WorkRecords
 {
     public class IndexModel : PageModel
     {
@@ -19,13 +19,13 @@ namespace comaiz.Pages.Clients
             _context = context;
         }
 
-        public IList<Client> Client { get;set; } = default!;
+        public IList<WorkRecord> WorkRecord { get;set; } = default!;
 
         public async Task OnGetAsync()
         {
-            if (_context.Clients != null)
+            if (_context.WorkRecords != null)
             {
-                Client = await _context.Clients.ToListAsync();
+                WorkRecord = await _context.WorkRecords.ToListAsync();
             }
         }
     }

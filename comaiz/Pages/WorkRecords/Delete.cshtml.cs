@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using comaiz.Data;
 using comaiz.Models;
 
-namespace comaiz.Pages.Clients
+namespace comaiz.Pages.WorkRecords
 {
     public class DeleteModel : PageModel
     {
@@ -20,40 +20,40 @@ namespace comaiz.Pages.Clients
         }
 
         [BindProperty]
-      public Client Client { get; set; } = default!;
+      public WorkRecord WorkRecord { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Clients == null)
+            if (id == null || _context.WorkRecords == null)
             {
                 return NotFound();
             }
 
-            var client = await _context.Clients.FirstOrDefaultAsync(m => m.Id == id);
+            var workrecord = await _context.WorkRecords.FirstOrDefaultAsync(m => m.Id == id);
 
-            if (client == null)
+            if (workrecord == null)
             {
                 return NotFound();
             }
             else 
             {
-                Client = client;
+                WorkRecord = workrecord;
             }
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(int? id)
         {
-            if (id == null || _context.Clients == null)
+            if (id == null || _context.WorkRecords == null)
             {
                 return NotFound();
             }
-            var client = await _context.Clients.FindAsync(id);
+            var workrecord = await _context.WorkRecords.FindAsync(id);
 
-            if (client != null)
+            if (workrecord != null)
             {
-                Client = client;
-                _context.Clients.Remove(Client);
+                WorkRecord = workrecord;
+                _context.WorkRecords.Remove(WorkRecord);
                 await _context.SaveChangesAsync();
             }
 

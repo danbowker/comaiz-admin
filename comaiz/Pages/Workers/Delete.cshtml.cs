@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using comaiz.Data;
 using comaiz.Models;
 
-namespace comaiz.Pages.Clients
+namespace comaiz.Pages.Workers
 {
     public class DeleteModel : PageModel
     {
@@ -20,40 +20,40 @@ namespace comaiz.Pages.Clients
         }
 
         [BindProperty]
-      public Client Client { get; set; } = default!;
+      public Worker Worker { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Clients == null)
+            if (id == null || _context.Workers == null)
             {
                 return NotFound();
             }
 
-            var client = await _context.Clients.FirstOrDefaultAsync(m => m.Id == id);
+            var worker = await _context.Workers.FirstOrDefaultAsync(m => m.Id == id);
 
-            if (client == null)
+            if (worker == null)
             {
                 return NotFound();
             }
             else 
             {
-                Client = client;
+                Worker = worker;
             }
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(int? id)
         {
-            if (id == null || _context.Clients == null)
+            if (id == null || _context.Workers == null)
             {
                 return NotFound();
             }
-            var client = await _context.Clients.FindAsync(id);
+            var worker = await _context.Workers.FindAsync(id);
 
-            if (client != null)
+            if (worker != null)
             {
-                Client = client;
-                _context.Clients.Remove(Client);
+                Worker = worker;
+                _context.Workers.Remove(Worker);
                 await _context.SaveChangesAsync();
             }
 
