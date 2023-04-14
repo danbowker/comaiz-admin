@@ -25,7 +25,10 @@ namespace comaiz.Pages.Contracts
         {
             if (_context.Contracts != null)
             {
-                Contract = await _context.Contracts.ToListAsync();
+                Contract = await _context
+                    .Contracts.Include(c => c.Client)
+                    .AsNoTracking()
+                    .ToListAsync();
             }
         }
     }

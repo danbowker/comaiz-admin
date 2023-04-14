@@ -15,6 +15,14 @@
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
+                <label asp-for="Contract.Client" class="control-label"></label>
+                <select asp-for="Contract.ClientId" class="form-control"
+                        asp-items="@Model.ClientNameSelectList">
+                    <option value="">-- Select Client --</option>
+                </select>
+                <span asp-validation-for="Contract.ClientId" class="text-danger" />
+            </div>
+            <div class="form-group">
                 <label asp-for="Contract.Description" class="control-label"></label>
                 <input asp-for="Contract.Description" class="form-control" />
                 <span asp-validation-for="Contract.Description" class="text-danger"></span>
@@ -31,7 +39,8 @@
             </div>
             <div class="form-group">
                 <label asp-for="Contract.ChargeType" class="control-label"></label>
-                <select asp-for="Contract.ChargeType" asp-items="Html.GetEnumSelectList<ChargeType>()" class="form-control"></select>
+                <select asp-for="Contract.ChargeType"
+                        asp-items="Html.GetEnumSelectList<ChargeType>()" class="form-control"></select>
                 <span asp-validation-for="Contract.ChargeType" class="text-danger"></span>
             </div>
             <div class="form-group">
