@@ -13,9 +13,9 @@ namespace comaiz.Pages.Workers
 {
     public class EditModel : PageModel
     {
-        private readonly comaiz.Data.comaizContext _context;
+        private readonly comaiz.Data.ComaizContext _context;
 
-        public EditModel(comaiz.Data.comaizContext context)
+        public EditModel(comaiz.Data.ComaizContext context)
         {
             _context = context;
         }

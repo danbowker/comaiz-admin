@@ -7,9 +7,9 @@ using comaiz.Models;
 
 namespace comaiz.Data
 {
-    public class comaizContext : DbContext
+    public class ComaizContext : DbContext
     {
-        public comaizContext (DbContextOptions<comaizContext> options)
+        public ComaizContext (DbContextOptions<ComaizContext> options)
             : base(options)
         {
         }

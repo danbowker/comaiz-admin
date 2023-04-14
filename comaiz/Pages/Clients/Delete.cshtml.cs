@@ -12,9 +12,9 @@ namespace comaiz.Pages.Clients
 {
     public class DeleteModel : PageModel
     {
-        private readonly comaiz.Data.comaizContext _context;
+        private readonly comaiz.Data.ComaizContext _context;
 
-        public DeleteModel(comaiz.Data.comaizContext context)
+        public DeleteModel(comaiz.Data.ComaizContext context)
         {
             _context = context;
         }

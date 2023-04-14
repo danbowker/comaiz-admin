@@ -12,9 +12,9 @@ namespace comaiz.Pages.Clients
 {
     public class CreateModel : PageModel
     {
-        private readonly comaiz.Data.comaizContext _context;
+        private readonly comaiz.Data.ComaizContext _context;
 
-        public CreateModel(comaiz.Data.comaizContext context)
+        public CreateModel(comaiz.Data.ComaizContext context)
         {
             _context = context;
         }

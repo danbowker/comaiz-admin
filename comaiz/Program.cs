@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddDbContext<comaizContext>(options =>
+builder.Services.AddDbContext<ComaizContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("comaizContext") ?? throw new InvalidOperationException("Connection string 'comaizContext' not found.")));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -22,6 +22,15 @@ else
     app.UseDeveloperExceptionPage();
     app.UseMigrationsEndPoint();
 }
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var context = services.GetRequiredService<ComaizContext>();
+    context.Database.EnsureCreated();
+}
+
 app.UseStaticFiles();
 
 app.UseRouting();

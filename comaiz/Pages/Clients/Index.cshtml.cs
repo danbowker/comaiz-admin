@@ -12,9 +12,9 @@ namespace comaiz.Pages.Clients
 {
     public class IndexModel : PageModel
     {
-        private readonly comaiz.Data.comaizContext _context;
+        private readonly comaiz.Data.ComaizContext _context;
 
-        public IndexModel(comaiz.Data.comaizContext context)
+        public IndexModel(comaiz.Data.ComaizContext context)
         {
             _context = context;
         }
