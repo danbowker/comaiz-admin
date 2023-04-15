@@ -32,14 +32,14 @@ namespace comaiz.Pages.Clients
         public async Task<IActionResult> OnPostAsync()
         {
           if (!ModelState.IsValid || _context.Clients == null || Client == null)
-            {
-                return Page();
-            }
+          {
+              return Page();
+          }
 
-            _context.Clients.Add(Client);
-            await _context.SaveChangesAsync();
+          _context.Clients.Add(Client);
+          await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Index");
+          return RedirectToPage("./Index");
         }
     }
 }

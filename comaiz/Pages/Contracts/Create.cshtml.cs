@@ -32,21 +32,17 @@ namespace comaiz.Pages.Contracts
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
-            var contract = new Contract();
-
-            if (await TryUpdateModelAsync<Contract>(
-                    contract,
-                    "contract",   // Prefix for form value.
-                    s => s.Id, s => s.ClientId, s => s.Description, s => s.ChargeType, s => s.Rate, s => s.Price))
+            if (!ModelState.IsValid || _context.Contracts == null || Contract == null)
             {
-                _context.Contracts.Add(contract);
-                await _context.SaveChangesAsync();
-                return RedirectToPage("./Index");
+                PopulateClientNameSelectList(_context, Contract.ClientId);
+                return Page();
             }
 
-            // Select DepartmentID if TryUpdateModelAsync fails.
-            PopulateClientNameSelectList(_context, contract.ClientId);
-            return Page();
+            _context.Contracts.Add(Contract);
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage("./Index");
+
         }
     }
 }
