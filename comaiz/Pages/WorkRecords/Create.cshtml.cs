@@ -1,26 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using comaiz.Data;
+﻿using Microsoft.AspNetCore.Mvc;
 using comaiz.Models;
 
 namespace comaiz.Pages.WorkRecords
 {
-    public class CreateModel : PageModel
+    public class CreateModel : ContractWorkerNamePageViewModel
     {
-        private readonly comaiz.Data.ComaizContext _context;
+        private readonly Data.ComaizContext _context;
 
-        public CreateModel(comaiz.Data.ComaizContext context)
+        public CreateModel(Data.ComaizContext context)
         {
             _context = context;
         }
 
         public IActionResult OnGet()
         {
+            PopulateContractNameSelectList(_context);
+            PopulateWorkerNameSelectList(_context);
             return Page();
         }
 
@@ -31,15 +26,17 @@ namespace comaiz.Pages.WorkRecords
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
-          if (!ModelState.IsValid || _context.WorkRecords == null || WorkRecord == null)
-            {
-                return Page();
-            }
+          if (!ModelState.IsValid || _context.WorkRecords == null)
+          {
+              PopulateContractNameSelectList(_context, WorkRecord.ContractId);
+              PopulateWorkerNameSelectList(_context, WorkRecord.WorkerId);
+              return Page();
+          }
 
-            _context.WorkRecords.Add(WorkRecord);
-            await _context.SaveChangesAsync();
+          _context.WorkRecords.Add(WorkRecord);
+          await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Index");
+          return RedirectToPage("./Index");
         }
     }
 }

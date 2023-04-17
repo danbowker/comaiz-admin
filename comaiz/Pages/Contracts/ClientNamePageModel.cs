@@ -8,9 +8,9 @@ namespace comaiz.Pages.Contracts
 {
     public class ClientNamePageModel : PageModel
     {
-        public SelectList ClientNameSelectList { get; set; }
+        public SelectList? ClientNameSelectList { get; set; }
 
-        public void PopulateClientNameSelectList(ComaizContext context, object selectedClient = null)
+        public void PopulateClientNameSelectList(ComaizContext context, object? selectedClient = null)
         {
             var clientQuery = context.Clients.OrderBy(c => c.Name);
 

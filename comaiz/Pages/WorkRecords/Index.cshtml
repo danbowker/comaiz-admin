@@ -16,6 +16,12 @@
             <th>
                 @Html.DisplayNameFor(model => model.WorkRecord[0].Hours)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkRecord[0].Contract!.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkRecord[0].Worker!.Name)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -24,6 +30,12 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Hours)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Contract!.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Worker!.Name)
             </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
