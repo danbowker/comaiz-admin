@@ -11,7 +11,7 @@ using comaiz.Models;
 
 namespace comaiz.Pages.Contracts
 {
-    public class EditModel : PageModel
+    public class EditModel : ClientNamePageModel
     {
         private readonly comaiz.Data.ComaizContext _context;
 
@@ -30,12 +30,14 @@ namespace comaiz.Pages.Contracts
                 return NotFound();
             }
 
-            var contract =  await _context.Contracts.FirstOrDefaultAsync(m => m.Id == id);
+            var contract =  await _context.Contracts.Include(c => c.Client)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (contract == null)
             {
                 return NotFound();
             }
             Contract = contract;
+            PopulateClientNameSelectList(_context);
             return Page();
         }
 
