@@ -23,6 +23,24 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Client.Name)
         </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Client.Contracts)
+        </dt>
+        <dd class="col-sm-10">
+            <table class="table">
+                @if (Model.Client.Contracts != null)
+                {
+                    @foreach (var contract in Model.Client.Contracts)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(model => contract.Description)
+                            </td>
+                        </tr>
+                    }
+                }
+            </table>
+        </dd>
     </dl>
 </div>
 <div>

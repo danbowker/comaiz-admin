@@ -28,7 +28,10 @@ namespace comaiz.Pages.Clients
                 return NotFound();
             }
 
-            var client = await _context.Clients.FirstOrDefaultAsync(m => m.Id == id);
+            var client = await _context.Clients
+                .Include(c => c.Contracts)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (client == null)
             {
                 return NotFound();
