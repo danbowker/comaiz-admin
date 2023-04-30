@@ -44,7 +44,19 @@
                         asp-items="Html.GetEnumSelectList<ChargeType>()" class="form-control"></select>
                 <span asp-validation-for="Contract.ChargeType" class="text-danger"></span>
             </div>
-            <div class="form-group">
+@*            <table class="table">
+                <thead>
+                <tr>
+                    <th>
+                        "Rate"
+                    </th>
+                </tr>
+                </thead>
+                <tbody id="childtable">
+                    @Html.EditorFor(model => model.Contract.ContractRates)
+                </tbody>
+            </table>
+*@            <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>

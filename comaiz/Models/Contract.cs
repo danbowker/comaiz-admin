@@ -10,6 +10,7 @@
         public decimal Price { get; set; }
         public ChargeType ChargeType { get; set; }
         public ICollection<WorkRecord>? WorkRecords { get; set; }
+        //public ICollection<ContractRate>? ContractRates { get; set; } 
     }
 
     public enum ChargeType
