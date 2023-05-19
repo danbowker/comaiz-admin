@@ -34,18 +34,9 @@ using (var scope = app.Services.CreateScope())
 
     var context = services.GetRequiredService<ComaizContext>();
     context.Database.EnsureCreated();
-
+    DbInitializer.ImportFromExcel(context);
     var excelReader = services.GetRequiredService<ExcelAccountsReader>();
 
-    var hta = context.Clients.FirstOrDefault(c => c.ShortName == "HTA");
-
-    foreach (var contract in excelReader.GetContracts())
-    {
-        contract.Client = hta;
-        context.Contracts?.Add(contract);
-    }
-
-    context.SaveChanges();
 }
 
 app.UseStaticFiles();

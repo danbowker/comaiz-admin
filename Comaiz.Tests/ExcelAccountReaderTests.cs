@@ -1,3 +1,4 @@
+using comaiz.Data;
 using comaiz.Services;
 
 namespace Comaiz.Tests
@@ -5,13 +6,28 @@ namespace Comaiz.Tests
     public class ExcelAccountReaderTests
     {
         [Fact]
-        public void Test1()
+        public void GetContracts_ReturnsSomeContracts()
         {
-            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+            var excelReader = new ExcelAccountsReader();
+            excelReader.Load(@"C:\Users\danbo\Google Drive\Misc\Comaiz\Accounts.xlsx");
+            Assert.True(excelReader.GetContracts().Count() > 0);
+        }
 
-            var reader = new ExcelAccountsReader();
-            Assert.True(reader.GetContracts().Count() > 0);
-            
+        [Fact]
+        public void GetContracts_AllContractsHaveADescription()
+        {
+            var excelReader = new ExcelAccountsReader();
+            excelReader.Load(@"C:\Users\danbo\Google Drive\Misc\Comaiz\Accounts.xlsx");
+            Assert.True(excelReader.GetContracts().All(c => !string.IsNullOrEmpty(c.Description)));
+        }
+
+        // Test that GetContracts returns all contracts with a valid rate
+        [Fact]
+        public void GetContracts_AllContractsHaveAValidRate()
+        {
+            var excelReader = new ExcelAccountsReader();
+            excelReader.Load(@"C:\Users\danbo\Google Drive\Misc\Comaiz\Accounts.xlsx");
+            Assert.True(excelReader.GetContracts().All(c => c.Rate > 0));
         }
     }
 }

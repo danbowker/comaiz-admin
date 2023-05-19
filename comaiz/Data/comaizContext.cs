@@ -22,12 +22,15 @@ namespace comaiz.Data
 
         public DbSet<comaiz.Models.WorkRecord>? WorkRecords { get; set; }
 
+        public DbSet<comaiz.Models.ContractRate>? ContractRates { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Client>().ToTable("Client");
             modelBuilder.Entity<Contract>().ToTable("Contract");
             modelBuilder.Entity<Worker>().ToTable("Worker");
             modelBuilder.Entity<WorkRecord>().ToTable("WorkRecord");
+            modelBuilder.Entity<ContractRate>().ToTable("ContractRate");
         }
     }
 }
