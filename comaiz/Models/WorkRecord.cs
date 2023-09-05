@@ -6,7 +6,7 @@
         public decimal Hours { get; set; }
         public int WorkerId { get; set; }
         public Worker? Worker { get; set; }
-        public int ContractId { get; set; }
-        public Contract? Contract { get; set; }
+        public int CostId { get; set; }
+        public Cost? Cost{ get; set; }
     }
 }

@@ -14,7 +14,7 @@ namespace comaiz.Services
                 .AsEnumerable().Select(row =>
                     new Contract
                     {
-                        ChargeType = ChargeType.TimeAndMaterials,
+                        //ChargeType = ChargeType.TimeAndMaterials,
                         Description = row["Name"] as string,
                         // Convert the hourly rate from a double to a decimal
                         Rate = Convert.ToDecimal(row["HourlyRate"]),

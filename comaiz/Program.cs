@@ -34,7 +34,7 @@ using (var scope = app.Services.CreateScope())
 
     var context = services.GetRequiredService<ComaizContext>();
     context.Database.EnsureCreated();
-    DbInitializer.ImportFromExcel(context);
+    //DbInitializer.ImportFromExcel(context);
     var excelReader = services.GetRequiredService<ExcelAccountsReader>();
 
 }

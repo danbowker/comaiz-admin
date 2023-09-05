@@ -6,20 +6,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace comaiz.Pages.WorkRecords
 {
-    public class ContractWorkerNamePageViewModel : PageModel
+    public class CostWorkerNamePageViewModel : PageModel
     {
-        public SelectList? ContractNameSelectList { get; set; }
+        public SelectList? CostsNameSelectList { get; set; }
         public SelectList? WorkerNameSelectList { get; set; }
 
-        public void PopulateContractNameSelectList(ComaizContext context, object? selectedContract = null)
+        public void PopulateCostNameSelectList(ComaizContext context, object? selectedContract = null)
         {
-            if (context.Contracts != null)
+            if (context.Costs != null)
             {
-                var contractQuery = context.Contracts.OrderBy(c => c.Id);
+                var costsQuery = context.Costs.OrderBy(c => c.Id);
 
-                ContractNameSelectList = new SelectList(contractQuery.AsNoTracking(),
-                    nameof(Contract.Id),
-                    nameof(Contract.Description),
+                CostsNameSelectList = new SelectList(costsQuery.AsNoTracking(),
+                    nameof(Cost.Id),
+                    nameof(Cost.Name),
                     selectedContract);
             }
         }

@@ -3,7 +3,7 @@ using comaiz.Models;
 
 namespace comaiz.Pages.WorkRecords
 {
-    public class CreateModel : ContractWorkerNamePageViewModel
+    public class CreateModel : CostWorkerNamePageViewModel
     {
         private readonly Data.ComaizContext _context;
 
@@ -14,7 +14,7 @@ namespace comaiz.Pages.WorkRecords
 
         public IActionResult OnGet()
         {
-            PopulateContractNameSelectList(_context);
+            PopulateCostNameSelectList(_context);
             PopulateWorkerNameSelectList(_context);
             return Page();
         }
@@ -28,7 +28,7 @@ namespace comaiz.Pages.WorkRecords
         {
           if (!ModelState.IsValid || _context.WorkRecords == null)
           {
-              PopulateContractNameSelectList(_context, WorkRecord.ContractId);
+              PopulateCostNameSelectList(_context, WorkRecord.CostId);
               PopulateWorkerNameSelectList(_context, WorkRecord.WorkerId);
               return Page();
           }

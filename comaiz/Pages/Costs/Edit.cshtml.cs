@@ -1,36 +1,42 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using comaiz.Data;
 using comaiz.Models;
 
-namespace comaiz.Pages.WorkRecords
+namespace comaiz.Pages.Costs
 {
-    public class EditModel : CostWorkerNamePageViewModel
+    public class EditModel : ContractNamePageModel
     {
-        private readonly Data.ComaizContext _context;
+        private readonly comaiz.Data.ComaizContext _context;
 
-        public EditModel(Data.ComaizContext context)
+        public EditModel(comaiz.Data.ComaizContext context)
         {
             _context = context;
         }
 
         [BindProperty]
-        public WorkRecord WorkRecord { get; set; } = default!;
+        public Cost Cost { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.WorkRecords == null)
+            if (id == null || _context.Costs == null)
             {
                 return NotFound();
             }
 
-            var workrecord =  await _context.WorkRecords.FirstOrDefaultAsync(m => m.Id == id);
-            if (workrecord == null)
+            var cost =  await _context.Costs.FirstOrDefaultAsync(m => m.Id == id);
+            if (cost == null)
             {
                 return NotFound();
             }
-            WorkRecord = workrecord;
-            PopulateCostNameSelectList(_context, workrecord.CostId);
-            PopulateWorkerNameSelectList(_context, workrecord.WorkerId);
+            Cost = cost;
+            PopulateContractNameSelectList(_context);
             return Page();
         }
 
@@ -43,7 +49,7 @@ namespace comaiz.Pages.WorkRecords
                 return Page();
             }
 
-            _context.Attach(WorkRecord).State = EntityState.Modified;
+            _context.Attach(Cost).State = EntityState.Modified;
 
             try
             {
@@ -51,7 +57,7 @@ namespace comaiz.Pages.WorkRecords
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!WorkRecordExists(WorkRecord.Id))
+                if (!CostExists(Cost.Id))
                 {
                     return NotFound();
                 }
@@ -64,9 +70,9 @@ namespace comaiz.Pages.WorkRecords
             return RedirectToPage("./Index");
         }
 
-        private bool WorkRecordExists(int id)
+        private bool CostExists(int id)
         {
-          return (_context.WorkRecords?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Costs?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

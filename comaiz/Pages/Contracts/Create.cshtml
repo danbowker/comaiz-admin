@@ -38,12 +38,6 @@
                 <span asp-validation-for="Contract.Price" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Contract.ChargeType" class="control-label"></label>
-                <select asp-for="Contract.ChargeType"
-                        asp-items="Html.GetEnumSelectList<ChargeType>()" class="form-control"></select>
-                <span asp-validation-for="Contract.ChargeType" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>

@@ -20,6 +20,8 @@ namespace comaiz.Data
 
         public DbSet<comaiz.Models.Worker>? Workers { get; set; }
 
+        public DbSet<comaiz.Models.Cost>? Costs { get; set; }
+
         public DbSet<comaiz.Models.WorkRecord>? WorkRecords { get; set; }
 
         public DbSet<comaiz.Models.ContractRate>? ContractRates { get; set; }

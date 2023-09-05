@@ -15,9 +15,9 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="WorkRecord.Id" />
             <div class="form-group">
-                <label asp-for="WorkRecord.Contract" class="control-label"></label>
-                <select asp-for="WorkRecord.ContractId"
-                        asp-items="@Model.ContractNameSelectList">
+                <label asp-for="WorkRecord.Cost" class="control-label"></label>
+                <select asp-for="WorkRecord.CostId"
+                        asp-items="@Model.CostsNameSelectList">
                     <option value="">-- Select Contract --</option>
                 </select>
             </div>

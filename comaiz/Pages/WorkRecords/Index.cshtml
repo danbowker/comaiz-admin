@@ -17,7 +17,7 @@
                 @Html.DisplayNameFor(model => model.WorkRecord[0].Hours)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.WorkRecord[0].Contract!.Description)
+                @Html.DisplayNameFor(model => model.WorkRecord[0].Cost!.Name)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.WorkRecord[0].Worker!.Name)
@@ -32,7 +32,7 @@
                 @Html.DisplayFor(modelItem => item.Hours)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Contract!.Description)
+                @Html.DisplayFor(modelItem => item.Cost!.Name)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Worker!.Name)

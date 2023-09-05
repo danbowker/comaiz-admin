@@ -21,7 +21,7 @@ namespace comaiz.Data
             context.SaveChanges();
 
             if (context.Contracts != null)
-                context.Contracts.Add(new Contract { ChargeType = ChargeType.Fixed, Client = hta });
+                context.Contracts.Add(new Contract { Client = hta });
             context.SaveChanges();
         }
 
