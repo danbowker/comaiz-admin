@@ -14,17 +14,14 @@ namespace comaiz.Data
         {
         }
 
-        public DbSet<comaiz.Models.Client> Clients { get; set; } = default!;
-
-        public DbSet<comaiz.Models.Contract>? Contracts { get; set; }
-
-        public DbSet<comaiz.Models.Worker>? Workers { get; set; }
-
-        public DbSet<comaiz.Models.Cost>? Costs { get; set; }
-
-        public DbSet<comaiz.Models.WorkRecord>? WorkRecords { get; set; }
-
-        public DbSet<comaiz.Models.ContractRate>? ContractRates { get; set; }
+        public DbSet<Client> Clients { get; set; } = default!;
+        public DbSet<Contract>? Contracts { get; set; }
+        public DbSet<Worker>? Workers { get; set; }
+        public DbSet<Cost>? Costs { get; set; }
+        public DbSet<WorkRecord>? WorkRecords { get; set; }
+        public DbSet<ContractRate>? ContractRates { get; set; }
+        public DbSet<Invoice>? Invoices { get; set; }
+        public DbSet<InvoiceItem>? InvoiceItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

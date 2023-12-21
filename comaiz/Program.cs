@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<ComaizContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("comaizContext") ?? throw new InvalidOperationException("Connection string 'comaizContext' not found.")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("comaizContext") ?? throw new InvalidOperationException("Connection string 'comaizContext' not found."), x => x.UseDateOnlyTimeOnly()));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddSingleton<ExcelAccountsReader>();
@@ -36,7 +36,6 @@ using (var scope = app.Services.CreateScope())
     context.Database.EnsureCreated();
     //DbInitializer.ImportFromExcel(context);
     var excelReader = services.GetRequiredService<ExcelAccountsReader>();
-
 }
 
 app.UseStaticFiles();
