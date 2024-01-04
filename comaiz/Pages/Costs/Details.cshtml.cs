@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using comaiz.data;
+using comaiz.data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using comaiz.Data;
-using comaiz.Models;
 
 namespace comaiz.Pages.Costs
 {
     public class DetailsModel : PageModel
     {
-        private readonly comaiz.Data.ComaizContext _context;
+        private readonly ComaizContext _context;
 
-        public DetailsModel(comaiz.Data.ComaizContext context)
+        public DetailsModel(ComaizContext context)
         {
             _context = context;
         }

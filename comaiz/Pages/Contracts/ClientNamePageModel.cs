@@ -1,5 +1,5 @@
-﻿using comaiz.Data;
-using comaiz.Models;
+﻿using comaiz.data;
+using comaiz.data.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;

@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using comaiz.data;
+using comaiz.data.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using comaiz.Models;
 
 namespace comaiz.Pages.WorkRecords
 {
     public class EditModel : CostWorkerNamePageViewModel
     {
-        private readonly Data.ComaizContext _context;
+        private readonly ComaizContext _context;
 
-        public EditModel(Data.ComaizContext context)
+        public EditModel(ComaizContext context)
         {
             _context = context;
         }

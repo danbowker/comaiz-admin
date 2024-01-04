@@ -1,8 +1,8 @@
 ﻿using System.Data;
-using comaiz.Models;
+using comaiz.data.Models;
 using ExcelDataReader;
 
-namespace comaiz.Services
+namespace comaiz.data.Services
 {
     public class ExcelAccountsReader
     {

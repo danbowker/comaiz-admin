@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using comaiz.Data;
-using comaiz.Services;
+﻿using comaiz.data;
+using comaiz.data.Services;
+using Microsoft.EntityFrameworkCore;
 
 // Required for ExcelDataReader
 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);

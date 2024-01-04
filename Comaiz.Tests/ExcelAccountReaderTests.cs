@@ -1,5 +1,4 @@
-using comaiz.Data;
-using comaiz.Services;
+using comaiz.data.Services;
 
 namespace Comaiz.Tests
 {

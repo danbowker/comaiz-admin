@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using comaiz.data;
+using comaiz.data.Models;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using comaiz.Models;
 
 namespace comaiz.Pages.WorkRecords
 {
     public class IndexModel : PageModel
     {
-        private readonly Data.ComaizContext _context;
+        private readonly ComaizContext _context;
 
-        public IndexModel(Data.ComaizContext context)
+        public IndexModel(ComaizContext context)
         {
             _context = context;
         }

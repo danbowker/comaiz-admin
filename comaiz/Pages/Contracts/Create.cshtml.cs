@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using comaiz.Models;
+﻿using comaiz.data;
+using comaiz.data.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace comaiz.Pages.Contracts
 {
     public class CreateModel : ClientNamePageModel
     {
-        private readonly Data.ComaizContext _context;
+        private readonly ComaizContext _context;
 
-        public CreateModel(Data.ComaizContext context)
+        public CreateModel(ComaizContext context)
         {
             _context = context;
         }

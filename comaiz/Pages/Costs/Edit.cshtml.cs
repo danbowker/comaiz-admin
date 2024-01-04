@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using comaiz.data;
+using comaiz.data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using comaiz.Data;
-using comaiz.Models;
 
 namespace comaiz.Pages.Costs
 {
     public class EditModel : ContractNamePageModel
     {
-        private readonly comaiz.Data.ComaizContext _context;
+        private readonly ComaizContext _context;
 
-        public EditModel(comaiz.Data.ComaizContext context)
+        public EditModel(ComaizContext context)
         {
             _context = context;
         }

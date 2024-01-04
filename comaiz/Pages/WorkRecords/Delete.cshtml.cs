@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using comaiz.data;
+using comaiz.data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using comaiz.Data;
-using comaiz.Models;
 
 namespace comaiz.Pages.WorkRecords
 {
     public class DeleteModel : PageModel
     {
-        private readonly comaiz.Data.ComaizContext _context;
+        private readonly ComaizContext _context;
 
-        public DeleteModel(comaiz.Data.ComaizContext context)
+        public DeleteModel(ComaizContext context)
         {
             _context = context;
         }

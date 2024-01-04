@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using comaiz.Data;
-using comaiz.Models;
+using comaiz.data.Models;
+using comaiz.data;
 
 namespace comaiz.Pages.Clients
 {
     public class IndexModel : PageModel
     {
-        private readonly comaiz.Data.ComaizContext _context;
+        private readonly ComaizContext _context;
 
-        public IndexModel(comaiz.Data.ComaizContext context)
+        public IndexModel(ComaizContext context)
         {
             _context = context;
         }

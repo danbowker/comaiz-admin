@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using comaiz.Models;
+﻿using comaiz.data;
+using comaiz.data.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace comaiz.Pages.Costs
 {
     public class CreateModel : ContractNamePageModel
     {
-        private readonly comaiz.Data.ComaizContext _context;
+        private readonly ComaizContext _context;
 
-        public CreateModel(comaiz.Data.ComaizContext context)
+        public CreateModel(ComaizContext context)
         {
             _context = context;
         }

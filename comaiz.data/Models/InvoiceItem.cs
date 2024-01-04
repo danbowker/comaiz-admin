@@ -1,4 +1,4 @@
-﻿namespace comaiz.Models
+﻿namespace comaiz.data.Models
 {
     public class InvoiceItem
     {

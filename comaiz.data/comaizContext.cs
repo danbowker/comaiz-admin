@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using comaiz.data.Models;
 using Microsoft.EntityFrameworkCore;
-using comaiz.Models;
 
-namespace comaiz.Data
+namespace comaiz.data
 {
     public class ComaizContext : DbContext
     {
-        public ComaizContext (DbContextOptions<ComaizContext> options)
+        public ComaizContext(DbContextOptions<ComaizContext> options)
             : base(options)
         {
         }
 
-        public DbSet<Client> Clients { get; set; } = default!;
+        public DbSet<Client>? Clients { get; set; } = default!;
         public DbSet<Contract>? Contracts { get; set; }
         public DbSet<Worker>? Workers { get; set; }
         public DbSet<Cost>? Costs { get; set; }
