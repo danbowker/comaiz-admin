@@ -1,6 +1,6 @@
 using comaiz.data.Services;
 
-namespace Comaiz.Tests
+namespace comaiz.tests
 {
     public class ExcelAccountReaderTests
     {

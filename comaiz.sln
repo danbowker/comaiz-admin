@@ -5,7 +5,7 @@ VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "comaiz", "comaiz\comaiz.csproj", "{CF66ADB7-DFFC-46A9-9922-6BC12F8FCAC8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Comaiz.Tests", "Comaiz.Tests\Comaiz.Tests.csproj", "{62BDA058-D224-48C0-90BF-B2FBE7ED556A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "comaiz.tests", "comaiz.tests\comaiz.tests.csproj", "{62BDA058-D224-48C0-90BF-B2FBE7ED556A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "comaiz.data", "comaiz.data\comaiz.data.csproj", "{DC4B7517-A2D8-483F-B68B-483A14F3F6C6}"
 EndProject
