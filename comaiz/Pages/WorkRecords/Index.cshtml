@@ -1,0 +1,47 @@
+﻿@page
+@model comaiz.Pages.WorkRecords.IndexModel
+
+@{
+    ViewData["Title"] = "WorkRecords";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkRecord[0].Hours)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkRecord[0].Cost!.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkRecord[0].Worker!.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.WorkRecord) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Hours)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cost!.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Worker!.Name)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
