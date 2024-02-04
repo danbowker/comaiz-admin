@@ -25,8 +25,13 @@ namespace comaiz.data
             modelBuilder.Entity<Client>().ToTable("Client");
             modelBuilder.Entity<Contract>().ToTable("Contract");
             modelBuilder.Entity<Worker>().ToTable("Worker");
+            modelBuilder.Entity<FixedCost>().ToTable("FixedCost");
+            modelBuilder.Entity<CarJourney>().ToTable("CarJourney");
             modelBuilder.Entity<WorkRecord>().ToTable("WorkRecord");
             modelBuilder.Entity<ContractRate>().ToTable("ContractRate");
+            modelBuilder.Entity<Invoice>().ToTable("Invoice");
+            modelBuilder.Entity<InvoiceItem>().ToTable("InvoiceItem");
+            modelBuilder.Ignore<Cost>();
         }
     }
 }
