@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace comaiz.Pages.Costs
+namespace comaiz.Pages.FixedCosts
 {
     public class ContractNamePageModel : PageModel
     {

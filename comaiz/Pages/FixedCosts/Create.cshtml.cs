@@ -2,7 +2,7 @@
 using comaiz.data.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace comaiz.Pages.Costs
+namespace comaiz.Pages.FixedCosts
 {
     public class CreateModel : ContractNamePageModel
     {
@@ -20,19 +20,19 @@ namespace comaiz.Pages.Costs
         }
 
         [BindProperty]
-        public Cost Cost { get; set; } = default!;
+        public FixedCost FixedCost { get; set; } = default!;
         
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid || _context.Costs == null)
+            if (!ModelState.IsValid || _context.FixedCosts == null)
             {
-                PopulateContractNameSelectList(_context, Cost.ContractId);
+                PopulateContractNameSelectList(_context, FixedCost.ContractId);
                 return Page();
             }
 
-            _context.Costs.Add(Cost);
+            _context.FixedCosts.Add(FixedCost);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

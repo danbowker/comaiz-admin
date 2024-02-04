@@ -21,7 +21,6 @@ namespace comaiz.Pages.WorkRecords
             if (_context.WorkRecords != null)
             {
                 WorkRecord = await _context.WorkRecords
-                    .Include(w => w.Cost)
                     .Include(w => w.Worker)
                     .ToListAsync();
             }

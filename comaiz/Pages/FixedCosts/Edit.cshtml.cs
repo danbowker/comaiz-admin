@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using comaiz.data;
+﻿using comaiz.data;
 using comaiz.data.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace comaiz.Pages.Costs
+namespace comaiz.Pages.FixedCosts
 {
     public class EditModel : ContractNamePageModel
     {
@@ -21,21 +15,21 @@ namespace comaiz.Pages.Costs
         }
 
         [BindProperty]
-        public Cost Cost { get; set; } = default!;
+        public FixedCost FixedCost { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Costs == null)
+            if (id == null || _context.FixedCosts == null)
             {
                 return NotFound();
             }
 
-            var cost =  await _context.Costs.FirstOrDefaultAsync(m => m.Id == id);
-            if (cost == null)
+            var fixedCost =  await _context.FixedCosts.FirstOrDefaultAsync(m => m.Id == id);
+            if (fixedCost == null)
             {
                 return NotFound();
             }
-            Cost = cost;
+            FixedCost = fixedCost;
             PopulateContractNameSelectList(_context);
             return Page();
         }
@@ -49,7 +43,7 @@ namespace comaiz.Pages.Costs
                 return Page();
             }
 
-            _context.Attach(Cost).State = EntityState.Modified;
+            _context.Attach(FixedCost).State = EntityState.Modified;
 
             try
             {
@@ -57,7 +51,7 @@ namespace comaiz.Pages.Costs
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CostExists(Cost.Id))
+                if (!CostExists(FixedCost.Id))
                 {
                     return NotFound();
                 }
@@ -72,7 +66,7 @@ namespace comaiz.Pages.Costs
 
         private bool CostExists(int id)
         {
-          return (_context.Costs?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.FixedCosts?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

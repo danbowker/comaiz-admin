@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
-namespace comaiz.Pages.Costs
+namespace comaiz.Pages.FixedCosts
 {
     public class DeleteModel : PageModel
     {
@@ -20,40 +20,40 @@ namespace comaiz.Pages.Costs
         }
 
         [BindProperty]
-      public Cost Cost { get; set; } = default!;
+      public FixedCost FixedCost { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Costs == null)
+            if (id == null || _context.FixedCosts == null)
             {
                 return NotFound();
             }
 
-            var cost = await _context.Costs.FirstOrDefaultAsync(m => m.Id == id);
+            var fixedCost = await _context.FixedCosts.FirstOrDefaultAsync(m => m.Id == id);
 
-            if (cost == null)
+            if (fixedCost == null)
             {
                 return NotFound();
             }
             else 
             {
-                Cost = cost;
+                FixedCost = fixedCost;
             }
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(int? id)
         {
-            if (id == null || _context.Costs == null)
+            if (id == null || _context.FixedCosts == null)
             {
                 return NotFound();
             }
-            var cost = await _context.Costs.FindAsync(id);
+            var fixedCost = await _context.FixedCosts.FindAsync(id);
 
-            if (cost != null)
+            if (fixedCost != null)
             {
-                Cost = cost;
-                _context.Costs.Remove(Cost);
+                FixedCost = fixedCost;
+                _context.FixedCosts.Remove(fixedCost);
                 await _context.SaveChangesAsync();
             }
 

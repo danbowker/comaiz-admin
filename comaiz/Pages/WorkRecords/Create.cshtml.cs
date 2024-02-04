@@ -15,7 +15,7 @@ namespace comaiz.Pages.WorkRecords
 
         public IActionResult OnGet()
         {
-            PopulateCostNameSelectList(_context);
+            //PopulateCostNameSelectList(_context);
             PopulateWorkerNameSelectList(_context);
             return Page();
         }
@@ -29,7 +29,6 @@ namespace comaiz.Pages.WorkRecords
         {
           if (!ModelState.IsValid || _context.WorkRecords == null)
           {
-              PopulateCostNameSelectList(_context, WorkRecord.CostId);
               PopulateWorkerNameSelectList(_context, WorkRecord.WorkerId);
               return Page();
           }

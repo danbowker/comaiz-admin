@@ -5,12 +5,20 @@
         public int Id { get; set; }
         public int ContractId { get; set; }
         public Contract? Contract { get; set; }
-        public string? Name { get; set; }
-        public ChargeType ChargeType { get; set; }
+        public int ? InvoiceItemId { get; set; }
     }
-    public enum ChargeType
+
+    public class FixedCost : Cost
     {
-        Fixed = 0,
-        TimeAndMaterials = 1,
+        public string? Name { get; set; }
+        public decimal? Amount { get; set; }
+    }
+
+    public class CarJourney : Cost
+    {
+        public DateOnly? Date { get; set; }
+        public string? Description { get; set; }
+        public decimal? Miles { get; set; }
+        public decimal? Rate { get; set; }
     }
 }
