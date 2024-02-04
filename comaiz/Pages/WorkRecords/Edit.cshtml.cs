@@ -30,7 +30,6 @@ namespace comaiz.Pages.WorkRecords
                 return NotFound();
             }
             WorkRecord = workrecord;
-            PopulateCostNameSelectList(_context, workrecord.CostId);
             PopulateWorkerNameSelectList(_context, workrecord.WorkerId);
             return Page();
         }

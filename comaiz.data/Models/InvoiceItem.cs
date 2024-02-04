@@ -1,5 +1,6 @@
 ﻿namespace comaiz.data.Models
 {
+    // Can either be a cost or quantity, unit and rate
     public class InvoiceItem
     {
         public int Id { get; set; }

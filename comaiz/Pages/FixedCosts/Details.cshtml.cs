@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using comaiz.data;
+﻿using comaiz.data;
 using comaiz.data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
-namespace comaiz.Pages.Costs
+namespace comaiz.Pages.FixedCosts
 {
     public class DetailsModel : PageModel
     {
@@ -19,23 +15,23 @@ namespace comaiz.Pages.Costs
             _context = context;
         }
 
-      public Cost Cost { get; set; } = default!; 
+      public FixedCost FixedCost { get; set; } = default!; 
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Costs == null)
+            if (id == null || _context.FixedCosts == null)
             {
                 return NotFound();
             }
 
-            var cost = await _context.Costs.FirstOrDefaultAsync(m => m.Id == id);
+            var cost = await _context.FixedCosts.FirstOrDefaultAsync(m => m.Id == id);
             if (cost == null)
             {
                 return NotFound();
             }
             else 
             {
-                Cost = cost;
+                FixedCost = cost;
             }
             return Page();
         }

@@ -11,18 +11,18 @@ namespace comaiz.Pages.WorkRecords
         public SelectList? CostsNameSelectList { get; set; }
         public SelectList? WorkerNameSelectList { get; set; }
 
-        public void PopulateCostNameSelectList(ComaizContext context, object? selectedContract = null)
-        {
-            if (context.Costs != null)
-            {
-                var costsQuery = context.Costs.OrderBy(c => c.Id);
+        //public void PopulateCostNameSelectList(ComaizContext context, object? selectedContract = null)
+        //{
+        //    if (context.FixedCosts != null)
+        //    {
+        //        var costsQuery = context.FixedCosts.OrderBy(c => c.Id);
 
-                CostsNameSelectList = new SelectList(costsQuery.AsNoTracking(),
-                    nameof(Cost.Id),
-                    nameof(Cost.Name),
-                    selectedContract);
-            }
-        }
+        //        CostsNameSelectList = new SelectList(costsQuery.AsNoTracking(),
+        //            nameof(Cost.Id),
+        //            nameof(Cost.Name),
+        //            selectedContract);
+        //    }
+        //}
 
         public void PopulateWorkerNameSelectList(ComaizContext context, object? selectedWorker = null)
         {

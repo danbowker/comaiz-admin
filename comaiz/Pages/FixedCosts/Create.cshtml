@@ -1,7 +1,7 @@
 ﻿@page
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using comaiz.data.Models
-@model comaiz.Pages.Costs.CreateModel
+@model comaiz.Pages.FixedCosts.CreateModel
 
 @{
     ViewData["Title"] = "Create";
@@ -9,29 +9,24 @@
 
 <h1>Create</h1>
 
-<h4>Cost</h4>
+<h4>FixedCost</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Cost.Contract" class="control-label"></label>
-                <select asp-for="Cost.ContractId" class="form-control"
+                <label asp-for="FixedCost.Contract" class="control-label"></label>
+                <select asp-for="FixedCost.ContractId" class="form-control"
                         asp-items="@Model.ContractsNameSelectList">
                     <option value="">-- Select Client --</option>
                 </select>
-                <span asp-validation-for="Cost.ContractId" class="text-danger" />
+                <span asp-validation-for="FixedCost.ContractId" class="text-danger" />
             </div>
             <div class="form-group">
-                <label asp-for="Cost.Name" class="control-label"></label>
-                <input asp-for="Cost.Name" class="form-control" />
-                <span asp-validation-for="Cost.Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Cost.ChargeType" class="control-label"></label>
-                <select asp-for="Cost.ChargeType" asp-items="Html.GetEnumSelectList<ChargeType>()" class="form-control"></select>
-                <span asp-validation-for="Cost.ChargeType" class="text-danger"></span>
+                <label asp-for="FixedCost.Name" class="control-label"></label>
+                <input asp-for="FixedCost.Name" class="form-control" />
+                <span asp-validation-for="FixedCost.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

@@ -12,9 +12,9 @@ namespace comaiz.Pages.Contracts
 
         public void PopulateClientNameSelectList(ComaizContext context, object? selectedClient = null)
         {
-            var clientQuery = context.Clients.OrderBy(c => c.Name);
+            var clientQuery = context?.Clients?.OrderBy(c => c.Name);
 
-            ClientNameSelectList = new SelectList(clientQuery.AsNoTracking(),
+            ClientNameSelectList = new SelectList(clientQuery?.AsNoTracking(),
                 nameof(Client.Id),
                 nameof(Client.ShortName),
                 selectedClient);

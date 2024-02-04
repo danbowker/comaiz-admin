@@ -26,7 +26,7 @@ namespace comaiz.tests
         {
             var excelReader = new ExcelAccountsReader();
             excelReader.Load(@"C:\Users\danbo\Google Drive\Misc\Comaiz\Accounts.xlsx");
-            Assert.True(excelReader.GetContracts().All(c => c.Rate > 0));
+            Assert.True(excelReader.GetContracts().All(c => c?.ContractRates?.First().Rate > 0));
         }
     }
 }

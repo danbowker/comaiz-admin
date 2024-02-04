@@ -13,7 +13,8 @@ namespace comaiz.data
         public DbSet<Client>? Clients { get; set; } = default!;
         public DbSet<Contract>? Contracts { get; set; }
         public DbSet<Worker>? Workers { get; set; }
-        public DbSet<Cost>? Costs { get; set; }
+        public DbSet<FixedCost>? FixedCosts { get; set; }
+        public DbSet<CarJourney>? CarJourneys { get; set; }
         public DbSet<WorkRecord>? WorkRecords { get; set; }
         public DbSet<ContractRate>? ContractRates { get; set; }
         public DbSet<Invoice>? Invoices { get; set; }

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using comaiz.data;
+﻿using comaiz.data;
 using comaiz.data.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
-namespace comaiz.Pages.Costs
+namespace comaiz.Pages.FixedCosts
 {
     public class IndexModel : PageModel
     {
@@ -19,13 +14,13 @@ namespace comaiz.Pages.Costs
             _context = context;
         }
 
-        public IList<Cost> Cost { get;set; } = default!;
+        public IList<FixedCost> FixedCosts { get;set; } = default!;
 
         public async Task OnGetAsync()
         {
-            if (_context.Costs != null)
+            if (_context.FixedCosts != null)
             {
-                Cost = await _context.Costs.ToListAsync();
+                FixedCosts = await _context.FixedCosts.ToListAsync();
             }
         }
     }
