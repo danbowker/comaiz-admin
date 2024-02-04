@@ -1,6 +1,8 @@
-﻿namespace comaiz.data.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace comaiz.data.Models
 {
-    public class Cost
+    public abstract class Cost
     {
         public int Id { get; set; }
         public int ContractId { get; set; }

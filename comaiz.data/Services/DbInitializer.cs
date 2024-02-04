@@ -6,7 +6,6 @@ namespace comaiz.data.Services
     {
         public static void Initialize(ComaizContext context)
         {
-            context.Database.EnsureCreated();
             // Look for any clients.
             if (context.Clients?.Any() ?? false)
             {
