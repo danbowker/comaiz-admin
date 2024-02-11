@@ -24,7 +24,8 @@ namespace comaiz.Pages.FixedCosts
                 return NotFound();
             }
 
-            var cost = await _context.FixedCosts.FirstOrDefaultAsync(m => m.Id == id);
+            var cost = await _context.FixedCosts.Include(c => c.Contract)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (cost == null)
             {
                 return NotFound();

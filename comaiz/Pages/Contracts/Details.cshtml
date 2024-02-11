@@ -18,6 +18,24 @@
             @Html.DisplayFor(model => model.Contract.Description)
         </dd>
         <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Contract.Client)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Contract.Client!.ShortName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Contract.Schedule)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Contract.Schedule)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Contract.ChargeType)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Contract.ChargeType)
+        </dd>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Contract.Price)
         </dt>
         <dd class="col-sm-10">

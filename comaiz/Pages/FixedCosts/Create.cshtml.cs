@@ -1,5 +1,6 @@
 ﻿using comaiz.data;
 using comaiz.data.Models;
+using comaiz.Pages.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace comaiz.Pages.FixedCosts

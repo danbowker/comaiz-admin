@@ -21,7 +21,31 @@
                         asp-items="@Model.WorkerNameSelectList">
                     <option value="">-- Select Worker --</option>
                 </select>
-            </div>           
+            </div>
+            <div class="form-group">
+                <label asp-for="WorkRecord.Contract" class="control-label"></label>
+<select asp-for="WorkRecord.ContractId"
+        asp-items="@Model.ContractsNameSelectList">
+    <option value="">-- Select Contract --</option>
+</select>
+</div>
+            <div class="form-group">
+                <label asp-for="WorkRecord.ContractRate" class="control-label"></label>
+                <select asp-for="WorkRecord.ContractRateId"
+                        asp-items="@Model.RateSelectList">
+                    <option value="">-- Select Rate --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="WorkRecord.StartDate" class="control-label"></label>
+                <input asp-for="WorkRecord.StartDate" class="form-control" />
+                <span asp-validation-for="WorkRecord.StartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WorkRecord.EndDate" class="control-label"></label>
+                <input asp-for="WorkRecord.EndDate" class="form-control" />
+<span asp-validation-for="WorkRecord.EndDate" class="text-danger"></span>
+</div>
             <div class="form-group">
                 <label asp-for="WorkRecord.Hours" class="control-label"></label>
                 <input asp-for="WorkRecord.Hours" class="form-control" />

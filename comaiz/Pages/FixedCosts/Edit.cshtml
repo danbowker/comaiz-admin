@@ -15,14 +15,22 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="FixedCost.Id" />
             <div class="form-group">
-                <label asp-for="FixedCost.ContractId" class="control-label"></label>
-                <select asp-for="FixedCost.ContractId" class="form-control" asp-items="ViewBag.ContractId"></select>
-                <span asp-validation-for="FixedCost.ContractId" class="text-danger"></span>
+                <label asp-for="FixedCost.Contract" class="control-label"></label>
+                <select asp-for="FixedCost.ContractId" class="form-control"
+                        asp-items="@Model.ContractsNameSelectList">
+                    <option value="">-- Select ClientContract --</option>
+                </select>
+                <span asp-validation-for="FixedCost.ContractId" class="text-danger" />
             </div>
             <div class="form-group">
                 <label asp-for="FixedCost.Name" class="control-label"></label>
                 <input asp-for="FixedCost.Name" class="form-control" />
                 <span asp-validation-for="FixedCost.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FixedCost.Amount" class="control-label"></label>
+                <input asp-for="FixedCost.Amount" class="form-control" />
+                <span asp-validation-for="FixedCost.Amount" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

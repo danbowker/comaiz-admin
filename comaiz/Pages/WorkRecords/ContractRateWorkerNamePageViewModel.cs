@@ -1,28 +1,30 @@
 ﻿using comaiz.data;
 using comaiz.data.Models;
+using comaiz.Pages.FixedCosts;
+using comaiz.Pages.Shared;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace comaiz.Pages.WorkRecords
 {
-    public class CostWorkerNamePageViewModel : PageModel
+    public class ContractRateWorkerNamePageViewModel : ContractNamePageModel
     {
-        public SelectList? CostsNameSelectList { get; set; }
+        public SelectList? RateSelectList { get; set; }
         public SelectList? WorkerNameSelectList { get; set; }
 
-        //public void PopulateCostNameSelectList(ComaizContext context, object? selectedContract = null)
-        //{
-        //    if (context.FixedCosts != null)
-        //    {
-        //        var costsQuery = context.FixedCosts.OrderBy(c => c.Id);
+        public void PopulateRateSelectList(ComaizContext context, object? selectedRate = null)
+        {
+            if (context.ContractRates != null)
+            {
+                var rateQuery = context.ContractRates.OrderBy(c => c.Contract);
 
-        //        CostsNameSelectList = new SelectList(costsQuery.AsNoTracking(),
-        //            nameof(Cost.Id),
-        //            nameof(Cost.Name),
-        //            selectedContract);
-        //    }
-        //}
+                RateSelectList = new SelectList(rateQuery.AsNoTracking(),
+                    nameof(ContractRate.Id),
+                    nameof(ContractRate.Rate),
+                    selectedRate);
+            }
+        }
 
         public void PopulateWorkerNameSelectList(ComaizContext context, object? selectedWorker = null)
         {

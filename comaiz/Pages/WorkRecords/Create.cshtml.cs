@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace comaiz.Pages.WorkRecords
 {
-    public class CreateModel : CostWorkerNamePageViewModel
+    public class CreateModel : ContractRateWorkerNamePageViewModel
     {
         private readonly ComaizContext _context;
 
@@ -15,7 +15,8 @@ namespace comaiz.Pages.WorkRecords
 
         public IActionResult OnGet()
         {
-            //PopulateCostNameSelectList(_context);
+            PopulateContractNameSelectList(_context);
+            PopulateRateSelectList(_context);
             PopulateWorkerNameSelectList(_context);
             return Page();
         }

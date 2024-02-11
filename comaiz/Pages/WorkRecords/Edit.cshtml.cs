@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace comaiz.Pages.WorkRecords
 {
-    public class EditModel : CostWorkerNamePageViewModel
+    public class EditModel : ContractRateWorkerNamePageViewModel
     {
         private readonly ComaizContext _context;
 

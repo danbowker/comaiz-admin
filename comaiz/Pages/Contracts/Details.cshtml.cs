@@ -28,7 +28,9 @@ namespace comaiz.Pages.Contracts
                 return NotFound();
             }
 
-            var contract = await _context.Contracts.FirstOrDefaultAsync(m => m.Id == id);
+            var contract = await _context.Contracts
+                .Include(c => c.Client)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (contract == null)
             {
                 return NotFound();
