@@ -20,7 +20,7 @@ namespace comaiz.Pages.FixedCosts
         {
             if (_context.FixedCosts != null)
             {
-                FixedCosts = await _context.FixedCosts.ToListAsync();
+                FixedCosts = await _context.FixedCosts.Include(c => c.Contract).ToListAsync();
             }
         }
     }

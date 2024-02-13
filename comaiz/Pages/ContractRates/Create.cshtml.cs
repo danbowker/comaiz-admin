@@ -3,9 +3,9 @@ using comaiz.data.Models;
 using comaiz.Pages.Shared;
 using Microsoft.AspNetCore.Mvc;
 
-namespace comaiz.Pages.Contracts
+namespace comaiz.Pages.ContractRates
 {
-    public class CreateModel : ClientNamePageModel
+    public class CreateModel : ContractNamePageModel
     {
         private readonly ComaizContext _context;
 
@@ -16,24 +16,24 @@ namespace comaiz.Pages.Contracts
 
         public IActionResult OnGet()
         {
-            PopulateClientNameSelectList(_context);
+            PopulateContractNameSelectList(_context);
             return Page();
         }
 
         [BindProperty]
-        public Contract Contract { get; set; } = default!;
+        public ContractRate ContractRate { get; set; } = default!;
         
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid || _context.Contracts == null)
+            if (!ModelState.IsValid || _context.ContractRates == null)
             {
-                PopulateClientNameSelectList(_context, Contract.ClientId);
+                PopulateContractNameSelectList(_context, ContractRate.ContractId);
                 return Page();
             }
 
-            _context.Contracts.Add(Contract);
+            _context.ContractRates.Add(ContractRate);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

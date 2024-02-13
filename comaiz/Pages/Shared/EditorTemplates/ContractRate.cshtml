@@ -1,9 +1,0 @@
-﻿@model comaiz.data.Models.ContractRate
-
-<tr>
-    <td>
-        @Html.HiddenFor(model => model.Id)
-        @Html.EditorFor(model => model.Rate)
-        @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
-    </td>
-</tr>

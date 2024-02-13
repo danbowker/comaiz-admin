@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace comaiz.Pages.Contracts
+namespace comaiz.Pages.Shared
 {
     public class ClientNamePageModel : PageModel
     {

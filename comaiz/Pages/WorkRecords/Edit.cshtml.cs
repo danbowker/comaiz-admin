@@ -31,6 +31,9 @@ namespace comaiz.Pages.WorkRecords
             }
             WorkRecord = workrecord;
             PopulateWorkerNameSelectList(_context, workrecord.WorkerId);
+            PopulateRateSelectList(_context, workrecord.ContractRateId);
+            PopulateContractNameSelectList(_context,workrecord.ContractId);
+
             return Page();
         }
 
