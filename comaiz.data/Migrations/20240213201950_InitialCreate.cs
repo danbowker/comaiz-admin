@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -15,10 +16,10 @@ namespace comaiz.data.Migrations
                 name: "Client",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ShortName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ShortName = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -29,9 +30,9 @@ namespace comaiz.data.Migrations
                 name: "Worker",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -42,13 +43,13 @@ namespace comaiz.data.Migrations
                 name: "Contract",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientId = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    Schedule = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ChargeType = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ClientId = table.Column<int>(type: "integer", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Price = table.Column<decimal>(type: "numeric", nullable: true),
+                    Schedule = table.Column<string>(type: "text", nullable: true),
+                    ChargeType = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -65,11 +66,11 @@ namespace comaiz.data.Migrations
                 name: "Invoice",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
-                    PurchaseOrder = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClientId = table.Column<int>(type: "int", nullable: false)
+                    PurchaseOrder = table.Column<string>(type: "text", nullable: true),
+                    ClientId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -86,14 +87,14 @@ namespace comaiz.data.Migrations
                 name: "CarJourney",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Date = table.Column<DateOnly>(type: "date", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Miles = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    Rate = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    ContractId = table.Column<int>(type: "int", nullable: false),
-                    InvoiceItemId = table.Column<int>(type: "int", nullable: true)
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Miles = table.Column<decimal>(type: "numeric", nullable: true),
+                    Rate = table.Column<decimal>(type: "numeric", nullable: true),
+                    ContractId = table.Column<int>(type: "integer", nullable: false),
+                    InvoiceItemId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -110,11 +111,11 @@ namespace comaiz.data.Migrations
                 name: "ContractRate",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ContractId = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Rate = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ContractId = table.Column<int>(type: "integer", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    Rate = table.Column<decimal>(type: "numeric", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -131,12 +132,12 @@ namespace comaiz.data.Migrations
                 name: "FixedCost",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    ContractId = table.Column<int>(type: "int", nullable: false),
-                    InvoiceItemId = table.Column<int>(type: "int", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: true),
+                    Amount = table.Column<decimal>(type: "numeric", nullable: true),
+                    ContractId = table.Column<int>(type: "integer", nullable: false),
+                    InvoiceItemId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -153,15 +154,15 @@ namespace comaiz.data.Migrations
                 name: "InvoiceItem",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    InvoiceId = table.Column<int>(type: "int", nullable: false),
-                    CostId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    Unit = table.Column<int>(type: "int", nullable: false),
-                    Rate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    VATRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    InvoiceId = table.Column<int>(type: "integer", nullable: false),
+                    CostId = table.Column<int>(type: "integer", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    Unit = table.Column<int>(type: "integer", nullable: false),
+                    Rate = table.Column<decimal>(type: "numeric", nullable: false),
+                    VATRate = table.Column<decimal>(type: "numeric", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -178,15 +179,15 @@ namespace comaiz.data.Migrations
                 name: "WorkRecord",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     StartDate = table.Column<DateOnly>(type: "date", nullable: false),
                     EndDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    Hours = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    WorkerId = table.Column<int>(type: "int", nullable: false),
-                    ContractRateId = table.Column<int>(type: "int", nullable: true),
-                    ContractId = table.Column<int>(type: "int", nullable: false),
-                    InvoiceItemId = table.Column<int>(type: "int", nullable: true)
+                    Hours = table.Column<decimal>(type: "numeric", nullable: false),
+                    WorkerId = table.Column<int>(type: "integer", nullable: false),
+                    ContractRateId = table.Column<int>(type: "integer", nullable: true),
+                    ContractId = table.Column<int>(type: "integer", nullable: false),
+                    InvoiceItemId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
