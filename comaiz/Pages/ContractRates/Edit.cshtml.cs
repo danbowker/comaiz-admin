@@ -10,7 +10,7 @@ using comaiz.data.Models;
 using comaiz.data;
 using comaiz.Pages.Shared;
 
-namespace comaiz.Pages.Contracts
+namespace comaiz.Pages.ContractRates
 {
     public class EditModel : ClientNamePageModel
     {
@@ -22,22 +22,22 @@ namespace comaiz.Pages.Contracts
         }
 
         [BindProperty]
-        public Contract Contract { get; set; } = default!;
+        public ContractRate ContractRate { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Contracts == null)
+            if (id == null || _context.ContractRates == null)
             {
                 return NotFound();
             }
 
-            var contract =  await _context.Contracts.Include(c => c.Client)
+            var contractrate =  await _context.ContractRates.Include(c => c.Contract)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (contract == null)
+            if (contractrate == null)
             {
                 return NotFound();
             }
-            Contract = contract;
+            ContractRate = contractrate;
             PopulateClientNameSelectList(_context);
             return Page();
         }
@@ -51,7 +51,7 @@ namespace comaiz.Pages.Contracts
                 return Page();
             }
 
-            _context.Attach(Contract).State = EntityState.Modified;
+            _context.Attach(ContractRate).State = EntityState.Modified;
 
             try
             {
@@ -59,7 +59,7 @@ namespace comaiz.Pages.Contracts
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ContractExists(Contract.Id))
+                if (!ContractExists(ContractRate.Id))
                 {
                     return NotFound();
                 }
@@ -74,7 +74,7 @@ namespace comaiz.Pages.Contracts
 
         private bool ContractExists(int id)
         {
-          return (_context.Contracts?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.ContractRates?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
