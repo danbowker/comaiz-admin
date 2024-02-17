@@ -12,9 +12,12 @@ var builder = WebApplication.CreateBuilder(args);
 var connStringBuilder = new NpgsqlConnectionStringBuilder();
 connStringBuilder.SslMode = SslMode.VerifyFull;
 
-var databaseUrlEnv = Environment.GetEnvironmentVariable("COMAIZ_ConnectionString");
-//var databaseUrlEnv = builder.Configuration.GetConnectionString("comaizContext") ??
-//                         throw new InvalidOperationException("Connection string 'comaizContext' not found.");
+// TODO: Use appsettings for connection string except for username and password
+// TODO: Use local database for development
+// TODO: Use environment variable for production
+
+// To use, setup an app secret with dotnet user-secrets
+var databaseUrlEnv = builder.Configuration["CockroachDB"];
 
 var databaseUrl = new Uri(databaseUrlEnv);
 connStringBuilder.Host = databaseUrl.Host;
