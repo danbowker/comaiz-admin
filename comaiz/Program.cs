@@ -3,34 +3,46 @@ using comaiz.data.Services;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
-// Required for ExcelDataReader
-System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-
 var builder = WebApplication.CreateBuilder(args);
 
+// Should work with appsettings.json or appsettings.[Environment].json or
+// with dotnet user-secrets set "ConnectionStrings:PostgresSQL" or with environment variable
+var connectionString = builder.Configuration.GetConnectionString("PostgresSQL");
+Console.WriteLine($"Connection string: {connectionString}");
+
+// TODO Extract this to an extension method
+NpgsqlConnectionStringBuilder connStringBuilder;
+
+// If the connection string is a URI, parse it and use the parts to build the connection string
+if (Uri.TryCreate(connectionString, UriKind.Absolute, out var databaseUrl))
+{
+    connStringBuilder = new NpgsqlConnectionStringBuilder
+    {
+        SslMode = SslMode.VerifyFull
+    };
+    
+    connStringBuilder.Host = databaseUrl.Host;
+    connStringBuilder.Port = databaseUrl.Port;
+    var items = databaseUrl.UserInfo.Split(new[] { ':' });
+    if (items.Length > 0) connStringBuilder.Username = items[0];
+    if (items.Length > 1) connStringBuilder.Password = items[1];
+}
+else
+{
+    connStringBuilder = new NpgsqlConnectionStringBuilder(connectionString);
+}
+
+
+if (string.IsNullOrEmpty(connStringBuilder.Database))
+    connStringBuilder.Database = "comaiz";
+var connection = connStringBuilder.ConnectionString;
+
 // Add services to the container.
-var connStringBuilder = new NpgsqlConnectionStringBuilder();
-connStringBuilder.SslMode = SslMode.VerifyFull;
-
-// TODO: Use appsettings for connection string except for username and password
-// TODO: Use local database for development
-// TODO: Use environment variable for production
-
-// To use, setup an app secret with dotnet user-secrets
-var databaseUrlEnv = builder.Configuration["CockroachDB"];
-
-var databaseUrl = new Uri(databaseUrlEnv);
-connStringBuilder.Host = databaseUrl.Host;
-connStringBuilder.Port = databaseUrl.Port;
-var items = databaseUrl.UserInfo.Split(new[] { ':' });
-if (items.Length > 0) connStringBuilder.Username = items[0];
-if (items.Length > 1) connStringBuilder.Password = items[1];
-
-connStringBuilder.Database = "comaiz";
-
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<ComaizContext>(options =>
-    options.UseNpgsql(connStringBuilder.ConnectionString));
+{
+    options.UseNpgsql(connection);
+});
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddSingleton<ExcelAccountsReader>();

@@ -22,6 +22,11 @@ This is designed to work with CockroachDB for production (or any PostgresSQL as 
 dotnet user-secrets add CockroachDB <connection string>
 ```
 
+Once you have a database, configure it by running the following command from terminal in the solution folder:
+```
+dotnet ef database update -p comaiz.data -s comaiz
+```
+
 ## Usage
 
 There's a web page
