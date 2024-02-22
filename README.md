@@ -8,24 +8,28 @@ An application for managing a small consultancy business.
 
 Currently, check it out and build it.
 
-It uses [Entity Framework](https://learn.microsoft.com/en-us/ef/) with [PostgresSQL](https://www.postgresql.org/). 
+It uses [Entity Framework](https://learn.microsoft.com/en-us/ef/) with [PostgresSQL](https://www.postgresql.org/).
 
-To get a development database up:
-1. [Install PostgresSQL](https://www.postgresql.org/download/)
-1. ....
+This is designed to work with CockroachDB (or any PostgresSQL as a service provider) or with a local PostgresSQL for development.
 
-This is designed to work with CockroachDB for production (or any PostgresSQL as a service provider). To work with CockroadDB:
-1. Get an account (or ask me for mine, colleague)
-1. Create a database called "comaiz"
-2. Create a user-secret in the "comaiz" project with:
-```
-dotnet user-secrets add CockroachDB <connection string>
-```
+To work with CockroadDB set up an accout and get a connection string. For local, install PostgresSQL.
 
-Once you have a database, configure it by running the following command from terminal in the solution folder:
-```
-dotnet ef database update -p comaiz.data -s comaiz
-```
+To set up the DB:
+
+1. Create a database. Default name is 'comaiz' but you could override in the connection string.
+2. Set a "PostgresSQL" connection string in the "comaiz" project. Recommended approaches:
+   + For local development, set the "PostgresSQL" connection string in appSettings.Development.json
+   + For testing on production, create a user-secret from the command line in the project with:
+
+        ```text
+        dotnet user-secrets set ConnectionStrings:PostgresSQL <connection string>
+        ```
+
+3. Once you have a database and the connection strings setup up, create table by running the following command from terminal in the solution folder:
+
+    ```text
+    dotnet ef database update -p comaiz.data -s comaiz
+    ```
 
 ## Usage
 
