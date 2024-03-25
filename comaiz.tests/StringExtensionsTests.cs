@@ -1,7 +1,6 @@
-using Xunit;
 using comaiz.Extensions;
 
-namespace comaiz.Tests
+namespace comaiz.tests
 {
     public class StringExtensionsTests
     {
