@@ -29,5 +29,12 @@ namespace comaiz.tests
             // Assert
             Assert.Equal("Host=localhost;Port=5432;Username=username;Password=password;Database=comaiz", result);
         }
+
+        [Fact]
+
+        public void FailTest()
+        {
+            Assert.True(false);
+        }
     }
 }
