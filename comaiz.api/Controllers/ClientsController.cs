@@ -22,7 +22,6 @@ namespace comaiz.api.Controllers
         {
             if(dbContext.Clients == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            //retreive all clients from db asynchronously
             return await dbContext.Clients.ToListAsync();
 
         }
