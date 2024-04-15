@@ -19,12 +19,16 @@ namespace comaiz.api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Cost>>> GetCosts()
         {
+            if (dbContext.FixedCosts == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             return await dbContext.FixedCosts.ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Cost>> GetCost(int id)
         {
+            if (dbContext.FixedCosts == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             var cost = await dbContext.FixedCosts.FindAsync(id);
 
             if (cost == null)
@@ -42,6 +46,8 @@ namespace comaiz.api.Controllers
             {
                 return BadRequest();
             }
+
+            if (dbContext.FixedCosts == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             dbContext.Entry(cost).State = EntityState.Modified;
 
@@ -62,12 +68,16 @@ namespace comaiz.api.Controllers
 
         private bool CostExists(int id)
         {
+            if (dbContext.FixedCosts == null) return false;
+
             return dbContext.FixedCosts.Any(e => e.Id == id);
         }
 
         [HttpPost]
         public async Task<ActionResult<Cost>> PostCost(FixedCost cost)
         {
+            if (dbContext.FixedCosts == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             dbContext.FixedCosts.Add(cost);
             await dbContext.SaveChangesAsync();
 
@@ -77,6 +87,8 @@ namespace comaiz.api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCost(int id)
         {
+            if (dbContext.FixedCosts == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             var cost = await dbContext.FixedCosts.FindAsync(id);
             if (cost == null)
             {

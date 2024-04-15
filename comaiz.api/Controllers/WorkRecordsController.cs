@@ -20,12 +20,16 @@ namespace comaiz.api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<WorkRecord>>> GetWorkRecords()
         {
+            if (dbContext.WorkRecords == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             return await dbContext.WorkRecords.ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<WorkRecord>> GetWorkRecord(int id)
         {
+            if (dbContext.WorkRecords == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             var workRecord = await dbContext.WorkRecords.FindAsync(id);
 
             if (workRecord == null)
@@ -43,6 +47,8 @@ namespace comaiz.api.Controllers
             {
                 return BadRequest();
             }
+
+            if (dbContext.WorkRecords == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             dbContext.Entry(workRecord).State = EntityState.Modified;
 
@@ -64,14 +70,18 @@ namespace comaiz.api.Controllers
 
         private bool WorkRecordExists(int id)
         {
+            if (dbContext.WorkRecords == null) return false;
+
             return dbContext.WorkRecords.Any(e => e.Id == id);
         }
 
         [HttpPost]
         public async Task<ActionResult<WorkRecord>> PostWorkRecord(WorkRecord workRecord)
         {
+            if (dbContext.WorkRecords == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             dbContext.WorkRecords.Add(workRecord);
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(); 
 
             return CreatedAtAction("GetWorkRecord", new { id = workRecord.Id }, workRecord);
         }
@@ -79,6 +89,8 @@ namespace comaiz.api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteWorkRecord(int id)
         {
+            if (dbContext.WorkRecords == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             var workRecord = await dbContext.WorkRecords.FindAsync(id);
             if (workRecord == null)
             {

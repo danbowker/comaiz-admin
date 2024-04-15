@@ -20,12 +20,16 @@ namespace comaiz.api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Invoice>>> GetInvoices()
         {
+            if (dbContext.Invoices == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             return await dbContext.Invoices.ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Invoice>> GetInvoice(int id)
         {
+            if (dbContext.Invoices == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             var invoice = await dbContext.Invoices.FindAsync(id);
 
             if (invoice == null)
@@ -43,6 +47,8 @@ namespace comaiz.api.Controllers
             {
                 return BadRequest();
             }
+
+            if (dbContext.Invoices == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             dbContext.Entry(invoice).State = EntityState.Modified;
 
@@ -62,13 +68,17 @@ namespace comaiz.api.Controllers
         }
 
         private bool InvoiceExists(int id)
-        {
+        { 
+            if (dbContext.Invoices == null) return false;
+
             return dbContext.Invoices.Any(e => e.Id == id);
         }
 
         [HttpPost]
         public async Task<ActionResult<Invoice>> PostInvoice(Invoice invoice)
         {
+            if (dbContext.Invoices == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             dbContext.Invoices.Add(invoice);
             await dbContext.SaveChangesAsync();
 
@@ -78,6 +88,8 @@ namespace comaiz.api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteInvoice(int id)
         {
+            if (dbContext.Invoices == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             var invoice = await dbContext.Invoices.FindAsync(id);
             if (invoice == null)
             {

@@ -20,12 +20,16 @@ namespace comaiz.api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Contract>>> GetContractsAsync()
         {
+            if (dbContext.Contracts == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             return await dbContext.Contracts.ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Contract>> GetContractAsync(int id)
         {
+            if (dbContext.Contracts == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             var contract = await dbContext.Contracts.FindAsync(id);
 
             if (contract == null)
@@ -43,6 +47,8 @@ namespace comaiz.api.Controllers
             {
                 return BadRequest();
             }
+
+            if(dbContext.Contracts == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             dbContext.Entry(contract).State = EntityState.Modified;
 
@@ -67,12 +73,15 @@ namespace comaiz.api.Controllers
 
         private bool ContractExists(int id)
         {
+            if (dbContext.Contracts == null) return false;
             return dbContext.Contracts.Any(e => e.Id == id);
         }
 
         [HttpPost]
         public async Task<ActionResult<Contract>> PostContract(Contract contract)
         {
+            if (dbContext.Contracts == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             dbContext.Contracts.Add(contract);
             await dbContext.SaveChangesAsync();
 
@@ -82,6 +91,8 @@ namespace comaiz.api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteContract(int id)
         {
+            if(dbContext.Contracts == null) return StatusCode(StatusCodes.Status500InternalServerError);
+            
             var contract = await dbContext.Contracts.FindAsync(id);
             if (contract == null)
             {

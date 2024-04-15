@@ -20,6 +20,8 @@ namespace comaiz.api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Client>>> GetClientsAsync()
         {
+            if(dbContext.Clients == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             //retreive all clients from db asynchronously
             return await dbContext.Clients.ToListAsync();
 
@@ -28,6 +30,8 @@ namespace comaiz.api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Client>> GetClientAsync(int id)
         {
+            if(dbContext.Clients == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             var client = await dbContext.Clients.FindAsync(id);
 
             if (client == null)
@@ -46,6 +50,8 @@ namespace comaiz.api.Controllers
                 return BadRequest();
             }
 
+            if (dbContext.Clients == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             dbContext.Entry(client).State = EntityState.Modified;
 
             try
@@ -60,7 +66,7 @@ namespace comaiz.api.Controllers
                 }
                 else
                 {
-                    throw;
+                    return StatusCode(StatusCodes.Status500InternalServerError);
                 }
             }
 
@@ -70,15 +76,18 @@ namespace comaiz.api.Controllers
         [HttpPost]
         public async Task<ActionResult<Client>> PostClient(Client client)
         {
+            if (dbContext.Clients == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             dbContext.Clients.Add(client);
             await dbContext.SaveChangesAsync();
-
             return CreatedAtAction("GetClient", new { id = client.Id }, client);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteClient(int id)
         {
+            if (dbContext.Clients == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
             var client = await dbContext.Clients.FindAsync(id);
             if (client == null)
             {
@@ -93,6 +102,8 @@ namespace comaiz.api.Controllers
 
         private bool ClientExists(int id)
         {
+            if (dbContext.Clients == null) return false;
+
             return dbContext.Clients.Any(e => e.Id == id);
         }
     }
