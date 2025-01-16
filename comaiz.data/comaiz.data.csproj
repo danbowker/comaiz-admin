@@ -18,6 +18,8 @@
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.9" />
 		<PackageReference Include="Npgsql" Version="8.0.2" />
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+		<PackageReference Include="NuGet.Packaging" Version="6.12.1" />
+		<PackageReference Include="NuGet.Protocol" Version="6.6.1" />
 		<PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
 	</ItemGroup>
 
