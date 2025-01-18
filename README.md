@@ -24,15 +24,28 @@ To set up the DB:
         ```text
         dotnet user-secrets set ConnectionStrings:PostgresSQL <connection string>
         ```
+    + Or set an environment variable
 
-3. Once you have a database and the connection strings setup up, create table by running the following command from terminal in the solution folder:
+3. Once you have a database and the connection strings setup up, create tables by running the following command from terminal in the solution folder:
 
     ```text
     dotnet ef database update -p comaiz.data -s comaiz
     ```
 
+Configure authentication and authorization:
+
+1. Setup oauth2 with a provider such as Google
+2. Create appsettings, dotnet user-secrets or environment variables for:
+   + Jwt.Authority (EnvVar Jwt__Authority) : e.g. "https://accounts.google.com"
+   + Jwt.Audience (EnvVar Jwt__Audience) : e.g. <Your Google oauth2 client ID>
+
 ## Usage
 
-There's a web page
+To test from Swagger:
+
+1. Run comaiz.api with the Swagger launch settings
+2. Obtain a valid id token from, for example the Google oath2 playground, having first set your clientID and clientSecret from your oauth provider
+3. On the Swagger page, click the authenticate button, paste in the id token (test on JWT.io)
+4. Test one of the API calls
 
 ## Contributing
