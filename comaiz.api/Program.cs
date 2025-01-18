@@ -28,7 +28,11 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseSwagger();
-app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "comaiz.api v1"));
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "comaiz.api v1");
+    options.EnableTryItOutByDefault();
+});
 
 
 app.UseHttpsRedirection();
