@@ -26,7 +26,7 @@ builder.Services.AddAuthentication(options =>
     })
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://accounts.google.com";
+        options.Authority = builder.Configuration["Jwt:Authority"];
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
