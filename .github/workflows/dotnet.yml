@@ -40,5 +40,5 @@ jobs:
             docker pull ghcr.io/${{ github.repository }}/comaiz-admin:latest
             docker stop comaiz-admin || true
             docker rm comaiz-admin || true
-            docker run -d --name comaiz-admin -p 80:80 -e Jwt__Authority=${{ secrets.JWT_AUTHORITY }} -e Jwt__Audience=${{ secrets.JWT_AUDIENCE }} -e ConnectionStrings__PostgresSQL=${{ secrets.CONNECTION_STRING }} ghcr.io/${{ github.repository }}/comaiz-admin:latest
+            docker run -d --name comaiz-admin -p 80:8080 -e Jwt__Authority=${{ secrets.JWT_AUTHORITY }} -e Jwt__Audience=${{ secrets.JWT_AUDIENCE }} -e ConnectionStrings__PostgresSQL=${{ secrets.CONNECTION_STRING }} ghcr.io/${{ github.repository }}/comaiz-admin:latest
           EOF
