@@ -36,7 +36,7 @@ jobs:
         run: |
           echo "$SSH_PRIVATE_KEY" > private_key
           chmod 600 private_key
-          ssh -i private_key $SERVER_USER@$SERVER_IP << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i private_key $SERVER_USER@$SERVER_IP << 'EOF'
             docker pull ghcr.io/${{ github.repository }}/comaiz-admin:latest
             docker stop comaiz-admin || true
             docker rm comaiz-admin || true
