@@ -28,3 +28,18 @@ jobs:
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Push Docker image
         run: docker push ghcr.io/${{ github.repository }}/comaiz-admin:latest
+      - name: Deploy to server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" > private_key
+          chmod 600 private_key
+          scp -i private_key docker-compose.yml $SERVER_USER@$SERVER_IP:/path/to/deploy/
+          ssh -i private_key $SERVER_USER@$SERVER_IP << 'EOF'
+            docker pull ghcr.io/${{ github.repository }}/comaiz-admin:latest
+            docker stop comaiz-admin || true
+            docker rm comaiz-admin || true
+            docker run -d --name comaiz-admin -p 80:80 ghcr.io/${{ github.repository }}/comaiz-admin:latest
+          EOF
