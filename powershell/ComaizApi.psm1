@@ -1,5 +1,16 @@
 # ComaizApi.psm1
 
+enum Collection {
+    Clients
+    Contracts
+    ContractRates
+    FixedCosts
+    Workers
+    WorkRecords
+    Invoices
+    InvoiceItems
+}
+
 function Get-IdToken {
     param (
         [string]$ClientId,
@@ -18,40 +29,43 @@ function Get-IdToken {
     return $response.id_token
 }
 
-function Get-Clients {
+function Get-Items {
     param (
         [string]$BaseUrl,
-        [string]$IdToken
+        [string]$IdToken,
+        [Collection]$Collection
     )
 
     $headers = @{
         Authorization = "Bearer $IdToken"
     }
 
-    $response = Invoke-RestMethod -Uri "$BaseUrl/api/Clients" -Method Get -Headers $headers
+    $response = Invoke-RestMethod -Uri "$BaseUrl/api/$Collection" -Method Get -Headers $headers
     return $response
 }
 
-function Get-ClientById {
+function Get-ItemById {
     param (
         [string]$BaseUrl,
         [string]$IdToken,
-        [int]$ClientId
+        [Collection]$Collection,
+        [int]$ItemId
     )
 
     $headers = @{
         Authorization = "Bearer $IdToken"
     }
 
-    $response = Invoke-RestMethod -Uri "$BaseUrl/api/Clients/$ClientId" -Method Get -Headers $headers
+    $response = Invoke-RestMethod -Uri "$BaseUrl/api/$Collection/$ItemId" -Method Get -Headers $headers
     return $response
 }
 
-function Add-Client {
+function Add-Item {
     param (
         [string]$BaseUrl,
         [string]$IdToken,
-        [object]$Client
+        [Collection]$Collection,
+        [object]$Item
     )
 
     $headers = @{
@@ -59,15 +73,16 @@ function Add-Client {
         "Content-Type" = "application/json"
     }
 
-    $response = Invoke-RestMethod -Uri "$BaseUrl/api/Clients" -Method Post -Headers $headers -Body ($Client | ConvertTo-Json)
+    $response = Invoke-RestMethod -Uri "$BaseUrl/api/$Collection" -Method Post -Headers $headers -Body ($Item | ConvertTo-Json)
     return $response
 }
 
-function Update-Client {
+function Update-Item {
     param (
         [string]$BaseUrl,
         [string]$IdToken,
-        [object]$Client
+        [Collection]$Collection,
+        [object]$Item
     )
 
     $headers = @{
@@ -75,23 +90,24 @@ function Update-Client {
         "Content-Type" = "application/json"
     }
 
-    $response = Invoke-RestMethod -Uri "$BaseUrl/api/Clients" -Method Put -Headers $headers -Body ($Client | ConvertTo-Json)
+    $response = Invoke-RestMethod -Uri "$BaseUrl/api/$Collection" -Method Put -Headers $headers -Body ($Item | ConvertTo-Json)
     return $response
 }
 
-function Remove-Client {
+function Remove-Item {
     param (
         [string]$BaseUrl,
         [string]$IdToken,
-        [int]$ClientId
+        [Collection]$Collection,
+        [int]$ItemId
     )
 
     $headers = @{
         Authorization = "Bearer $IdToken"
     }
 
-    $response = Invoke-RestMethod -Uri "$BaseUrl/api/Clients/$ClientId" -Method Delete -Headers $headers
+    $response = Invoke-RestMethod -Uri "$BaseUrl/api/$Collection/$ItemId" -Method Delete -Headers $headers
     return $response
 }
 
-Export-ModuleMember -Function *-Client*, Get-IdToken
+Export-ModuleMember -Function *-Item*, Get-IdToken
