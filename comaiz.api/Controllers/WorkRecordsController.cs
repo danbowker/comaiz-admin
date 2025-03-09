@@ -39,14 +39,9 @@ namespace comaiz.api.Controllers
             return workRecord;
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutWorkRecord(int id, WorkRecord workRecord)
+        [HttpPut]
+        public async Task<IActionResult> PutWorkRecord(WorkRecord workRecord)
         {
-            if (id != workRecord.Id)
-            {
-                return BadRequest();
-            }
-
             if (dbContext.WorkRecords == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             dbContext.Entry(workRecord).State = EntityState.Modified;
@@ -57,7 +52,7 @@ namespace comaiz.api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!WorkRecordExists(id))
+                if (!WorkRecordExists(workRecord.Id))
                 {
                     return NotFound();
                 }

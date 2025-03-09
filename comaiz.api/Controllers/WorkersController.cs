@@ -40,14 +40,9 @@ namespace comaiz.api.Controllers
             return worker;
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutWorker(int id, Worker worker)
+        [HttpPut]
+        public async Task<IActionResult> PutWorker(Worker worker)
         {
-            if (id != worker.Id)
-            {
-                return BadRequest();
-            }
-
             if (dbContext.Workers == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             dbContext.Entry(worker).State = EntityState.Modified;
@@ -58,7 +53,7 @@ namespace comaiz.api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!WorkerExists(id))
+                if (!WorkerExists(worker.Id))
                 {
                     return NotFound();
                 }

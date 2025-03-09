@@ -40,14 +40,9 @@ namespace comaiz.api.Controllers
             return invoiceItem;
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutInvoiceItem(int id, InvoiceItem invoiceItem)
+        [HttpPut]
+        public async Task<IActionResult> PutInvoiceItem(InvoiceItem invoiceItem)
         {
-            if (id != invoiceItem.Id)
-            {
-                return BadRequest();
-            }
-
             if (dbContext.InvoiceItems == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             dbContext.Entry(invoiceItem).State = EntityState.Modified;
@@ -58,7 +53,7 @@ namespace comaiz.api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!InvoiceItemExists(id))
+                if (!InvoiceItemExists(invoiceItem.Id))
                 {
                     return NotFound();
                 }

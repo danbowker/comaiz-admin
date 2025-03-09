@@ -38,14 +38,9 @@ namespace comaiz.api.Controllers
             return cost;
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCost(int id, Cost cost)
+        [HttpPut]
+        public async Task<IActionResult> PutCost(Cost cost)
         {
-            if (id != cost.Id)
-            {
-                return BadRequest();
-            }
-
             if (dbContext.FixedCosts == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             dbContext.Entry(cost).State = EntityState.Modified;
@@ -56,7 +51,7 @@ namespace comaiz.api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CostExists(id))
+                if (!CostExists(cost.Id))
                 {
                     return NotFound();
                 }
