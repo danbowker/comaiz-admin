@@ -39,6 +39,10 @@ Configure authentication and authorization:
    + Jwt.Authority (EnvVar Jwt__Authority) : e.g. "https://accounts.google.com"
    + Jwt.Audience (EnvVar Jwt__Audience) : e.g. <Your Google oauth2 client ID>
 
+## Deployment
+
+This will deploy to any server running docker with ssh access. Setup secrets as used in the github workflow dotnet.yml
+
 ## Usage
 
 To test from Swagger:
@@ -47,5 +51,16 @@ To test from Swagger:
 2. Obtain a valid id token from, for example the Google oath2 playground, having first set your clientID and clientSecret from your oauth provider
 3. On the Swagger page, click the authenticate button, paste in the id token (test on JWT.io)
 4. Test one of the API calls
+
+To test from Powershell
+
+1. Import the Powershell module:
+```ps
+import-module -name .\powershell\ComaizApi.psm1 -Force
+``` 
+2.Get a token using your oath2 setup - if using Google you can get the refresh-token from the oath2 playground
+```ps
+$idToken = Get-IdToken -ClientId [client-id] -ClientSecret [client-sectret] -RefreshToken [refresh-token]
+```
 
 ## Contributing
