@@ -41,14 +41,9 @@ namespace comaiz.api.Controllers
             return client;
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutClient(int id, Client client)
+        [HttpPut]
+        public async Task<IActionResult> PutClient(Client client)
         {
-            if (id != client.Id)
-            {
-                return BadRequest();
-            }
-
             if (dbContext.Clients == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             dbContext.Entry(client).State = EntityState.Modified;
@@ -59,7 +54,7 @@ namespace comaiz.api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ClientExists(id))
+                if (!ClientExists(client.Id))
                 {
                     return NotFound();
                 }

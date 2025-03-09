@@ -39,14 +39,9 @@ namespace comaiz.api.Controllers
             return contractRate;
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutContractRate(int id, ContractRate contractRate)
+        [HttpPut]
+        public async Task<IActionResult> PutContractRate(ContractRate contractRate)
         {
-            if (id != contractRate.Id)
-            {
-                return BadRequest();
-            }
-
             if (dbContext.ContractRates == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             dbContext.Entry(contractRate).State = EntityState.Modified;
@@ -57,7 +52,7 @@ namespace comaiz.api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ContractRateExists(id))
+                if (!ContractRateExists(contractRate.Id))
                 {
                     return NotFound();
                 }

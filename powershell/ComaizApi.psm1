@@ -67,7 +67,6 @@ function Update-Client {
     param (
         [string]$BaseUrl,
         [string]$IdToken,
-        [int]$ClientId,
         [object]$Client
     )
 
@@ -76,7 +75,7 @@ function Update-Client {
         "Content-Type" = "application/json"
     }
 
-    $response = Invoke-RestMethod -Uri "$BaseUrl/api/Clients/$ClientId" -Method Put -Headers $headers -Body ($Client | ConvertTo-Json)
+    $response = Invoke-RestMethod -Uri "$BaseUrl/api/Clients" -Method Put -Headers $headers -Body ($Client | ConvertTo-Json)
     return $response
 }
 
