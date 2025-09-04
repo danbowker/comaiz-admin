@@ -4,7 +4,43 @@
 
 An application for managing a small consultancy business.
 
-## Installation
+## 🚀 Quick Start with GitHub Codespaces
+
+**The fastest way to get started is with GitHub Codespaces:**
+
+1. Click the green "Code" button on the repository
+2. Select "Codespaces" tab
+3. Click "Create codespace on main"
+
+The devcontainer will automatically:
+- Set up .NET 9.0 SDK and all dependencies
+- Start a PostgreSQL database
+- Run database migrations
+- Launch the application with Swagger UI
+- Open the Swagger UI in your browser at `https://localhost:7057/swagger`
+
+### Codespace Features
+
+- **Auto-configured Development Environment**: .NET 9.0 SDK, PostgreSQL, Entity Framework tools
+- **Pre-configured Database**: PostgreSQL with connection string set up automatically
+- **Auto-start Application**: The API launches automatically on Codespace startup
+- **Swagger UI**: Accessible at `https://localhost:7057/swagger` for API testing
+- **VS Code Extensions**: C# development tools pre-installed
+
+### Environment Variables in Codespaces
+
+The devcontainer includes development-ready environment variables:
+- `ConnectionStrings__PostgresSQL`: Pre-configured for local PostgreSQL
+- `Jwt__Authority`: Set to `https://accounts.google.com` (for development)
+- `Jwt__Audience`: Set to `development-client-id` (for development)
+
+**Note**: For production deployment, you'll need to set up proper OAuth2 credentials and database connection strings as described in the deployment section below.
+
+📚 **For detailed Codespaces usage instructions, see [CODESPACES.md](CODESPACES.md)**
+
+## Installation (Local Development)
+
+If you prefer local development instead of Codespaces, follow these steps:
 
 Currently, check it out and build it.
 
@@ -41,7 +77,37 @@ Configure authentication and authorization:
 
 ## Deployment
 
-This will deploy to any server running docker with ssh access. Setup secrets as used in the github workflow dotnet.yml
+This will deploy to any server running docker with ssh access. 
+
+### GitHub Actions Secrets
+
+The following secrets are required for the GitHub Actions workflow:
+
+**For Codespaces (Development)**:
+- Development environment variables are pre-configured in the devcontainer
+- No additional secrets needed for development
+
+**For Production Deployment**:
+- `CONNECTION_STRING`: PostgreSQL connection string for production database
+- `JWT_AUTHORITY`: OAuth2 authority URL (e.g., `https://accounts.google.com`)
+- `JWT_AUDIENCE`: OAuth2 client ID for your application
+- `SSH_PRIVATE_KEY`: Private key for SSH access to deployment server
+- `SERVER_IP`: IP address of the deployment server  
+- `SERVER_USER`: SSH username for the deployment server
+
+### Setting up Production OAuth2
+
+1. Create OAuth2 credentials with your provider (e.g., Google Cloud Console)
+2. Set the `JWT_AUTHORITY` to your provider's authority URL
+3. Set the `JWT_AUDIENCE` to your OAuth2 client ID
+4. Configure your OAuth2 application's authorized redirect URIs
+
+### Production Database
+
+Set up a PostgreSQL database and configure the `CONNECTION_STRING` secret with your production database connection string in the format:
+```
+Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=your-database
+```
 
 ## Usage
 
