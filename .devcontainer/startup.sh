@@ -26,13 +26,26 @@ dotnet build --no-restore
 
 # Initialize the database (create tables if they don't exist)
 echo "Updating database..."
+# First, try to create a migration to handle EF Core version upgrade
+echo "Creating migration for EF Core 9.0 compatibility if needed..."
+dotnet ef migrations add EFCore9Upgrade -p comaiz.data -s comaiz.api --no-build --force > /dev/null 2>&1 || echo "Migration not needed or already exists"
+
 dotnet ef database update -p comaiz.data -s comaiz.api --no-build
 
 echo "Starting the application..."
 
+# Check for HTTPS certificate availability
+LAUNCH_PROFILE="swagger"
+if ! dotnet dev-certs https --check > /dev/null 2>&1; then
+    echo "⚠️  HTTPS certificate not available, using HTTP-only mode"
+    LAUNCH_PROFILE="swagger-http"
+else
+    echo "✅ HTTPS certificate available"
+fi
+
 # Start the application in the background with the swagger profile
-echo "📝 Starting dotnet application..."
-nohup dotnet run --project comaiz.api --launch-profile swagger --no-build > /tmp/app.log 2>&1 &
+echo "📝 Starting dotnet application with profile: $LAUNCH_PROFILE"
+nohup dotnet run --project comaiz.api --launch-profile $LAUNCH_PROFILE --no-build > /tmp/app.log 2>&1 &
 APP_PID=$!
 echo "🔄 Application started with PID: $APP_PID"
 
@@ -65,14 +78,18 @@ if [ "$APP_READY" = true ]; then
     echo "🎉 Comaiz Admin is now running!"
     echo ""
     echo "📝 Swagger UI is available at:"
-    echo "   - HTTP:  http://localhost:5000/swagger"
-    echo "   - HTTPS: https://localhost:7057/swagger"
+    if [ "$LAUNCH_PROFILE" = "swagger-http" ]; then
+        echo "   - HTTP:  http://localhost:5000/swagger"
+    else
+        echo "   - HTTP:  http://localhost:5000/swagger"
+        echo "   - HTTPS: https://localhost:7057/swagger"
+    fi
     echo ""
     echo "📊 Database: PostgreSQL running on localhost:5432"
     echo "📋 Username: postgres, Password: devpassword, Database: comaiz"
     echo ""
     echo "📖 Check /tmp/app.log for application logs"
-    echo "💡 To restart the app: pkill -f comaiz.api && dotnet run --project comaiz.api --launch-profile swagger"
+    echo "💡 To restart the app: pkill -f comaiz.api && .devcontainer/start-app.sh"
     echo ""
     echo "✅ Startup complete! Application is running in the background (PID: $APP_PID)"
 else
@@ -82,6 +99,7 @@ else
     echo ""
     echo "🔍 Troubleshooting:"
     echo "   - Check if PostgreSQL is running: pg_isready -h localhost -p 5432 -U postgres"
-    echo "   - Try manual start: dotnet run --project comaiz.api --launch-profile swagger"
+    echo "   - Try manual start: .devcontainer/start-app.sh"
     echo "   - Check database connection: psql -h localhost -p 5432 -U postgres -d comaiz"
+    echo "   - Check HTTPS certificates: dotnet dev-certs https --check"
 fi

@@ -117,6 +117,45 @@ For actual authentication testing, you'll need to:
 
 ### Common Issues and Solutions
 
+#### Entity Framework Migration Issues
+
+If you see errors about "pending model changes" or migration version conflicts:
+
+1. **Check current migration status**:
+   ```bash
+   dotnet ef migrations list -p comaiz.data -s comaiz.api
+   ```
+
+2. **Create a new migration for EF Core 9.0**:
+   ```bash
+   dotnet ef migrations add EFCore9Upgrade -p comaiz.data -s comaiz.api --force
+   ```
+
+3. **Update the database**:
+   ```bash
+   dotnet ef database update -p comaiz.data -s comaiz.api
+   ```
+
+#### HTTPS Certificate Issues
+
+If you see "Unable to configure HTTPS endpoint" errors:
+
+1. **Check certificate status**:
+   ```bash
+   dotnet dev-certs https --check
+   ```
+
+2. **Generate new certificate**:
+   ```bash
+   dotnet dev-certs https --clean
+   dotnet dev-certs https
+   ```
+
+3. **Use HTTP-only mode as fallback**:
+   ```bash
+   dotnet run --project comaiz.api --launch-profile swagger-http
+   ```
+
 #### Application Not Starting Automatically
 
 If the application doesn't start automatically when the Codespace loads:

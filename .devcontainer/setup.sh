@@ -37,6 +37,22 @@ else
     echo "✅ Entity Framework tools already available"
 fi
 
+# Generate HTTPS developer certificates for the container
+echo "🔐 Setting up HTTPS developer certificates..."
+if dotnet dev-certs https --check > /dev/null 2>&1; then
+    echo "✅ HTTPS developer certificate already exists"
+else
+    echo "📜 Generating HTTPS developer certificate..."
+    dotnet dev-certs https --clean > /dev/null 2>&1 || true
+    dotnet dev-certs https --trust > /dev/null 2>&1 || true
+    if dotnet dev-certs https > /dev/null 2>&1; then
+        echo "✅ HTTPS developer certificate generated successfully"
+    else
+        echo "⚠️  Warning: Failed to generate HTTPS certificate"
+        echo "    The application will only be accessible via HTTP"
+    fi
+fi
+
 echo "✅ Codespace setup complete!"
 echo ""
 echo "🔨 To start the application manually:"

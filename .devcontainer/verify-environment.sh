@@ -36,6 +36,16 @@ else
 fi
 echo ""
 
+# Check HTTPS certificates
+echo "🔐 HTTPS Certificate Status:"
+if dotnet dev-certs https --check > /dev/null 2>&1; then
+    echo "✅ HTTPS developer certificate is available"
+else
+    echo "❌ HTTPS developer certificate is missing"
+    echo "   Try: dotnet dev-certs https"
+fi
+echo ""
+
 # Check port forwarding (VS Code specific)
 if [ -n "$VSCODE_INJECTION" ]; then
     echo "📡 VS Code Environment:"
@@ -63,4 +73,6 @@ echo "   Start app:     .devcontainer/start-app.sh"
 echo "   Check logs:    tail -f /tmp/app.log"
 echo "   Test DB:       psql -h localhost -p 5432 -U postgres -d comaiz"
 echo "   Stop app:      pkill -f comaiz.api"
+echo "   Fix HTTPS:     dotnet dev-certs https"
+echo "   Create migration: dotnet ef migrations add MigrationName -p comaiz.data -s comaiz.api"
 echo ""
