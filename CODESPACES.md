@@ -115,7 +115,75 @@ For actual authentication testing, you'll need to:
 
 ## Troubleshooting
 
-### Application Won't Start
+### Common Issues and Solutions
+
+#### Application Not Starting Automatically
+
+If the application doesn't start automatically when the Codespace loads:
+
+1. **Check startup logs**:
+   ```bash
+   tail -f /tmp/app.log
+   ```
+
+2. **Start manually**:
+   ```bash
+   .devcontainer/start-app.sh
+   ```
+
+3. **Check process status**:
+   ```bash
+   ps aux | grep dotnet
+   ```
+
+#### Swagger UI Not Accessible
+
+If you can't access Swagger UI through the forwarded ports:
+
+1. **Verify application is running**:
+   ```bash
+   curl -k -s https://localhost:7057/swagger
+   # OR
+   curl -s http://localhost:5000/swagger
+   ```
+
+2. **Check port forwarding in VS Code**:
+   - Open the **Ports** tab in the bottom panel
+   - Ensure port 7057 is forwarded and set to "Public"
+   - Try accessing via the forwarded URL shown in the Ports tab
+
+3. **Restart the application**:
+   ```bash
+   pkill -f comaiz.api
+   .devcontainer/start-app.sh
+   ```
+
+#### Database Connection Problems
+
+If you see database connection errors:
+
+1. **Verify PostgreSQL is running**:
+   ```bash
+   pg_isready -h localhost -p 5432 -U postgres
+   ```
+
+2. **Check database service**:
+   ```bash
+   docker-compose -f .devcontainer/docker-compose.yml ps
+   ```
+
+3. **Restart database**:
+   ```bash
+   docker-compose -f .devcontainer/docker-compose.yml restart db
+   ```
+
+4. **Test connection manually**:
+   ```bash
+   psql -h localhost -p 5432 -U postgres -d comaiz
+   # Password: devpassword
+   ```
+
+#### Application Won't Start
 
 Check the application logs:
 ```bash
