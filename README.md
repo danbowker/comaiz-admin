@@ -17,7 +17,7 @@ The devcontainer will automatically:
 - Start a PostgreSQL database
 - Run database migrations
 - Launch the application with Swagger UI
-- Open the Swagger UI in your browser at `https://localhost:7057/swagger`
+- Open the Swagger UI in your browser at `https://localhost:7057/swagger/index.html`
 
 ### Codespace Features
 

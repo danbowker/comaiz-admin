@@ -26,9 +26,9 @@ dotnet build --no-restore
 
 # Initialize the database (create tables if they don't exist)
 echo "Updating database..."
-# First, try to create a migration to handle EF Core version upgrade
-echo "Creating migration for EF Core 9.0 compatibility if needed..."
-dotnet ef migrations add EFCore9Upgrade -p comaiz.data -s comaiz.api --no-build --force > /dev/null 2>&1 || echo "Migration not needed or already exists"
+# # First, try to create a migration to handle EF Core version upgrade
+# echo "Creating migration for EF Core 9.0 compatibility if needed..."
+# dotnet ef migrations add EFCore9Upgrade -p comaiz.data -s comaiz.api --no-build --force > /dev/null 2>&1 || echo "Migration not needed or already exists"
 
 dotnet ef database update -p comaiz.data -s comaiz.api --no-build
 
