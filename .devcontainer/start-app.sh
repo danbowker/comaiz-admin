@@ -18,7 +18,7 @@ pkill -f "dotnet.*comaiz.api" || true
 echo "📊 Updating database migrations..."
 # First, create a new migration if needed to sync EF Core 9.0 model
 echo "Creating migration for EF Core 9.0 compatibility..."
-dotnet ef migrations add EFCore9Upgrade -p comaiz.data -s comaiz.api --force || echo "Migration creation failed or not needed"
+dotnet ef migrations add EFCore9Upgrade -p comaiz.data -s comaiz.api || echo "Migration creation failed or not needed"
 
 echo "📊 Updating database..."
 dotnet ef database update -p comaiz.data -s comaiz.api
