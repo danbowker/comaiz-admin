@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using comaiz.data;
@@ -11,9 +12,11 @@ using comaiz.data;
 namespace comaiz.data.Migrations
 {
     [DbContext(typeof(ComaizContext))]
-    partial class ComaizContextModelSnapshot : ModelSnapshot
+    [Migration("20250929120102_EFCore9Upgrade")]
+    partial class EFCore9Upgrade
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -8,6 +8,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
         curl \
         wget \
         git \
+        lsof \
+        pkill \
     && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Install Entity Framework Core tools globally
