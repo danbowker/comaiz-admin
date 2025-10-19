@@ -11,6 +11,7 @@ public class WorkersApiIntegrationTests : IClassFixture<ComaizApiWebApplicationF
 {
     private readonly ComaizApiWebApplicationFactory _factory;
     private readonly HttpClient _client;
+    private string _authToken = string.Empty;
 
     public WorkersApiIntegrationTests(ComaizApiWebApplicationFactory factory)
     {
@@ -20,6 +21,10 @@ public class WorkersApiIntegrationTests : IClassFixture<ComaizApiWebApplicationF
 
     public async Task InitializeAsync()
     {
+        // Get auth token first
+        _authToken = await AuthHelper.GetAuthTokenAsync(_client);
+        AuthHelper.SetAuthToken(_client, _authToken);
+
         // Seed test data before each test
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ComaizContext>();
@@ -156,5 +161,18 @@ public class WorkersApiIntegrationTests : IClassFixture<ComaizApiWebApplicationF
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetWorkers_WithoutAuthentication_ReturnsUnauthorized()
+    {
+        // Arrange - Create a new client without auth token
+        var unauthenticatedClient = _factory.CreateClient();
+
+        // Act
+        var response = await unauthenticatedClient.GetAsync("/api/workers");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 }
