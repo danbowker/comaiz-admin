@@ -2,6 +2,7 @@
 using comaiz.data;
 using comaiz.data.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace comaiz.api.Controllers
 {
