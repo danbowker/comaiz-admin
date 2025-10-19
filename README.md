@@ -106,4 +106,29 @@ To test from Powershell
 import-module -name .\powershell\ComaizApi.psm1 -Force
 ``` 
 
+## Testing
+
+The project includes both unit tests and integration tests.
+
+### Running Tests
+
+Run all tests:
+```bash
+dotnet test
+```
+
+Run only integration tests:
+```bash
+dotnet test --filter "FullyQualifiedName~IntegrationTests"
+```
+
+📚 **For detailed information about integration tests, see [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md)**
+
+The integration tests:
+- Use PostgreSQL test containers with Docker
+- Test API CRUD operations (Create, Read, Update, Delete)
+- Initialize and seed a fresh database for each test
+- Clean up test data automatically
+- Run as part of CI/CD pipeline
+
 ## Contributing
