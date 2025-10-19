@@ -31,10 +31,8 @@ The devcontainer will automatically:
 
 The devcontainer includes development-ready environment variables:
 - `ConnectionStrings__PostgresSQL`: Pre-configured for local PostgreSQL
-- `Jwt__Authority`: Set to `https://accounts.google.com` (for development)
-- `Jwt__Audience`: Set to `development-client-id` (for development)
 
-**Note**: For production deployment, you'll need to set up proper OAuth2 credentials and database connection strings as described in the deployment section below.
+**Note**: For production deployment, you'll need to set up proper database connection strings as described in the deployment section below.
 
 📚 **For detailed Codespaces usage instructions, see [CODESPACES.md](CODESPACES.md)**
 
@@ -82,18 +80,9 @@ The following secrets are required for the GitHub Actions workflow:
 
 **For Production Deployment**:
 - `CONNECTION_STRING`: PostgreSQL connection string for production database
-- `JWT_AUTHORITY`: OAuth2 authority URL (e.g., `https://accounts.google.com`)
-- `JWT_AUDIENCE`: OAuth2 client ID for your application
 - `SSH_PRIVATE_KEY`: Private key for SSH access to deployment server
 - `SERVER_IP`: IP address of the deployment server  
 - `SERVER_USER`: SSH username for the deployment server
-
-### Setting up Production OAuth2
-
-1. Create OAuth2 credentials with your provider (e.g., Google Cloud Console)
-2. Set the `JWT_AUTHORITY` to your provider's authority URL
-3. Set the `JWT_AUDIENCE` to your OAuth2 client ID
-4. Configure your OAuth2 application's authorized redirect URIs
 
 ### Production Database
 
@@ -107,9 +96,8 @@ Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Databa
 To test from Swagger:
 
 1. Run comaiz.api with the Swagger launch settings
-2. Obtain a valid id token from, for example the Google oath2 playground, having first set your clientID and clientSecret from your oauth provider
-3. On the Swagger page, click the authenticate button, paste in the id token (test on JWT.io)
-4. Test one of the API calls
+2. Navigate to the Swagger UI (automatically opens in Codespaces)
+3. Test the API endpoints directly from the Swagger interface
 
 To test from Powershell
 

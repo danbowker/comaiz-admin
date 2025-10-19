@@ -52,8 +52,6 @@ The following environment variables are pre-configured for development:
 ```bash
 ASPNETCORE_ENVIRONMENT=Development
 ConnectionStrings__PostgresSQL=Host=localhost;Port=5432;Username=postgres;Password=devpassword;Database=comaiz
-Jwt__Authority=https://accounts.google.com
-Jwt__Audience=development-client-id
 ```
 
 ### VS Code Extensions
@@ -101,17 +99,6 @@ Example API test:
 ```bash
 curl -X GET "https://localhost:7057/api/your-endpoint" -k
 ```
-
-### Authentication in Development
-
-The development environment uses dummy JWT settings:
-- **Authority**: `https://accounts.google.com`
-- **Audience**: `development-client-id`
-
-For actual authentication testing, you'll need to:
-1. Set up OAuth2 with Google or another provider
-2. Update the JWT settings in the devcontainer configuration
-3. Obtain a valid JWT token for testing
 
 ## Troubleshooting
 
@@ -264,10 +251,9 @@ When developing in Codespaces:
 
 The Codespace environment is for development only. For production deployment:
 
-1. Set up proper OAuth2 credentials
-2. Configure production database connection strings
-3. Set up GitHub Actions secrets as described in the main README
-4. Deploy using the existing GitHub Actions workflow
+1. Configure production database connection strings
+2. Set up GitHub Actions secrets as described in the main README
+3. Deploy using the existing GitHub Actions workflow
 
 ## Need Help?
 

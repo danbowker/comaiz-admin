@@ -14,8 +14,6 @@ services:
       - ASPNETCORE_HTTP_PORTS=5000
       - ASPNETCORE_HTTPS_PORTS=7057
       - ConnectionStrings__PostgresSQL=Host=localhost;Port=5432;Username=postgres;Password=devpassword;Database=comaiz
-      - Jwt__Authority=https://accounts.google.com
-      - Jwt__Audience=development-client-id
 
   db:
     image: postgres:16
