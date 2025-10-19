@@ -26,18 +26,11 @@ To set up the DB:
         ```
     + Or set an environment variable
 
-3. Once you have a database and the connection strings setup up, create tables by running the following command from terminal in the solution folder:
+3. Once you have a database and the connection strings setup up, create table by running the following command from terminal in the solution folder:
 
     ```text
     dotnet ef database update -p comaiz.data -s comaiz
     ```
-
-Configure authentication and authorization:
-
-1. Setup oauth2 with a provider such as Google
-2. Create appsettings, dotnet user-secrets or environment variables for:
-   + Jwt.Authority (EnvVar Jwt__Authority) : e.g. "https://accounts.google.com"
-   + Jwt.Audience (EnvVar Jwt__Audience) : e.g. <Your Google oauth2 client ID>
 
 ## Deployment
 
@@ -58,9 +51,5 @@ To test from Powershell
 ```ps
 import-module -name .\powershell\ComaizApi.psm1 -Force
 ``` 
-2.Get a token using your oath2 setup - if using Google you can get the refresh-token from the oath2 playground
-```ps
-$idToken = Get-IdToken -ClientId [client-id] -ClientSecret [client-sectret] -RefreshToken [refresh-token]
-```
 
 ## Contributing
