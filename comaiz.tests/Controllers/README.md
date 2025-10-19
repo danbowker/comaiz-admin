@@ -32,7 +32,7 @@ This directory contains comprehensive unit tests for all API controllers in the 
      - WorkRecordsController (8 tests)
      - ContractRatesController (8 tests)
      - InvoiceItemsController (8 tests)
-   - **Total: 64 tests**
+   - **Total: 64 controller tests** (plus 2 existing tests = 66 total tests in the project)
 
 4. **Test Scenarios**
    - Success cases for all CRUD operations (Create, Read, Update, Delete)
