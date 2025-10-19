@@ -1,0 +1,47 @@
+{
+  "name": "Comaiz Admin Development",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "dotnet.defaultSolution": "comaiz.sln"
+      },
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.vscode-dotnet-runtime",
+        "ms-vscode.vscode-json",
+        "humao.rest-client"
+      ]
+    }
+  },
+
+  "forwardPorts": [5000, 7057, 5432],
+  "portsAttributes": {
+    "5000": {
+      "label": "HTTP API",
+      "onAutoForward": "silent"
+    },
+    "7057": {
+      "label": "HTTPS API (Swagger)", 
+      "onAutoForward": "openPreview"
+    },
+    "5432": {
+      "label": "PostgreSQL Database",
+      "onAutoForward": "ignore"
+    }
+  },
+
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postStartCommand": "bash .devcontainer/startup.sh",
+
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "shutdownAction": "stopContainer"
+}
