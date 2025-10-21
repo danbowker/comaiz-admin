@@ -62,63 +62,6 @@ function Get-ComaizToken {
     }
 }
 
-function Register-ComaizUser {
-    <#
-    .SYNOPSIS
-    Registers a new user with the Comaiz API.
-    
-    .DESCRIPTION
-    Creates a new user account in the Comaiz API and returns a JWT bearer token.
-    
-    .PARAMETER BaseUrl
-    The base URL of the Comaiz API (e.g., https://localhost:7057)
-    
-    .PARAMETER Username
-    The desired username
-    
-    .PARAMETER Email
-    The user's email address
-    
-    .PARAMETER Password
-    The desired password (must meet complexity requirements)
-    
-    .EXAMPLE
-    $token = Register-ComaizUser -BaseUrl "https://localhost:7057" -Username "newuser" -Email "user@example.com" -Password "SecurePass@123"
-    #>
-    param (
-        [Parameter(Mandatory=$true)]
-        [string]$BaseUrl,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$Username,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$Email,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$Password
-    )
-
-    $registerRequest = @{
-        username = $Username
-        email = $Email
-        password = $Password
-    } | ConvertTo-Json
-
-    try {
-        $response = Invoke-RestMethod -Uri "$BaseUrl/api/auth/register" `
-            -Method Post `
-            -ContentType "application/json" `
-            -Body $registerRequest
-        
-        return $response.token
-    }
-    catch {
-        Write-Error "Registration failed: $_"
-        throw
-    }
-}
-
 function Get-IdToken {
     <#
     .SYNOPSIS
@@ -354,5 +297,5 @@ function Remove-Item {
     return $response
 }
 
-Export-ModuleMember -Function Get-ComaizToken, Register-ComaizUser, Get-Items, Get-ItemById, Add-Item, Update-Item, Remove-Item, Get-IdToken
+Export-ModuleMember -Function Get-ComaizToken, Get-Items, Get-ItemById, Add-Item, Update-Item, Remove-Item, Get-IdToken
 

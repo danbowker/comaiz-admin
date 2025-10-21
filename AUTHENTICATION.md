@@ -155,47 +155,37 @@ var clients = await httpClient.GetFromJsonAsync<List<Client>>("/api/clients");
 
 ## User Management
 
-### Register a New User
+### Creating Users
 
-**Endpoint:** `POST /api/auth/register`
+**For security reasons, user registration is not exposed via the API.** Users must be created by administrators using one of the following methods:
 
-**Request Body:**
-```json
-{
-  "username": "newuser",
-  "email": "newuser@example.com",
-  "password": "SecurePassword@123"
-}
+#### Method 1: PowerShell Script (Recommended)
+
+Use the provided administrative script to create users:
+
+```powershell
+# Create a regular user
+.\powershell\Add-ComaizUser.ps1 -Username "newuser" -Email "user@example.com" -Password "SecurePass@123"
+
+# Create an admin user
+.\powershell\Add-ComaizUser.ps1 -Username "newadmin" -Email "admin@example.com" -Password "AdminPass@123" -Role "Admin"
 ```
 
-**Response:**
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "username": "newuser",
-  "email": "newuser@example.com",
-  "roles": ["User"]
-}
-```
+The script:
+- Validates password complexity requirements
+- Checks for existing users
+- Creates the user directly in the database
+- Assigns the specified role (Admin or User)
+- Confirms the user email automatically
 
-New users are automatically assigned the "User" role.
+**Requirements:**
+- .NET 9.0 SDK installed
+- Access to the database
+- Run from the project root directory
 
-### Creating Users in the Database (Advanced)
+#### Method 2: Database Seeding
 
-For manual user creation or role assignment, use the Entity Framework tools:
-
-#### 1. Add User Migration Script
-
-Create a file: `Scripts/add-user.sql`
-
-```sql
--- This is automatically handled by ASP.NET Identity
--- Users should be created via the API or seeding code
-```
-
-#### 2. Create User Programmatically
-
-Add to `DatabaseSeeder.cs`:
+Add users to the `DatabaseSeeder.cs` file for automatic creation on startup:
 
 ```csharp
 var newUser = new ApplicationUser
@@ -211,6 +201,10 @@ if (result.Succeeded)
     await userManager.AddToRoleAsync(newUser, "User");
 }
 ```
+
+#### Method 3: Direct Database Access (Not Recommended)
+
+For advanced scenarios, you can use Entity Framework tools directly, but the PowerShell script is the recommended approach as it handles all validation and role assignment.
 
 ## Roles and Permissions
 

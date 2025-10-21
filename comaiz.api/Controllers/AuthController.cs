@@ -25,43 +25,6 @@ public class AuthController : ControllerBase
         _tokenService = tokenService;
     }
 
-    [HttpPost("register")]
-    [AllowAnonymous]
-    public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest request)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        var user = new ApplicationUser
-        {
-            UserName = request.Username,
-            Email = request.Email
-        };
-
-        var result = await _userManager.CreateAsync(user, request.Password);
-
-        if (!result.Succeeded)
-        {
-            return BadRequest(result.Errors);
-        }
-
-        // Assign default role
-        await _userManager.AddToRoleAsync(user, "User");
-
-        var roles = await _userManager.GetRolesAsync(user);
-        var token = _tokenService.GenerateToken(user, roles);
-
-        return Ok(new AuthResponse
-        {
-            Token = token,
-            Username = user.UserName ?? "",
-            Email = user.Email ?? "",
-            Roles = roles
-        });
-    }
-
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)

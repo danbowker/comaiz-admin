@@ -39,8 +39,9 @@ Added to `appsettings.json` and `appsettings.Development.json`:
 ### 3. API Endpoints
 
 #### New AuthController
-- `POST /api/auth/register` - Register a new user
 - `POST /api/auth/login` - Login and receive JWT token
+
+**Note:** User registration is not exposed via the API for security reasons. Users must be created using the administrative PowerShell script (`Add-ComaizUser.ps1`) or database seeding.
 
 #### Protected Endpoints
 All existing controllers now require authentication:
@@ -124,14 +125,19 @@ Comprehensive guide covering:
 
 Updated `ComaizApi.psm1`:
 - New function: `Get-ComaizToken` - Authenticate and get JWT token
-- New function: `Register-ComaizUser` - Register new users
 - Updated all functions to use JWT Bearer tokens
 - Added comprehensive inline documentation
 - Parameter validation and error handling
 
+Created `Add-ComaizUser.ps1`:
+- Administrative script for user creation
+- Creates users directly in the database
+- Supports role assignment (Admin or User)
+- Password complexity validation
+
 Created `Examples.ps1`:
 - Complete workflow demonstration
-- 10 examples covering all operations
+- 9 examples covering all operations
 - Login, CRUD operations, and cleanup
 - Formatted output with colors
 
