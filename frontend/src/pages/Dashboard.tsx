@@ -1,37 +1,44 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
+
+  const dashboardItems = [
+    { title: 'Clients', description: 'Manage client information and relationships', path: '/clients' },
+    { title: 'Workers', description: 'Track workers and their assignments', path: '/workers' },
+    { title: 'Contracts', description: 'Manage contracts with clients', path: '/contracts' },
+    { title: 'Contract Rates', description: 'Define billing rates for contracts', path: '/contract-rates' },
+    { title: 'Work Records', description: 'Record and track work hours', path: '/work-records' },
+    { title: 'Fixed Costs', description: 'Track fixed costs', path: '/fixed-costs' },
+    { title: 'Invoices', description: 'Create and manage invoices', path: '/invoices' },
+    { title: 'Invoice Items', description: 'Manage invoice line items', path: '/invoice-items' },
+  ];
+
   return (
     <div className="dashboard">
       <h1>Welcome to Comaiz Admin</h1>
       <p className="subtitle">Manage your consultancy business efficiently</p>
       
       <div className="dashboard-grid">
-        <div className="dashboard-card">
-          <h3>Clients</h3>
-          <p>Manage client information and relationships</p>
-        </div>
-        <div className="dashboard-card">
-          <h3>Workers</h3>
-          <p>Track workers and their assignments</p>
-        </div>
-        <div className="dashboard-card">
-          <h3>Contracts</h3>
-          <p>Manage contracts with clients</p>
-        </div>
-        <div className="dashboard-card">
-          <h3>Work Records</h3>
-          <p>Record and track work hours</p>
-        </div>
-        <div className="dashboard-card">
-          <h3>Invoices</h3>
-          <p>Create and manage invoices</p>
-        </div>
-        <div className="dashboard-card">
-          <h3>Costs</h3>
-          <p>Track fixed costs and contract rates</p>
-        </div>
+        {dashboardItems.map((item) => (
+          <div 
+            key={item.path}
+            className="dashboard-card"
+            onClick={() => navigate(item.path)}
+            role="button"
+            tabIndex={0}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                navigate(item.path);
+              }
+            }}
+          >
+            <h3>{item.title}</h3>
+            <p>{item.description}</p>
+          </div>
+        ))}
       </div>
 
       <div className="info-section">
