@@ -26,7 +26,17 @@ FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "comaiz.api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
+# Build frontend
+FROM node:20 AS frontend-build
+WORKDIR /frontend
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+# Copy frontend build to wwwroot
+COPY --from=frontend-build /frontend/build ./wwwroot
 ENTRYPOINT ["dotnet", "comaiz.api.dll"]

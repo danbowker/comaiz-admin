@@ -28,3 +28,14 @@ README.md
 !.git/config
 !.git/packed-refs
 !.git/refs/heads/**
+
+# Don't ignore frontend source files needed for build
+!frontend/src/**
+!frontend/public/**
+!frontend/package.json
+!frontend/package-lock.json
+!frontend/tsconfig.json
+
+# But do ignore frontend build output and node_modules
+frontend/build/**
+frontend/node_modules/**

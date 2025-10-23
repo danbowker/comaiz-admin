@@ -93,6 +93,23 @@ Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Databa
 
 ## Usage
 
+### Accessing the Application
+
+The application now includes a React-based frontend that provides a full CRUD interface for managing your consultancy business.
+
+**Web Interface:**
+- Access the web application at the root URL (e.g., `http://localhost:8080` or your deployed domain)
+- Login with default credentials:
+  - Username: `admin`, Password: `Admin@123` (or)
+  - Username: `testuser`, Password: `Test@123`
+- Use the web interface to manage clients, workers, contracts, work records, invoices, and more
+
+**API Access:**
+- Swagger UI is available at `/swagger` for API documentation and testing
+- See the sections below for programmatic API access
+
+📚 **For detailed frontend setup and usage, see [frontend/README.md](frontend/README.md)**
+
 ### Authentication
 
 The API now requires authentication using JWT Bearer tokens. See the [Authentication Guide](AUTHENTICATION.md) for detailed instructions on:
