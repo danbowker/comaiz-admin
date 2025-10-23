@@ -93,18 +93,54 @@ Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Databa
 
 ## Usage
 
+### Authentication
+
+The API now requires authentication using JWT Bearer tokens. See the [Authentication Guide](AUTHENTICATION.md) for detailed instructions on:
+- Getting started with default users
+- Using Swagger UI with authentication
+- Obtaining and using tokens programmatically
+- Creating and managing users
+- Security best practices
+
+**Quick Start:**
+1. Run the API (it will create default users automatically)
+2. Open Swagger UI at `https://localhost:7057/swagger`
+3. Use the `/api/auth/login` endpoint with credentials:
+   - Username: `admin`, Password: `Admin@123` (or)
+   - Username: `testuser`, Password: `Test@123`
+4. Copy the returned token
+5. Click "Authorize" in Swagger and enter: `Bearer YOUR_TOKEN`
+6. Now you can test all API endpoints
+
+### Testing from Swagger
+
 To test from Swagger:
 
 1. Run comaiz.api with the Swagger launch settings
 2. Navigate to the Swagger UI (automatically opens in Codespaces)
-3. Test the API endpoints directly from the Swagger interface
+3. Authenticate using the steps above
+4. Test the API endpoints directly from the Swagger interface
+
+### Testing from Powershell
 
 To test from Powershell
 
 1. Import the Powershell module:
 ```ps
 import-module -name .\powershell\ComaizApi.psm1 -Force
-``` 
+```
+
+2. Get an authentication token:
+```ps
+$token = Get-ComaizToken -BaseUrl "https://localhost:7057" -Username "admin" -Password "Admin@123"
+```
+
+3. Use the token to make API calls:
+```ps
+$clients = Get-Items -BaseUrl "https://localhost:7057" -Token $token -Collection Clients
+```
+
+For more examples, see `powershell/Examples.ps1`.
 
 ## Testing
 

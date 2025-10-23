@@ -1,9 +1,10 @@
 ﻿using comaiz.data.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace comaiz.data
 {
-    public class ComaizContext : DbContext
+    public class ComaizContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
     {
         public ComaizContext(DbContextOptions<ComaizContext> options)
             : base(options)
@@ -22,6 +23,8 @@ namespace comaiz.data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder); // Important for Identity
+
             modelBuilder.Entity<Client>().ToTable("Client");
             modelBuilder.Entity<Contract>().ToTable("Contract");
             modelBuilder.Entity<Worker>().ToTable("Worker");

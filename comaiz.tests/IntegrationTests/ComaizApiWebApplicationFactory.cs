@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using comaiz.data;
 using DotNet.Testcontainers.Builders;
 using Testcontainers.PostgreSql;
+using comaiz.data.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace comaiz.tests.IntegrationTests;
 
@@ -42,7 +44,42 @@ public class ComaizApiWebApplicationFactory : WebApplicationFactory<Program>, IA
 
             // Ensure the database is created and apply migrations
             db.Database.EnsureCreated();
+            
+            // Seed roles and test user
+            var userManager = scopedServices.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = scopedServices.GetRequiredService<RoleManager<ApplicationRole>>();
+            
+            SeedRolesAndUser(roleManager, userManager).GetAwaiter().GetResult();
         });
+    }
+
+    private static async Task SeedRolesAndUser(RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
+    {
+        // Create roles
+        if (!await roleManager.RoleExistsAsync("Admin"))
+        {
+            await roleManager.CreateAsync(new ApplicationRole { Name = "Admin" });
+        }
+        
+        if (!await roleManager.RoleExistsAsync("User"))
+        {
+            await roleManager.CreateAsync(new ApplicationRole { Name = "User" });
+        }
+
+        // Create test user
+        var testUser = await userManager.FindByNameAsync("testuser");
+        if (testUser == null)
+        {
+            testUser = new ApplicationUser
+            {
+                UserName = "testuser",
+                Email = "testuser@test.com",
+                EmailConfirmed = true
+            };
+            
+            await userManager.CreateAsync(testUser, "Test@123");
+            await userManager.AddToRoleAsync(testUser, "User");
+        }
     }
 
     public async Task InitializeAsync()

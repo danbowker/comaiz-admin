@@ -1,10 +1,51 @@
 using comaiz.data;
 using comaiz.data.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace comaiz.tests.IntegrationTests;
 
 public static class TestDataSeeder
 {
+    public static async Task<string> CreateTestUserAndGetToken(IServiceProvider serviceProvider)
+    {
+        var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+        
+        // Create Admin role if it doesn't exist
+        if (!await roleManager.RoleExistsAsync("Admin"))
+        {
+            await roleManager.CreateAsync(new ApplicationRole { Name = "Admin" });
+        }
+        
+        // Create User role if it doesn't exist
+        if (!await roleManager.RoleExistsAsync("User"))
+        {
+            await roleManager.CreateAsync(new ApplicationRole { Name = "User" });
+        }
+
+        // Create test user
+        var testUsername = "testuser";
+        var testUser = await userManager.FindByNameAsync(testUsername);
+        
+        if (testUser == null)
+        {
+            testUser = new ApplicationUser
+            {
+                UserName = testUsername,
+                Email = "testuser@test.com",
+                EmailConfirmed = true
+            };
+            
+            await userManager.CreateAsync(testUser, "Test@123");
+            await userManager.AddToRoleAsync(testUser, "User");
+        }
+
+        // Generate token using a login request
+        // We'll return the username/password so tests can call /api/auth/login
+        return "testuser|Test@123";
+    }
+
     public static void SeedTestData(ComaizContext context)
     {
         // Clear any existing data
