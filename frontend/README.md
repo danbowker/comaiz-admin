@@ -56,6 +56,34 @@ This will start the development server at `http://localhost:3000`.
 
 **Note**: You'll need the backend API running at `http://localhost:7057` or configure the `REACT_APP_API_URL` environment variable.
 
+### Local Development Setup
+
+When running the frontend and backend separately during development:
+
+1. **Start the Backend** (in the repository root):
+   ```bash
+   dotnet run --project comaiz.api
+   ```
+   The backend will run at `https://localhost:7057` (or `http://localhost:5057`)
+
+2. **Configure Frontend** - Create `.env.local` in the `frontend` directory:
+   ```bash
+   # For HTTP backend
+   REACT_APP_API_URL=http://localhost:5057/api
+   
+   # OR for HTTPS backend (default)
+   REACT_APP_API_URL=https://localhost:7057/api
+   ```
+
+3. **Start the Frontend**:
+   ```bash
+   cd frontend
+   npm start
+   ```
+   The frontend will run at `http://localhost:3000`
+
+**CORS Note**: The backend is configured with CORS support in development mode to allow requests from `http://localhost:3000`. This is automatically enabled when running in Development environment.
+
 ### Configuration
 
 Create a `.env.local` file in the `frontend` directory to configure the API endpoint:

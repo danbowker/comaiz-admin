@@ -69,6 +69,18 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
+// Configure CORS for development
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevelopmentCors", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000", "https://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 // Register Token Service
 builder.Services.AddScoped<ITokenService, TokenService>();
 
@@ -138,6 +150,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// Enable CORS in development
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("DevelopmentCors");
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

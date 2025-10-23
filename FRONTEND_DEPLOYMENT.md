@@ -80,7 +80,12 @@ This setup ensures:
 
 ### Development Mode
 
-In development, you typically run frontend and backend separately:
+In development, you run frontend and backend separately to enable hot-reload and faster iteration:
+
+**Backend** (port 7057 for HTTPS, 5057 for HTTP):
+```bash
+dotnet run --project comaiz.api
+```
 
 **Frontend** (port 3000):
 ```bash
@@ -88,15 +93,33 @@ cd frontend
 npm start
 ```
 
-**Backend** (port 7057):
-```bash
-dotnet run --project comaiz.api
+**Important**: The backend includes CORS configuration that allows requests from `http://localhost:3000` when running in Development mode. This is automatically enabled based on the `ASPNETCORE_ENVIRONMENT` variable.
+
+Create a `.env.local` file in the `frontend/` directory:
+```env
+# Use HTTP if backend runs on port 5057
+REACT_APP_API_URL=http://localhost:5057/api
+
+# OR use HTTPS if backend runs on port 7057 (default)
+REACT_APP_API_URL=https://localhost:7057/api
 ```
 
-The frontend `.env.local` should point to the backend:
+**Note**: If using HTTPS, you may need to trust the development certificate:
+```bash
+dotnet dev-certs https --trust
 ```
-REACT_APP_API_URL=http://localhost:7057/api
-```
+
+### Troubleshooting Local Development
+
+**CORS Errors**: If you see "strict-origin-when-cross-origin" or CORS-related errors:
+1. Verify the backend is running in Development mode (check console output)
+2. Ensure `.env.local` has the correct `REACT_APP_API_URL`
+3. Restart both frontend and backend after configuration changes
+
+**405 Method Not Allowed**: This usually indicates CORS preflight (OPTIONS) request is being rejected:
+1. Verify CORS is enabled in `Program.cs` (should be automatic in Development)
+2. Check that the frontend URL in `.env.local` matches the backend port
+3. Ensure the backend is running before starting the frontend
 
 ### Production Mode
 

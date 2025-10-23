@@ -257,13 +257,24 @@ try {
 
 ## CORS
 
-CORS is not required because the frontend and backend are served from the same origin in production.
+### Production
+CORS is not required in production because the frontend and backend are served from the same origin (same Docker container).
 
-In development, if running frontend and backend separately:
-- Frontend: `http://localhost:3000`
-- Backend: `http://localhost:7057`
+### Development
+When running frontend (port 3000) and backend (port 5057 or 7057) separately, CORS is required and automatically enabled.
 
-The backend should be configured to allow requests from the frontend origin during development.
+The backend is configured with CORS support for development:
+- Allows requests from `http://localhost:3000` and `https://localhost:3000`
+- Allows all headers and methods
+- Supports credentials (cookies, authorization headers)
+
+This is automatically enabled when the backend runs in Development environment (`ASPNETCORE_ENVIRONMENT=Development`).
+
+If you encounter CORS errors during local development:
+1. Verify the backend is running in Development mode
+2. Check the console output for CORS configuration
+3. Ensure your `.env.local` has the correct backend URL
+4. Restart both services after making configuration changes
 
 ## Data Validation
 
