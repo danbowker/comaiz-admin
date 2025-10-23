@@ -6,12 +6,12 @@ namespace comaiz.api.Services;
 
 public static class DatabaseSeeder
 {
-    public static async Task SeedDefaultRolesAndUser(IServiceProvider serviceProvider)
+    public static async Task SeedDefaultRolesAndUser(IServiceProvider serviceProvider, bool isDevelopment = false)
     {
         var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
         var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-        // Seed Roles
+        // Seed Roles (always create roles)
         string[] roleNames = { "Admin", "User" };
         
         foreach (var roleName in roleNames)
@@ -23,8 +23,17 @@ public static class DatabaseSeeder
             }
         }
 
-        // Seed Default Admin User (for testing purposes)
-        // In production, this should be done manually or via secure setup
+        // Only seed default users in Development environment
+        if (!isDevelopment)
+        {
+            Console.WriteLine("Skipping default user creation in non-Development environment.");
+            Console.WriteLine("Use Add-ComaizUser.ps1 script or DatabaseSeeder to create users.");
+            return;
+        }
+
+        Console.WriteLine("Development environment detected - creating default users...");
+
+        // Seed Default Admin User (for development/testing purposes only)
         var adminEmail = "admin@comaiz.local";
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         
@@ -44,6 +53,7 @@ public static class DatabaseSeeder
             {
                 await userManager.AddToRoleAsync(newAdminUser, "Admin");
                 Console.WriteLine("Default admin user created: admin / Admin@123");
+                Console.WriteLine("WARNING: Change this password immediately in production!");
             }
         }
 

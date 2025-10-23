@@ -107,13 +107,16 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Seed database with roles and default users
+// Seed database with roles and default users (only in Development)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        await DatabaseSeeder.SeedDefaultRolesAndUser(services);
+        var environment = services.GetRequiredService<IWebHostEnvironment>();
+        var isDevelopment = environment.IsDevelopment();
+        
+        await DatabaseSeeder.SeedDefaultRolesAndUser(services, isDevelopment);
     }
     catch (Exception ex)
     {

@@ -13,7 +13,7 @@ The API uses:
 
 ### Default Users
 
-The application automatically creates two default users on startup:
+**In Development environment only**, the application automatically creates two default users on startup:
 
 1. **Admin User**
    - Username: `admin`
@@ -27,7 +27,11 @@ The application automatically creates two default users on startup:
    - Role: `User`
    - Email: `testuser@comaiz.local`
 
-⚠️ **Security Note**: Change these default passwords immediately in production environments!
+⚠️ **Important Security Notes**: 
+- Default users are **only created in Development environment** (when `ASPNETCORE_ENVIRONMENT=Development`)
+- In Production, Staging, or any other environment, default users are **NOT** created
+- You must create users manually using the PowerShell script or database seeding
+- This prevents hardcoded passwords from being deployed to production
 
 ## Using Swagger UI
 
@@ -263,6 +267,52 @@ JWT settings are configured in `appsettings.json`:
    openssl rand -base64 64
    ```
 
+## Production Deployment
+
+### Environment-Based User Seeding
+
+The application uses **environment-aware user seeding**:
+
+- **Development Environment** (`ASPNETCORE_ENVIRONMENT=Development`):
+  - Default users (admin/testuser) are created automatically
+  - Convenient for local development and testing
+  
+- **Production/Staging/Other Environments**:
+  - Default users are **NOT** created
+  - Prevents hardcoded passwords in production
+  - Administrators must create users manually
+
+### Setting the Environment
+
+**During deployment, ensure the environment is set correctly:**
+
+```bash
+# Linux/Mac
+export ASPNETCORE_ENVIRONMENT=Production
+
+# Windows PowerShell
+$env:ASPNETCORE_ENVIRONMENT="Production"
+
+# Docker
+docker run -e ASPNETCORE_ENVIRONMENT=Production ...
+
+# Azure App Service / Kubernetes
+# Set via configuration/environment variables in your deployment
+```
+
+### First User Creation in Production
+
+After deploying to production for the first time:
+
+1. **Create your first admin user** using the PowerShell script:
+   ```powershell
+   .\powershell\Add-ComaizUser.ps1 -Username "admin" -Email "admin@yourdomain.com" -Password "YourSecurePassword@123" -Role "Admin"
+   ```
+
+2. **Or add to DatabaseSeeder.cs** before deployment and remove after first run
+
+3. The application will only create the roles (Admin, User) but not the users
+
 ## Token Expiration
 
 Tokens expire after 60 minutes by default. After expiration:
@@ -307,13 +357,14 @@ Tokens expire after 60 minutes by default. After expiration:
 1. **Use HTTPS**: Always use HTTPS in production
 2. **Strong Secrets**: Use cryptographically strong secret keys (64+ characters)
 3. **Environment Variables**: Store secrets in environment variables, not in code
-4. **Token Expiration**: Keep token expiration times short (15-60 minutes)
-5. **Secure Storage**: Don't store tokens in browser local storage for sensitive apps
-6. **Change Default Passwords**: Immediately change default user passwords
-7. **Implement Refresh Tokens**: For production, implement refresh token flow
-8. **Rate Limiting**: Implement rate limiting on authentication endpoints
-9. **Log Authentication**: Monitor and log authentication attempts
-10. **Role-Based Access**: Use role-based authorization for sensitive operations
+4. **Production Environment**: Set `ASPNETCORE_ENVIRONMENT=Production` to prevent default user creation
+5. **Token Expiration**: Keep token expiration times short (15-60 minutes)
+6. **Secure Storage**: Don't store tokens in browser local storage for sensitive apps
+7. **Manual User Creation**: In production, create users only via PowerShell script or secure admin process
+8. **Implement Refresh Tokens**: For production, implement refresh token flow
+9. **Rate Limiting**: Implement rate limiting on authentication endpoints
+10. **Log Authentication**: Monitor and log authentication attempts
+11. **Role-Based Access**: Use role-based authorization for sensitive operations
 
 ## Integration with Tests
 

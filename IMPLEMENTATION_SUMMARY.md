@@ -63,10 +63,14 @@ All existing controllers now require authentication:
 - Validates secret key length (minimum 32 characters)
 
 #### DatabaseSeeder
-- Automatically creates "Admin" and "User" roles
-- Seeds default users on application startup:
-  - **Admin**: username=admin, password=Admin@123, role=Admin
-  - **Test User**: username=testuser, password=Test@123, role=User
+- Automatically creates "Admin" and "User" roles (in all environments)
+- **Environment-aware user seeding**:
+  - **Development**: Seeds default users on application startup
+    - **Admin**: username=admin, password=Admin@123, role=Admin
+    - **Test User**: username=testuser, password=Test@123, role=User
+  - **Production/Other**: Skips user creation for security
+    - Prevents hardcoded passwords in production
+    - Administrators must create users via PowerShell script
 
 ### 5. Program.cs Configuration
 
