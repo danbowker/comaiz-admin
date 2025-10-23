@@ -142,9 +142,10 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllers();
+
+// Serve React app
+app.MapFallbackToFile("index.html");
 
 app.Run();
 
