@@ -12,6 +12,7 @@ namespace comaiz.Pages.WorkRecords
     {
         public SelectList? RateSelectList { get; set; }
         public SelectList? WorkerNameSelectList { get; set; }
+        public SelectList? ApplicationUserSelectList { get; set; }
 
         public void PopulateRateSelectList(ComaizContext context, object? selectedRate = null)
         {
@@ -36,6 +37,19 @@ namespace comaiz.Pages.WorkRecords
                     nameof(Worker.Id),
                     nameof(Worker.Name),
                     selectedWorker);
+            }
+        }
+
+        public void PopulateApplicationUserSelectList(ComaizContext context, object? selectedUser = null)
+        {
+            if (context.Users != null)
+            {
+                var userQuery = context.Users.OrderBy(u => u.UserName);
+
+                ApplicationUserSelectList = new SelectList(userQuery.AsNoTracking(),
+                    nameof(ApplicationUser.Id),
+                    nameof(ApplicationUser.UserName),
+                    selectedUser);
             }
         }
     }
