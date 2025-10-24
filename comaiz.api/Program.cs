@@ -126,32 +126,35 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Apply any pending migrations and seed database
-using (var scope = app.Services.CreateScope())
+// Apply any pending migrations and seed database (skip in test environment)
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    var services = scope.ServiceProvider;
-    try
+    using (var scope = app.Services.CreateScope())
     {
-        var context = services.GetRequiredService<ComaizContext>();
-        var environment = services.GetRequiredService<IWebHostEnvironment>();
-        
-        // Check if any migrations are pending before attempting to migrate
-        var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
-        if (pendingMigrations.Any())
+        var services = scope.ServiceProvider;
+        try
         {
-            // Apply any pending migrations
-            await context.Database.MigrateAsync();
+            var context = services.GetRequiredService<ComaizContext>();
+            var environment = services.GetRequiredService<IWebHostEnvironment>();
+            
+            // Check if any migrations are pending before attempting to migrate
+            var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+            if (pendingMigrations.Any())
+            {
+                // Apply any pending migrations
+                await context.Database.MigrateAsync();
+            }
+            
+            // Seed database with roles and default users
+            var isDevelopment = environment.IsDevelopment();
+            await DatabaseSeeder.SeedDefaultRolesAndUser(services, isDevelopment);
         }
-        
-        // Seed database with roles and default users
-        var isDevelopment = environment.IsDevelopment();
-        await DatabaseSeeder.SeedDefaultRolesAndUser(services, isDevelopment);
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
-        throw; // Fail startup if database setup fails
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+            throw; // Fail startup if database setup fails
+        }
     }
 }
 

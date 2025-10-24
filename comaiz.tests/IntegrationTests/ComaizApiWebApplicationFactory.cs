@@ -16,6 +16,9 @@ public class ComaizApiWebApplicationFactory : WebApplicationFactory<Program>, IA
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        // Set the environment to Testing to skip automatic migrations
+        builder.UseEnvironment("Testing");
+        
         builder.ConfigureServices(services =>
         {
             // Remove the existing DbContext configuration
