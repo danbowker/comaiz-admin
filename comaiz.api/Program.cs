@@ -69,7 +69,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// Configure CORS for development
+// Configure CORS for development and production
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevelopmentCors", policy =>
@@ -78,6 +78,13 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
+    });
+    
+    options.AddPolicy("ProductionCors", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
@@ -119,21 +126,27 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Seed database with roles and default users (only in Development)
+// Apply any pending migrations and seed database
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
+        var context = services.GetRequiredService<ComaizContext>();
         var environment = services.GetRequiredService<IWebHostEnvironment>();
-        var isDevelopment = environment.IsDevelopment();
         
+        // Apply any pending migrations
+        await context.Database.MigrateAsync();
+        
+        // Seed database with roles and default users
+        var isDevelopment = environment.IsDevelopment();
         await DatabaseSeeder.SeedDefaultRolesAndUser(services, isDevelopment);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database.");
+        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+        throw; // Fail startup if database setup fails
     }
 }
 
@@ -151,10 +164,14 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// Enable CORS in development
+// Enable CORS
 if (app.Environment.IsDevelopment())
 {
     app.UseCors("DevelopmentCors");
+}
+else
+{
+    app.UseCors("ProductionCors");
 }
 
 app.UseAuthentication();
