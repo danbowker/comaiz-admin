@@ -135,8 +135,13 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<ComaizContext>();
         var environment = services.GetRequiredService<IWebHostEnvironment>();
         
-        // Apply any pending migrations
-        await context.Database.MigrateAsync();
+        // Check if any migrations are pending before attempting to migrate
+        var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+        if (pendingMigrations.Any())
+        {
+            // Apply any pending migrations
+            await context.Database.MigrateAsync();
+        }
         
         // Seed database with roles and default users
         var isDevelopment = environment.IsDevelopment();
