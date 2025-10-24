@@ -15,6 +15,13 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="WorkRecord.Id" />
             <div class="form-group">
+                <label asp-for="WorkRecord.ApplicationUser" class="control-label"></label>
+                <select asp-for="WorkRecord.ApplicationUserId"
+                        asp-items="@Model.ApplicationUserSelectList">
+                    <option value="">-- Select User --</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label asp-for="WorkRecord.Worker" class="control-label"></label>
                 <select asp-for="WorkRecord.WorkerId"
                         asp-items="@Model.WorkerNameSelectList">
