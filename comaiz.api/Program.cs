@@ -137,13 +137,9 @@ if (!app.Environment.IsEnvironment("Testing"))
             var context = services.GetRequiredService<ComaizContext>();
             var environment = services.GetRequiredService<IWebHostEnvironment>();
             
-            // Check if any migrations are pending before attempting to migrate
-            var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
-            if (pendingMigrations.Any())
-            {
-                // Apply any pending migrations
-                await context.Database.MigrateAsync();
-            }
+            // Ensure database exists and apply any pending migrations
+            // This is idempotent and safe to run multiple times
+            await context.Database.MigrateAsync();
             
             // Seed database with roles and default users
             var isDevelopment = environment.IsDevelopment();
