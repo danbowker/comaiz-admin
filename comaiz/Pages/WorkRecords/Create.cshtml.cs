@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace comaiz.Pages.WorkRecords
 {
-    public class CreateModel : ContractRateWorkerNamePageViewModel
+    public class CreateModel : ContractRateApplicationUserPageViewModel
     {
         private readonly ComaizContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -20,7 +20,6 @@ namespace comaiz.Pages.WorkRecords
         {
             PopulateContractNameSelectList(_context);
             PopulateRateSelectList(_context);
-            PopulateWorkerNameSelectList(_context);
             PopulateApplicationUserSelectList(_context);
             
             // Set default ApplicationUser to current logged-in user
@@ -48,7 +47,6 @@ namespace comaiz.Pages.WorkRecords
         {
           if (!ModelState.IsValid || _context.WorkRecords == null)
           {
-              PopulateWorkerNameSelectList(_context, WorkRecord.WorkerId);
               PopulateApplicationUserSelectList(_context, WorkRecord.ApplicationUserId);
               return Page();
           }

@@ -112,7 +112,6 @@ namespace comaiz.tests.Pages
             // Add test data
             context.Contracts!.Add(new Contract { Id = 1, Description = "Test Contract" });
             context.ContractRates!.Add(new ContractRate { Id = 1, Rate = 100, ContractId = 1 });
-            context.Workers!.Add(new Worker { Id = 1, Name = "Test Worker" });
             context.Users!.Add(new ApplicationUser { Id = "user-1", UserName = "user1@example.com" });
             await context.SaveChangesAsync();
             
@@ -132,7 +131,6 @@ namespace comaiz.tests.Pages
             Assert.IsType<PageResult>(result);
             Assert.NotNull(pageModel.ContractsNameSelectList);
             Assert.NotNull(pageModel.RateSelectList);
-            Assert.NotNull(pageModel.WorkerNameSelectList);
             Assert.NotNull(pageModel.ApplicationUserSelectList);
         }
     }

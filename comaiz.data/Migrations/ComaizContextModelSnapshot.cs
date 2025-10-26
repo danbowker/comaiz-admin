@@ -441,9 +441,6 @@ namespace comaiz.data.Migrations
                     b.Property<DateOnly>("StartDate")
                         .HasColumnType("date");
 
-                    b.Property<int>("WorkerId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
@@ -451,8 +448,6 @@ namespace comaiz.data.Migrations
                     b.HasIndex("ContractId");
 
                     b.HasIndex("ContractRateId");
-
-                    b.HasIndex("WorkerId");
 
                     b.ToTable("WorkRecord", (string)null);
                 });
@@ -606,19 +601,11 @@ namespace comaiz.data.Migrations
                         .WithMany()
                         .HasForeignKey("ContractRateId");
 
-                    b.HasOne("comaiz.data.Models.Worker", "Worker")
-                        .WithMany()
-                        .HasForeignKey("WorkerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("Contract");
 
                     b.Navigation("ContractRate");
-
-                    b.Navigation("Worker");
                 });
 
             modelBuilder.Entity("comaiz.data.Models.Client", b =>

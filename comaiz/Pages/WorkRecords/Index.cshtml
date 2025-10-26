@@ -23,7 +23,7 @@
             @Html.DisplayNameFor(model => model.WorkRecord[0].Hours)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.WorkRecord[0].Worker!.Name)
+            @Html.DisplayNameFor(model => model.WorkRecord[0].ApplicationUser!.UserName)
         </th>
         <th></th>
     </tr>
@@ -42,7 +42,7 @@
                 @Html.DisplayFor(modelItem => item.Hours)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Worker!.Name)
+                @Html.DisplayFor(modelItem => item.ApplicationUser!.UserName)
             </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |

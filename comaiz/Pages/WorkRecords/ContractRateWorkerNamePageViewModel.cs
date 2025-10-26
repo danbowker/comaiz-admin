@@ -8,10 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace comaiz.Pages.WorkRecords
 {
-    public class ContractRateWorkerNamePageViewModel : ContractNamePageModel
+    public class ContractRateApplicationUserPageViewModel : ContractNamePageModel
     {
         public SelectList? RateSelectList { get; set; }
-        public SelectList? WorkerNameSelectList { get; set; }
         public SelectList? ApplicationUserSelectList { get; set; }
 
         public void PopulateRateSelectList(ComaizContext context, object? selectedRate = null)
@@ -24,19 +23,6 @@ namespace comaiz.Pages.WorkRecords
                     nameof(ContractRate.Id),
                     nameof(ContractRate.Rate),
                     selectedRate);
-            }
-        }
-
-        public void PopulateWorkerNameSelectList(ComaizContext context, object? selectedWorker = null)
-        {
-            if (context.Workers != null)
-            {
-                var workerQuery = context.Workers.OrderBy(c => c.Name);
-
-                WorkerNameSelectList = new SelectList(workerQuery.AsNoTracking(),
-                    nameof(Worker.Id),
-                    nameof(Worker.Name),
-                    selectedWorker);
             }
         }
 
