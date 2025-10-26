@@ -8,6 +8,7 @@ export interface FormField<T> {
   type: 'text' | 'number' | 'date' | 'select';
   required?: boolean;
   options?: { value: any; label: string }[];
+  defaultValue?: any;
 }
 
 interface EntityFormProps<T extends { id?: number }> {
@@ -27,13 +28,36 @@ function EntityForm<T extends { id?: number }>({
   onClose,
   onSave,
 }: EntityFormProps<T>) {
-  const [formData, setFormData] = useState<Partial<T>>(item || {});
+  const [formData, setFormData] = useState<Partial<T>>(() => {
+    // Initialize with item or default values
+    if (item) {
+      return item;
+    }
+    const defaults: Partial<T> = {};
+    fields.forEach(field => {
+      if (field.defaultValue !== undefined) {
+        defaults[field.name] = field.defaultValue;
+      }
+    });
+    return defaults;
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    setFormData(item || {});
-  }, [item]);
+    if (item) {
+      setFormData(item);
+    } else {
+      // Set defaults for new items
+      const defaults: Partial<T> = {};
+      fields.forEach(field => {
+        if (field.defaultValue !== undefined) {
+          defaults[field.name] = field.defaultValue;
+        }
+      });
+      setFormData(defaults);
+    }
+  }, [item, fields]);
 
   const handleChange = (name: keyof T, value: any) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -84,12 +108,17 @@ function EntityForm<T extends { id?: number }>({
                   <select
                     id={String(field.name)}
                     value={String(formData[field.name] ?? '')}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Check if options use string or number values
+                      const firstOptionValue = field.options?.[0]?.value;
+                      const isStringValue = typeof firstOptionValue === 'string';
+                      
                       handleChange(
                         field.name,
-                        e.target.value === '' ? null : Number(e.target.value)
-                      )
-                    }
+                        value === '' ? null : isStringValue ? value : Number(value)
+                      );
+                    }}
                     required={field.required}
                     disabled={loading}
                   >

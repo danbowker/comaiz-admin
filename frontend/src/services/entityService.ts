@@ -1,7 +1,7 @@
 import api from './api';
 import { 
   Client, 
-  Worker, 
+  ApplicationUser,
   Contract, 
   ContractRate, 
   FixedCost, 
@@ -23,7 +23,7 @@ export class EntityService<T> {
     return response.data;
   }
 
-  async getById(id: number): Promise<T> {
+  async getById(id: number | string): Promise<T> {
     const response = await api.get<T>(`/${this.endpoint}/${id}`);
     return response.data;
   }
@@ -37,14 +37,14 @@ export class EntityService<T> {
     await api.put(`/${this.endpoint}`, entity);
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: number | string): Promise<void> {
     await api.delete(`/${this.endpoint}/${id}`);
   }
 }
 
 // Export services for all entities with proper types
 export const clientsService = new EntityService<Client>('clients');
-export const workersService = new EntityService<Worker>('workers');
+export const usersService = new EntityService<ApplicationUser>('users');
 export const contractsService = new EntityService<Contract>('contracts');
 export const contractRatesService = new EntityService<ContractRate>('contractrates');
 export const fixedCostsService = new EntityService<FixedCost>('fixedcosts');

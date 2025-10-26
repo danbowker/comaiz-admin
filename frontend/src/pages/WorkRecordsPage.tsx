@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
-import { workRecordsService, contractsService, workersService, contractRatesService } from '../services/entityService';
-import { WorkRecord, Contract, Worker, ContractRate } from '../types';
+import { workRecordsService, contractsService, usersService, contractRatesService } from '../services/entityService';
+import { WorkRecord, Contract, ApplicationUser, ContractRate } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 const WorkRecordsPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedItem, setSelectedItem] = useState<WorkRecord | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [contracts, setContracts] = useState<Contract[]>([]);
-  const [workers, setWorkers] = useState<Worker[]>([]);
+  const [users, setUsers] = useState<ApplicationUser[]>([]);
   const [contractRates, setContractRates] = useState<ContractRate[]>([]);
+  const { user } = useAuth();
 
   useEffect(() => {
     loadRelatedData();
@@ -18,13 +20,13 @@ const WorkRecordsPage: React.FC = () => {
 
   const loadRelatedData = async () => {
     try {
-      const [contractsData, workersData, ratesData] = await Promise.all([
+      const [contractsData, usersData, ratesData] = await Promise.all([
         contractsService.getAll(),
-        workersService.getAll(),
+        usersService.getAll(),
         contractRatesService.getAll(),
       ]);
       setContracts(contractsData);
-      setWorkers(workersData);
+      setUsers(usersData);
       setContractRates(ratesData);
     } catch (err) {
       console.error('Failed to load related data', err);
@@ -42,17 +44,26 @@ const WorkRecordsPage: React.FC = () => {
       }
     },
     { 
-      key: 'workerId' as keyof WorkRecord, 
-      label: 'Worker',
+      key: 'applicationUserId' as keyof WorkRecord, 
+      label: 'User',
       render: (item: WorkRecord) => {
-        const worker = workers.find(w => w.id === item.workerId);
-        return worker?.name || item.workerId;
+        const appUser = users.find(u => u.id === item.applicationUserId);
+        return appUser?.userName || item.applicationUserId || 'N/A';
       }
     },
     { key: 'startDate' as keyof WorkRecord, label: 'Start Date' },
     { key: 'endDate' as keyof WorkRecord, label: 'End Date' },
     { key: 'hours' as keyof WorkRecord, label: 'Hours' },
   ];
+
+  // Get current user's ID for defaulting
+  const getCurrentUserId = (): string | undefined => {
+    if (user && users.length > 0) {
+      const currentUser = users.find(u => u.userName === user.username || u.email === user.email);
+      return currentUser?.id;
+    }
+    return undefined;
+  };
 
   const fields: FormField<WorkRecord>[] = [
     {
@@ -63,11 +74,12 @@ const WorkRecordsPage: React.FC = () => {
       options: contracts.map((c) => ({ value: c.id, label: c.description || `Contract ${c.id}` })),
     },
     {
-      name: 'workerId',
-      label: 'Worker',
+      name: 'applicationUserId',
+      label: 'User',
       type: 'select',
-      required: true,
-      options: workers.map((w) => ({ value: w.id, label: w.name || `Worker ${w.id}` })),
+      required: false,
+      options: users.map((u) => ({ value: u.id, label: u.userName || u.email || `User ${u.id}` })),
+      defaultValue: getCurrentUserId(),
     },
     { name: 'startDate', label: 'Start Date', type: 'date', required: true },
     { name: 'endDate', label: 'End Date', type: 'date', required: true },

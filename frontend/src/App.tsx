@@ -6,7 +6,6 @@ import Login from './components/auth/Login';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import ClientsPage from './pages/ClientsPage';
-import WorkersPage from './pages/WorkersPage';
 import ContractsPage from './pages/ContractsPage';
 import ContractRatesPage from './pages/ContractRatesPage';
 import FixedCostsPage from './pages/FixedCostsPage';
@@ -31,7 +30,6 @@ function App() {
           >
             <Route index element={<Dashboard />} />
             <Route path="clients" element={<ClientsPage />} />
-            <Route path="workers" element={<WorkersPage />} />
             <Route path="contracts" element={<ContractsPage />} />
             <Route path="contract-rates" element={<ContractRatesPage />} />
             <Route path="fixed-costs" element={<FixedCostsPage />} />
