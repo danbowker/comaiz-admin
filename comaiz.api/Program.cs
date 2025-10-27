@@ -119,6 +119,31 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// Check for command-line user creation arguments
+if (args.Length >= 4 && args[0] == "--create-user")
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            var username = args[1];
+            var email = args[2];
+            var password = args[3];
+            var role = args.Length >= 5 ? args[4] : "User";
+            
+            Console.WriteLine($"Creating user: {username} with role: {role}");
+            var success = await DatabaseSeeder.CreateUser(services, username, email, password, role);
+            Environment.Exit(success ? 0 : 1);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            Environment.Exit(1);
+        }
+    }
+}
+
 // Seed database with roles and default users (only in Development)
 using (var scope = app.Services.CreateScope())
 {
