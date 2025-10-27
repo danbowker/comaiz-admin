@@ -21,7 +21,6 @@ const Layout: React.FC = () => {
         <div className="navbar-menu">
           <Link to="/">Dashboard</Link>
           <Link to="/clients">Clients</Link>
-          <Link to="/workers">Workers</Link>
           <Link to="/contracts">Contracts</Link>
           <Link to="/contract-rates">Contract Rates</Link>
           <Link to="/fixed-costs">Fixed Costs</Link>

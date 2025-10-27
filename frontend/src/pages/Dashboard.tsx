@@ -7,7 +7,6 @@ const Dashboard: React.FC = () => {
 
   const dashboardItems = [
     { title: 'Clients', description: 'Manage client information and relationships', path: '/clients' },
-    { title: 'Workers', description: 'Track workers and their assignments', path: '/workers' },
     { title: 'Contracts', description: 'Manage contracts with clients', path: '/contracts' },
     { title: 'Contract Rates', description: 'Define billing rates for contracts', path: '/contract-rates' },
     { title: 'Work Records', description: 'Record and track work hours', path: '/work-records' },
@@ -44,7 +43,7 @@ const Dashboard: React.FC = () => {
       <div className="info-section">
         <h2>Getting Started</h2>
         <ol>
-          <li>Start by adding your <strong>Clients</strong> and <strong>Workers</strong></li>
+          <li>Start by adding your <strong>Clients</strong></li>
           <li>Create <strong>Contracts</strong> with your clients</li>
           <li>Set up <strong>Contract Rates</strong> for billing</li>
           <li>Record <strong>Work</strong> as it's completed</li>

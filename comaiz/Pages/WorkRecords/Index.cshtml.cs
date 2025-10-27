@@ -21,7 +21,7 @@ namespace comaiz.Pages.WorkRecords
             if (_context.WorkRecords != null)
             {
                 WorkRecord = await _context.WorkRecords
-                    .Include(w => w.Worker)
+                    .Include(w => w.ApplicationUser)
                     .Include(w => w.Contract)
                     .Include(w => w.ContractRate)
                     .ToListAsync();

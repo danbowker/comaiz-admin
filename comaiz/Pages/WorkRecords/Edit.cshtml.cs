@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace comaiz.Pages.WorkRecords
 {
-    public class EditModel : ContractRateWorkerNamePageViewModel
+    public class EditModel : ContractRateApplicationUserPageViewModel
     {
         private readonly ComaizContext _context;
 
@@ -30,7 +30,7 @@ namespace comaiz.Pages.WorkRecords
                 return NotFound();
             }
             WorkRecord = workrecord;
-            PopulateWorkerNameSelectList(_context, workrecord.WorkerId);
+            PopulateApplicationUserSelectList(_context, workrecord.ApplicationUserId);
             PopulateRateSelectList(_context, workrecord.ContractRateId);
             PopulateContractNameSelectList(_context,workrecord.ContractId);
 

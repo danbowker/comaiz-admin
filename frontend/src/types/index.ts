@@ -6,9 +6,10 @@ export interface Client {
   name?: string;
 }
 
-export interface Worker {
-  id: number;
-  name?: string;
+export interface ApplicationUser {
+  id: string;
+  userName?: string;
+  email?: string;
 }
 
 export interface Contract {
@@ -47,7 +48,7 @@ export interface WorkRecord {
   startDate: string;
   endDate: string;
   hours: number;
-  workerId: number;
+  applicationUserId?: string;
   contractRateId?: number;
 }
 
