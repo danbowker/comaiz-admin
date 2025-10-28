@@ -173,16 +173,6 @@ The application uses JWT tokens for authentication:
 
 ## Development Notes
 
-### Known Dependencies Issues
-
-The React app uses create-react-app which has some known vulnerabilities in development dependencies. These do not affect production builds and are related to webpack-dev-server and other dev-only packages. The vulnerabilities are:
-
-- `nth-check` - Development only, no production impact
-- `postcss` - Development only, no production impact  
-- `webpack-dev-server` - Development only, no production impact
-
-To address these in the future, consider migrating to Vite or another modern build tool.
-
 ### Adding New Entities
 
 To add a new entity to the frontend:
