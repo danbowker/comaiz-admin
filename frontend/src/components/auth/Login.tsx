@@ -59,11 +59,6 @@ const Login: React.FC = () => {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-        <div className="login-info">
-          <p>Default credentials:</p>
-          <p>Username: <strong>admin</strong> / Password: <strong>Admin@123</strong></p>
-          <p>Username: <strong>testuser</strong> / Password: <strong>Test@123</strong></p>
-        </div>
       </div>
     </div>
   );
