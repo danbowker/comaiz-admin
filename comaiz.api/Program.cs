@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using comaiz.api.Services;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,6 +84,14 @@ builder.Services.AddCors(options =>
 
 // Register Token Service
 builder.Services.AddScoped<ITokenService, TokenService>();
+
+// Configure forwarded headers for reverse proxy
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 //add swagger
 builder.Services.AddSwaggerGen(c =>
@@ -163,6 +172,10 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
+
+// Use forwarded headers (must be early in pipeline)
+app.UseForwardedHeaders();
+
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
