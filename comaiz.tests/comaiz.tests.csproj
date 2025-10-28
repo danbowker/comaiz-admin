@@ -32,7 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\comaiz\comaiz.csproj" />
     <ProjectReference Include="..\comaiz.api\comaiz.api.csproj" />
     <ProjectReference Include="..\comaiz.data\comaiz.data.csproj" />
   </ItemGroup>
