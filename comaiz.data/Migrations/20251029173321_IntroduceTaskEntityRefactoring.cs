@@ -66,6 +66,10 @@ namespace comaiz.data.Migrations
                     table.PrimaryKey("PK_Task", x => x.Id);
                 });
 
+            // Clear existing TaskId values in WorkRecord since they were ContractRateIds
+            // and won't correspond to valid Task IDs
+            migrationBuilder.Sql("UPDATE \"WorkRecord\" SET \"TaskId\" = NULL");
+
             migrationBuilder.CreateIndex(
                 name: "IX_InvoiceItem_FixedCostId",
                 table: "InvoiceItem",

@@ -12,7 +12,7 @@ using comaiz.data;
 namespace comaiz.data.Migrations
 {
     [DbContext(typeof(ComaizContext))]
-    [Migration("20251029110448_IntroduceTaskEntityRefactoring")]
+    [Migration("20251029173321_IntroduceTaskEntityRefactoring")]
     partial class IntroduceTaskEntityRefactoring
     {
         /// <inheritdoc />
