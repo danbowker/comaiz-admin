@@ -20,6 +20,7 @@ namespace comaiz.data
         public DbSet<ContractRate>? ContractRates { get; set; }
         public DbSet<Invoice>? Invoices { get; set; }
         public DbSet<InvoiceItem>? InvoiceItems { get; set; }
+        public DbSet<Models.Task>? Tasks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,7 +35,21 @@ namespace comaiz.data
             modelBuilder.Entity<ContractRate>().ToTable("ContractRate");
             modelBuilder.Entity<Invoice>().ToTable("Invoice");
             modelBuilder.Entity<InvoiceItem>().ToTable("InvoiceItem");
+            modelBuilder.Entity<Models.Task>().ToTable("Task");
             modelBuilder.Ignore<Cost>();
+
+            // Configure InvoiceItem relationships to avoid shadow properties
+            modelBuilder.Entity<InvoiceItem>()
+                .HasOne(i => i.FixedCost)
+                .WithMany()
+                .HasForeignKey(i => i.FixedCostId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<InvoiceItem>()
+                .HasOne(i => i.Task)
+                .WithMany()
+                .HasForeignKey(i => i.TaskId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

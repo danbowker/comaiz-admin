@@ -36,7 +36,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetClientsAsync_ReturnsAllClients()
+        public async System.Threading.Tasks.Task GetClientsAsync_ReturnsAllClients()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -56,7 +56,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetClientAsync_WithValidId_ReturnsClient()
+        public async System.Threading.Tasks.Task GetClientAsync_WithValidId_ReturnsClient()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -76,7 +76,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetClientAsync_WithInvalidId_ReturnsNotFound()
+        public async System.Threading.Tasks.Task GetClientAsync_WithInvalidId_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -90,7 +90,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PostClient_WithValidClient_ReturnsCreatedAtAction()
+        public async System.Threading.Tasks.Task PostClient_WithValidClient_ReturnsCreatedAtAction()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -113,7 +113,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PutClient_WithValidClient_ReturnsNoContent()
+        public async System.Threading.Tasks.Task PutClient_WithValidClient_ReturnsNoContent()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -139,7 +139,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PutClient_WhenClientNotExists_ReturnsNotFound()
+        public async System.Threading.Tasks.Task PutClient_WhenClientNotExists_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -154,7 +154,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task DeleteClient_WithValidId_ReturnsNoContent()
+        public async System.Threading.Tasks.Task DeleteClient_WithValidId_ReturnsNoContent()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -176,7 +176,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task DeleteClient_WithInvalidId_ReturnsNotFound()
+        public async System.Threading.Tasks.Task DeleteClient_WithInvalidId_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();
