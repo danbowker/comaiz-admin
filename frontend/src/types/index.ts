@@ -37,6 +37,7 @@ export interface Task {
   id: number;
   name: string;
   contractId?: number;
+  contractRateId?: number;
 }
 
 export interface FixedCost {
