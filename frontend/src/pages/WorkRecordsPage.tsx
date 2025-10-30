@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
-import { workRecordsService, contractsService, usersService, contractRatesService } from '../services/entityService';
-import { WorkRecord, Contract, ApplicationUser, ContractRate } from '../types';
+import { workRecordsService, usersService, tasksService } from '../services/entityService';
+import { WorkRecord, ApplicationUser, Task } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 
 const WorkRecordsPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedItem, setSelectedItem] = useState<WorkRecord | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<ApplicationUser[]>([]);
-  const [contractRates, setContractRates] = useState<ContractRate[]>([]);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -20,14 +19,12 @@ const WorkRecordsPage: React.FC = () => {
 
   const loadRelatedData = async () => {
     try {
-      const [contractsData, usersData, ratesData] = await Promise.all([
-        contractsService.getAll(),
+      const [tasksData, usersData] = await Promise.all([
+        tasksService.getAll(),
         usersService.getAll(),
-        contractRatesService.getAll(),
       ]);
-      setContracts(contractsData);
+      setTasks(tasksData);
       setUsers(usersData);
-      setContractRates(ratesData);
     } catch (err) {
       console.error('Failed to load related data', err);
     }
@@ -36,11 +33,11 @@ const WorkRecordsPage: React.FC = () => {
   const columns = [
     { key: 'id' as keyof WorkRecord, label: 'ID' },
     { 
-      key: 'contractId' as keyof WorkRecord, 
-      label: 'Contract',
+      key: 'taskId' as keyof WorkRecord, 
+      label: 'Task',
       render: (item: WorkRecord) => {
-        const contract = contracts.find(c => c.id === item.contractId);
-        return contract?.description || item.contractId;
+        const task = tasks.find(t => t.id === item.taskId);
+        return task?.name || item.taskId || 'N/A';
       }
     },
     { 
@@ -67,11 +64,11 @@ const WorkRecordsPage: React.FC = () => {
 
   const fields: FormField<WorkRecord>[] = [
     {
-      name: 'contractId',
-      label: 'Contract',
+      name: 'taskId',
+      label: 'Task',
       type: 'select',
-      required: true,
-      options: contracts.map((c) => ({ value: c.id, label: c.description || `Contract ${c.id}` })),
+      required: false,
+      options: tasks.map((t) => ({ value: t.id, label: t.name })),
     },
     {
       name: 'applicationUserId',
@@ -84,12 +81,6 @@ const WorkRecordsPage: React.FC = () => {
     { name: 'startDate', label: 'Start Date', type: 'date', required: true },
     { name: 'endDate', label: 'End Date', type: 'date', required: true },
     { name: 'hours', label: 'Hours', type: 'number', required: true },
-    {
-      name: 'contractRateId',
-      label: 'Contract Rate',
-      type: 'select',
-      options: contractRates.map((r) => ({ value: r.id, label: r.description })),
-    },
   ];
 
   const handleEdit = (item: WorkRecord) => {

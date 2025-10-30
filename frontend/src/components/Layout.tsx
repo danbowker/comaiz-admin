@@ -24,6 +24,7 @@ const Layout: React.FC = () => {
           <Link to="/contracts">Contracts</Link>
           <Link to="/contract-rates">Contract Rates</Link>
           <Link to="/fixed-costs">Fixed Costs</Link>
+          <Link to="/tasks">Tasks</Link>
           <Link to="/work-records">Work Records</Link>
           <Link to="/invoices">Invoices</Link>
           <Link to="/invoice-items">Invoice Items</Link>

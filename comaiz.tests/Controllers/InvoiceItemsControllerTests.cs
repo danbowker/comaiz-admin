@@ -23,12 +23,12 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetInvoiceItems_ReturnsAllInvoiceItems()
+        public async System.Threading.Tasks.Task GetInvoiceItems_ReturnsAllInvoiceItems()
         {
             // Arrange
             using var context = CreateInMemoryContext();
-            context.InvoiceItems!.Add(new InvoiceItem { Id = 1, InvoiceId = 1, CostId = 1, Quantity = 10, Rate = 50m, VATRate = 0.20m, Price = 600m });
-            context.InvoiceItems.Add(new InvoiceItem { Id = 2, InvoiceId = 1, CostId = 2, Quantity = 5, Rate = 75m, VATRate = 0.20m, Price = 450m });
+            context.InvoiceItems!.Add(new InvoiceItem { Id = 1, InvoiceId = 1, TaskId = 1, Quantity = 10, Rate = 50m, VATRate = 0.20m, Price = 600m });
+            context.InvoiceItems.Add(new InvoiceItem { Id = 2, InvoiceId = 1, TaskId = 2, Quantity = 5, Rate = 75m, VATRate = 0.20m, Price = 450m });
             await context.SaveChangesAsync();
             
             var controller = new InvoiceItemsController(context);
@@ -43,11 +43,11 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetInvoiceItem_WithValidId_ReturnsInvoiceItem()
+        public async System.Threading.Tasks.Task GetInvoiceItem_WithValidId_ReturnsInvoiceItem()
         {
             // Arrange
             using var context = CreateInMemoryContext();
-            context.InvoiceItems!.Add(new InvoiceItem { Id = 1, InvoiceId = 1, CostId = 1, Quantity = 10, Rate = 50m, VATRate = 0.20m, Price = 600m });
+            context.InvoiceItems!.Add(new InvoiceItem { Id = 1, InvoiceId = 1, TaskId = 1, Quantity = 10, Rate = 50m, VATRate = 0.20m, Price = 600m });
             await context.SaveChangesAsync();
             
             var controller = new InvoiceItemsController(context);
@@ -64,7 +64,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetInvoiceItem_WithInvalidId_ReturnsNotFound()
+        public async System.Threading.Tasks.Task GetInvoiceItem_WithInvalidId_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -78,11 +78,11 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PostInvoiceItem_WithValidInvoiceItem_ReturnsCreatedAtAction()
+        public async System.Threading.Tasks.Task PostInvoiceItem_WithValidInvoiceItem_ReturnsCreatedAtAction()
         {
             // Arrange
             using var context = CreateInMemoryContext();
-            var invoiceItem = new InvoiceItem { InvoiceId = 1, CostId = 1, Quantity = 8, Rate = 60m, VATRate = 0.20m, Price = 576m };
+            var invoiceItem = new InvoiceItem { InvoiceId = 1, TaskId = 1, Quantity = 8, Rate = 60m, VATRate = 0.20m, Price = 576m };
             var controller = new InvoiceItemsController(context);
 
             // Act
@@ -100,17 +100,17 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PutInvoiceItem_WithValidInvoiceItem_ReturnsNoContent()
+        public async System.Threading.Tasks.Task PutInvoiceItem_WithValidInvoiceItem_ReturnsNoContent()
         {
             // Arrange
             using var context = CreateInMemoryContext();
-            var invoiceItem = new InvoiceItem { Id = 1, InvoiceId = 1, CostId = 1, Quantity = 10, Rate = 50m, VATRate = 0.20m, Price = 600m };
+            var invoiceItem = new InvoiceItem { Id = 1, InvoiceId = 1, TaskId = 1, Quantity = 10, Rate = 50m, VATRate = 0.20m, Price = 600m };
             context.InvoiceItems!.Add(invoiceItem);
             await context.SaveChangesAsync();
             
             context.Entry(invoiceItem).State = EntityState.Detached;
             
-            var updatedInvoiceItem = new InvoiceItem { Id = 1, InvoiceId = 1, CostId = 1, Quantity = 15, Rate = 55m, VATRate = 0.20m, Price = 990m };
+            var updatedInvoiceItem = new InvoiceItem { Id = 1, InvoiceId = 1, TaskId = 1, Quantity = 15, Rate = 55m, VATRate = 0.20m, Price = 990m };
             var controller = new InvoiceItemsController(context);
 
             // Act
@@ -125,11 +125,11 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PutInvoiceItem_WhenInvoiceItemNotExists_ReturnsNotFound()
+        public async System.Threading.Tasks.Task PutInvoiceItem_WhenInvoiceItemNotExists_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();
-            var invoiceItem = new InvoiceItem { Id = 999, InvoiceId = 1, CostId = 1, Quantity = 10, Rate = 50m, VATRate = 0.20m, Price = 600m };
+            var invoiceItem = new InvoiceItem { Id = 999, InvoiceId = 1, TaskId = 1, Quantity = 10, Rate = 50m, VATRate = 0.20m, Price = 600m };
             var controller = new InvoiceItemsController(context);
 
             // Act
@@ -140,11 +140,11 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task DeleteInvoiceItem_WithValidId_ReturnsNoContent()
+        public async System.Threading.Tasks.Task DeleteInvoiceItem_WithValidId_ReturnsNoContent()
         {
             // Arrange
             using var context = CreateInMemoryContext();
-            var invoiceItem = new InvoiceItem { Id = 1, InvoiceId = 1, CostId = 1, Quantity = 10, Rate = 50m, VATRate = 0.20m, Price = 600m };
+            var invoiceItem = new InvoiceItem { Id = 1, InvoiceId = 1, TaskId = 1, Quantity = 10, Rate = 50m, VATRate = 0.20m, Price = 600m };
             context.InvoiceItems!.Add(invoiceItem);
             await context.SaveChangesAsync();
             
@@ -161,7 +161,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task DeleteInvoiceItem_WithInvalidId_ReturnsNotFound()
+        public async System.Threading.Tasks.Task DeleteInvoiceItem_WithInvalidId_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();

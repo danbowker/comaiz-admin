@@ -1,18 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
-import { invoiceItemsService } from '../services/entityService';
-import { InvoiceItem } from '../types';
+import { invoiceItemsService, tasksService, fixedCostsService } from '../services/entityService';
+import { InvoiceItem, Task, FixedCost } from '../types';
 
 const InvoiceItemsPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InvoiceItem | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [fixedCosts, setFixedCosts] = useState<FixedCost[]>([]);
+
+  useEffect(() => {
+    loadRelatedData();
+  }, []);
+
+  const loadRelatedData = async () => {
+    try {
+      const [tasksData, fixedCostsData] = await Promise.all([
+        tasksService.getAll(),
+        fixedCostsService.getAll(),
+      ]);
+      setTasks(tasksData);
+      setFixedCosts(fixedCostsData);
+    } catch (err) {
+      console.error('Failed to load related data', err);
+    }
+  };
 
   const columns = [
     { key: 'id' as keyof InvoiceItem, label: 'ID' },
     { key: 'invoiceId' as keyof InvoiceItem, label: 'Invoice ID' },
-    { key: 'costId' as keyof InvoiceItem, label: 'Cost ID' },
+    { 
+      key: 'taskId' as keyof InvoiceItem, 
+      label: 'Task',
+      render: (item: InvoiceItem) => {
+        if (item.taskId) {
+          const task = tasks.find(t => t.id === item.taskId);
+          return task?.name || `Task ${item.taskId}`;
+        }
+        return 'N/A';
+      }
+    },
+    { 
+      key: 'fixedCostId' as keyof InvoiceItem, 
+      label: 'Fixed Cost',
+      render: (item: InvoiceItem) => {
+        if (item.fixedCostId) {
+          const fixedCost = fixedCosts.find(fc => fc.id === item.fixedCostId);
+          return fixedCost?.name || `Fixed Cost ${item.fixedCostId}`;
+        }
+        return 'N/A';
+      }
+    },
     { key: 'quantity' as keyof InvoiceItem, label: 'Quantity' },
     { key: 'rate' as keyof InvoiceItem, label: 'Rate' },
     { key: 'price' as keyof InvoiceItem, label: 'Price' },
@@ -20,7 +60,20 @@ const InvoiceItemsPage: React.FC = () => {
 
   const fields: FormField<InvoiceItem>[] = [
     { name: 'invoiceId', label: 'Invoice ID', type: 'number', required: true },
-    { name: 'costId', label: 'Cost ID', type: 'number', required: true },
+    {
+      name: 'taskId',
+      label: 'Task',
+      type: 'select',
+      required: false,
+      options: tasks.map((t) => ({ value: t.id, label: t.name })),
+    },
+    {
+      name: 'fixedCostId',
+      label: 'Fixed Cost',
+      type: 'select',
+      required: false,
+      options: fixedCosts.map((fc) => ({ value: fc.id, label: fc.name || `Fixed Cost ${fc.id}` })),
+    },
     { name: 'quantity', label: 'Quantity', type: 'number', required: true },
     { name: 'unit', label: 'Unit', type: 'number', required: true },
     { name: 'rate', label: 'Rate', type: 'number', required: true },

@@ -23,7 +23,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetInvoices_ReturnsAllInvoices()
+        public async System.Threading.Tasks.Task GetInvoices_ReturnsAllInvoices()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -43,7 +43,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetInvoice_WithValidId_ReturnsInvoice()
+        public async System.Threading.Tasks.Task GetInvoice_WithValidId_ReturnsInvoice()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -64,7 +64,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetInvoice_WithInvalidId_ReturnsNotFound()
+        public async System.Threading.Tasks.Task GetInvoice_WithInvalidId_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -78,7 +78,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PostInvoice_WithValidInvoice_ReturnsCreatedAtAction()
+        public async System.Threading.Tasks.Task PostInvoice_WithValidInvoice_ReturnsCreatedAtAction()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -99,7 +99,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PutInvoice_WithValidInvoice_ReturnsNoContent()
+        public async System.Threading.Tasks.Task PutInvoice_WithValidInvoice_ReturnsNoContent()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -123,7 +123,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PutInvoice_WhenInvoiceNotExists_ReturnsNotFound()
+        public async System.Threading.Tasks.Task PutInvoice_WhenInvoiceNotExists_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -138,7 +138,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task DeleteInvoice_WithValidId_ReturnsNoContent()
+        public async System.Threading.Tasks.Task DeleteInvoice_WithValidId_ReturnsNoContent()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -159,7 +159,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task DeleteInvoice_WithInvalidId_ReturnsNotFound()
+        public async System.Threading.Tasks.Task DeleteInvoice_WithInvalidId_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();

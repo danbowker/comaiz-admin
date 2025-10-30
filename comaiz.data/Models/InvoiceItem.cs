@@ -1,13 +1,15 @@
 ﻿namespace comaiz.data.Models
 {
-    // Can either be a cost or quantity, unit and rate
+    // Can either reference a Task or a FixedCost
     public class InvoiceItem
     {
         public int Id { get; set; }
         public int InvoiceId { get; set; }
         public Invoice? Invoice { get; set; }
-        public int CostId { get; set; }
-        public Cost? Cost{ get; set; }
+        public int? TaskId { get; set; }
+        public Task? Task { get; set; }
+        public int? FixedCostId { get; set; }
+        public FixedCost? FixedCost { get; set; }
         public int Quantity { get; set; }
         //TODO, Unit table or enum
         public int Unit { get; set; }

@@ -9,6 +9,7 @@ const Dashboard: React.FC = () => {
     { title: 'Clients', description: 'Manage client information and relationships', path: '/clients' },
     { title: 'Contracts', description: 'Manage contracts with clients', path: '/contracts' },
     { title: 'Contract Rates', description: 'Define billing rates for contracts', path: '/contract-rates' },
+    { title: 'Tasks', description: 'Define and manage tasks for work records', path: '/tasks' },
     { title: 'Work Records', description: 'Record and track work hours', path: '/work-records' },
     { title: 'Fixed Costs', description: 'Track fixed costs', path: '/fixed-costs' },
     { title: 'Invoices', description: 'Create and manage invoices', path: '/invoices' },

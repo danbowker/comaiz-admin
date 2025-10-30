@@ -35,7 +35,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetWorkers_ReturnsAllWorkers()
+        public async System.Threading.Tasks.Task GetWorkers_ReturnsAllWorkers()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -55,7 +55,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetWorker_WithValidId_ReturnsWorker()
+        public async System.Threading.Tasks.Task GetWorker_WithValidId_ReturnsWorker()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -75,7 +75,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetWorker_WithInvalidId_ReturnsNotFound()
+        public async System.Threading.Tasks.Task GetWorker_WithInvalidId_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -89,7 +89,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PostWorker_WithValidWorker_ReturnsCreatedAtAction()
+        public async System.Threading.Tasks.Task PostWorker_WithValidWorker_ReturnsCreatedAtAction()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -112,7 +112,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PutWorker_WithValidWorker_ReturnsNoContent()
+        public async System.Threading.Tasks.Task PutWorker_WithValidWorker_ReturnsNoContent()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -138,7 +138,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PutWorker_WhenWorkerNotExists_ReturnsNotFound()
+        public async System.Threading.Tasks.Task PutWorker_WhenWorkerNotExists_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -153,7 +153,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task DeleteWorker_WithValidId_ReturnsNoContent()
+        public async System.Threading.Tasks.Task DeleteWorker_WithValidId_ReturnsNoContent()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -175,7 +175,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task DeleteWorker_WithInvalidId_ReturnsNotFound()
+        public async System.Threading.Tasks.Task DeleteWorker_WithInvalidId_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();

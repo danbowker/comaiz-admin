@@ -7,7 +7,8 @@ import {
   FixedCost, 
   WorkRecord, 
   Invoice, 
-  InvoiceItem 
+  InvoiceItem,
+  Task
 } from '../types';
 
 // Generic CRUD service for all entities
@@ -51,4 +52,5 @@ export const fixedCostsService = new EntityService<FixedCost>('fixedcosts');
 export const workRecordsService = new EntityService<WorkRecord>('workrecords');
 export const invoicesService = new EntityService<Invoice>('invoices');
 export const invoiceItemsService = new EntityService<InvoiceItem>('invoiceitems');
+export const tasksService = new EntityService<Task>('tasks');
 
