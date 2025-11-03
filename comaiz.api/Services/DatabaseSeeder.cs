@@ -6,7 +6,7 @@ namespace comaiz.api.Services;
 
 public static class DatabaseSeeder
 {
-    public static async Task SeedDefaultRolesAndUser(IServiceProvider serviceProvider, bool isDevelopment = false)
+    public static async System.Threading.Tasks.Task SeedDefaultRolesAndUser(IServiceProvider serviceProvider, bool isDevelopment = false)
     {
         var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
         var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();

@@ -23,7 +23,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetContractsAsync_ReturnsAllContracts()
+        public async System.Threading.Tasks.Task GetContractsAsync_ReturnsAllContracts()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -43,7 +43,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetContractAsync_WithValidId_ReturnsContract()
+        public async System.Threading.Tasks.Task GetContractAsync_WithValidId_ReturnsContract()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -63,7 +63,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetContractAsync_WithInvalidId_ReturnsNotFound()
+        public async System.Threading.Tasks.Task GetContractAsync_WithInvalidId_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -77,7 +77,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PostContract_WithValidContract_ReturnsCreatedAtAction()
+        public async System.Threading.Tasks.Task PostContract_WithValidContract_ReturnsCreatedAtAction()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -99,7 +99,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PutContract_WithValidContract_ReturnsNoContent()
+        public async System.Threading.Tasks.Task PutContract_WithValidContract_ReturnsNoContent()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -123,7 +123,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PutContract_WhenContractNotExists_ReturnsNotFound()
+        public async System.Threading.Tasks.Task PutContract_WhenContractNotExists_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -138,7 +138,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task DeleteContract_WithValidId_ReturnsNoContent()
+        public async System.Threading.Tasks.Task DeleteContract_WithValidId_ReturnsNoContent()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -159,7 +159,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task DeleteContract_WithInvalidId_ReturnsNotFound()
+        public async System.Threading.Tasks.Task DeleteContract_WithInvalidId_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();

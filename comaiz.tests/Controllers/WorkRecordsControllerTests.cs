@@ -23,15 +23,15 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetWorkRecords_ReturnsAllWorkRecords()
+        public async System.Threading.Tasks.Task GetWorkRecords_ReturnsAllWorkRecords()
         {
             // Arrange
             using var context = CreateInMemoryContext();
             var startDate = DateOnly.FromDateTime(DateTime.Now);
             var endDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
             
-            context.WorkRecords!.Add(new WorkRecord { Id = 1, StartDate = startDate, EndDate = endDate, Hours = 8m, ApplicationUserId = "user-1", ContractId = 1 });
-            context.WorkRecords.Add(new WorkRecord { Id = 2, StartDate = startDate, EndDate = endDate, Hours = 6m, ApplicationUserId = "user-2", ContractId = 1 });
+            context.WorkRecords!.Add(new WorkRecord { Id = 1, StartDate = startDate, EndDate = endDate, Hours = 8m, ApplicationUserId = "user-1" });
+            context.WorkRecords.Add(new WorkRecord { Id = 2, StartDate = startDate, EndDate = endDate, Hours = 6m, ApplicationUserId = "user-2" });
             await context.SaveChangesAsync();
             
             var controller = new WorkRecordsController(context);
@@ -46,14 +46,14 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetWorkRecord_WithValidId_ReturnsWorkRecord()
+        public async System.Threading.Tasks.Task GetWorkRecord_WithValidId_ReturnsWorkRecord()
         {
             // Arrange
             using var context = CreateInMemoryContext();
             var startDate = DateOnly.FromDateTime(DateTime.Now);
             var endDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
             
-            context.WorkRecords!.Add(new WorkRecord { Id = 1, StartDate = startDate, EndDate = endDate, Hours = 8m, ApplicationUserId = "user-1", ContractId = 1 });
+            context.WorkRecords!.Add(new WorkRecord { Id = 1, StartDate = startDate, EndDate = endDate, Hours = 8m, ApplicationUserId = "user-1" });
             await context.SaveChangesAsync();
             
             var controller = new WorkRecordsController(context);
@@ -69,7 +69,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetWorkRecord_WithInvalidId_ReturnsNotFound()
+        public async System.Threading.Tasks.Task GetWorkRecord_WithInvalidId_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -83,14 +83,14 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PostWorkRecord_WithValidWorkRecord_ReturnsCreatedAtAction()
+        public async System.Threading.Tasks.Task PostWorkRecord_WithValidWorkRecord_ReturnsCreatedAtAction()
         {
             // Arrange
             using var context = CreateInMemoryContext();
             var startDate = DateOnly.FromDateTime(DateTime.Now);
             var endDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
             
-            var workRecord = new WorkRecord { StartDate = startDate, EndDate = endDate, Hours = 8m, ApplicationUserId = "user-1", ContractId = 1 };
+            var workRecord = new WorkRecord { StartDate = startDate, EndDate = endDate, Hours = 8m, ApplicationUserId = "user-1" };
             var controller = new WorkRecordsController(context);
 
             // Act
@@ -107,7 +107,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PostWorkRecord_WithApplicationUser_SavesApplicationUserId()
+        public async System.Threading.Tasks.Task PostWorkRecord_WithApplicationUser_SavesApplicationUserId()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -121,7 +121,6 @@ namespace comaiz.tests.Controllers
                 EndDate = endDate, 
                 Hours = 8m, 
                 ApplicationUserId = testUserId,
-                ContractId = 1
             };
             var controller = new WorkRecordsController(context);
 
@@ -139,20 +138,20 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PutWorkRecord_WithValidWorkRecord_ReturnsNoContent()
+        public async System.Threading.Tasks.Task PutWorkRecord_WithValidWorkRecord_ReturnsNoContent()
         {
             // Arrange
             using var context = CreateInMemoryContext();
             var startDate = DateOnly.FromDateTime(DateTime.Now);
             var endDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
             
-            var workRecord = new WorkRecord { Id = 1, StartDate = startDate, EndDate = endDate, Hours = 8m, ApplicationUserId = "user-1", ContractId = 1 };
+            var workRecord = new WorkRecord { Id = 1, StartDate = startDate, EndDate = endDate, Hours = 8m, ApplicationUserId = "user-1" };
             context.WorkRecords!.Add(workRecord);
             await context.SaveChangesAsync();
             
             context.Entry(workRecord).State = EntityState.Detached;
             
-            var updatedWorkRecord = new WorkRecord { Id = 1, StartDate = startDate, EndDate = endDate, Hours = 10m, ApplicationUserId = "user-1", ContractId = 1 };
+            var updatedWorkRecord = new WorkRecord { Id = 1, StartDate = startDate, EndDate = endDate, Hours = 10m, ApplicationUserId = "user-1" };
             var controller = new WorkRecordsController(context);
 
             // Act
@@ -166,7 +165,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PutWorkRecord_CanUpdateApplicationUserId()
+        public async System.Threading.Tasks.Task PutWorkRecord_CanUpdateApplicationUserId()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -182,7 +181,6 @@ namespace comaiz.tests.Controllers
                 EndDate = endDate, 
                 Hours = 8m, 
                 ApplicationUserId = originalUserId,
-                ContractId = 1
             };
             context.WorkRecords!.Add(workRecord);
             await context.SaveChangesAsync();
@@ -196,7 +194,6 @@ namespace comaiz.tests.Controllers
                 EndDate = endDate, 
                 Hours = 8m, 
                 ApplicationUserId = newUserId,
-                ContractId = 1
             };
             var controller = new WorkRecordsController(context);
 
@@ -211,14 +208,14 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PutWorkRecord_WhenWorkRecordNotExists_ReturnsNotFound()
+        public async System.Threading.Tasks.Task PutWorkRecord_WhenWorkRecordNotExists_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();
             var startDate = DateOnly.FromDateTime(DateTime.Now);
             var endDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
             
-            var workRecord = new WorkRecord { Id = 999, StartDate = startDate, EndDate = endDate, Hours = 8m, ApplicationUserId = "user-1", ContractId = 1 };
+            var workRecord = new WorkRecord { Id = 999, StartDate = startDate, EndDate = endDate, Hours = 8m, ApplicationUserId = "user-1" };
             var controller = new WorkRecordsController(context);
 
             // Act
@@ -229,14 +226,14 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task DeleteWorkRecord_WithValidId_ReturnsNoContent()
+        public async System.Threading.Tasks.Task DeleteWorkRecord_WithValidId_ReturnsNoContent()
         {
             // Arrange
             using var context = CreateInMemoryContext();
             var startDate = DateOnly.FromDateTime(DateTime.Now);
             var endDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
             
-            var workRecord = new WorkRecord { Id = 1, StartDate = startDate, EndDate = endDate, Hours = 8m, ApplicationUserId = "user-1", ContractId = 1 };
+            var workRecord = new WorkRecord { Id = 1, StartDate = startDate, EndDate = endDate, Hours = 8m, ApplicationUserId = "user-1" };
             context.WorkRecords!.Add(workRecord);
             await context.SaveChangesAsync();
             
@@ -253,7 +250,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task DeleteWorkRecord_WithInvalidId_ReturnsNotFound()
+        public async System.Threading.Tasks.Task DeleteWorkRecord_WithInvalidId_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();

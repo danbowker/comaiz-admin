@@ -19,7 +19,7 @@ public class WorkersApiIntegrationTests : IClassFixture<ComaizApiWebApplicationF
         _client = factory.CreateClient();
     }
 
-    public async Task InitializeAsync()
+    public async System.Threading.Tasks.Task InitializeAsync()
     {
         // Get auth token first
         _authToken = await AuthHelper.GetAuthTokenAsync(_client);
@@ -29,20 +29,20 @@ public class WorkersApiIntegrationTests : IClassFixture<ComaizApiWebApplicationF
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ComaizContext>();
         TestDataSeeder.SeedTestData(context);
-        await Task.CompletedTask;
+        await System.Threading.Tasks.Task.CompletedTask;
     }
 
-    public async Task DisposeAsync()
+    public async System.Threading.Tasks.Task DisposeAsync()
     {
         // Clean up after each test
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ComaizContext>();
         TestDataSeeder.ClearTestData(context);
-        await Task.CompletedTask;
+        await System.Threading.Tasks.Task.CompletedTask;
     }
 
     [Fact]
-    public async Task GetWorkers_ReturnsSuccessAndAllWorkers()
+    public async System.Threading.Tasks.Task GetWorkers_ReturnsSuccessAndAllWorkers()
     {
         // Act
         var response = await _client.GetAsync("/api/workers");
@@ -59,7 +59,7 @@ public class WorkersApiIntegrationTests : IClassFixture<ComaizApiWebApplicationF
     }
 
     [Fact]
-    public async Task GetWorker_WithValidId_ReturnsWorker()
+    public async System.Threading.Tasks.Task GetWorker_WithValidId_ReturnsWorker()
     {
         // Arrange - Get an existing worker ID
         var allWorkers = await _client.GetFromJsonAsync<List<Worker>>("/api/workers");
@@ -77,7 +77,7 @@ public class WorkersApiIntegrationTests : IClassFixture<ComaizApiWebApplicationF
     }
 
     [Fact]
-    public async Task GetWorker_WithInvalidId_ReturnsNotFound()
+    public async System.Threading.Tasks.Task GetWorker_WithInvalidId_ReturnsNotFound()
     {
         // Act
         var response = await _client.GetAsync("/api/workers/99999");
@@ -87,7 +87,7 @@ public class WorkersApiIntegrationTests : IClassFixture<ComaizApiWebApplicationF
     }
 
     [Fact]
-    public async Task PostWorker_WithValidData_CreatesNewWorker()
+    public async System.Threading.Tasks.Task PostWorker_WithValidData_CreatesNewWorker()
     {
         // Arrange
         var newWorker = new Worker
@@ -113,7 +113,7 @@ public class WorkersApiIntegrationTests : IClassFixture<ComaizApiWebApplicationF
     }
 
     [Fact]
-    public async Task PutWorker_WithValidData_UpdatesWorker()
+    public async System.Threading.Tasks.Task PutWorker_WithValidData_UpdatesWorker()
     {
         // Arrange - Get an existing worker
         var allWorkers = await _client.GetFromJsonAsync<List<Worker>>("/api/workers");
@@ -135,7 +135,7 @@ public class WorkersApiIntegrationTests : IClassFixture<ComaizApiWebApplicationF
     }
 
     [Fact]
-    public async Task DeleteWorker_WithValidId_DeletesWorker()
+    public async System.Threading.Tasks.Task DeleteWorker_WithValidId_DeletesWorker()
     {
         // Arrange - Get an existing worker
         var allWorkers = await _client.GetFromJsonAsync<List<Worker>>("/api/workers");
@@ -154,7 +154,7 @@ public class WorkersApiIntegrationTests : IClassFixture<ComaizApiWebApplicationF
     }
 
     [Fact]
-    public async Task DeleteWorker_WithInvalidId_ReturnsNotFound()
+    public async System.Threading.Tasks.Task DeleteWorker_WithInvalidId_ReturnsNotFound()
     {
         // Act
         var response = await _client.DeleteAsync("/api/workers/99999");
@@ -164,7 +164,7 @@ public class WorkersApiIntegrationTests : IClassFixture<ComaizApiWebApplicationF
     }
 
     [Fact]
-    public async Task GetWorkers_WithoutAuthentication_ReturnsUnauthorized()
+    public async System.Threading.Tasks.Task GetWorkers_WithoutAuthentication_ReturnsUnauthorized()
     {
         // Arrange - Create a new client without auth token
         var unauthenticatedClient = _factory.CreateClient();
