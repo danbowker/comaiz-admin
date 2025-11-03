@@ -124,11 +124,15 @@ Configure the following secrets in your repository (**Settings** → **Secrets a
    ```
 3. Run migrations to create the schema:
    ```bash
-   # Set the staging connection string temporarily
+   # Set the staging connection string temporarily (use a .env file or directly set for the command)
+   # Note: Avoid putting passwords in shell history - use a .env file or prefix with a space if your shell supports it
    export ConnectionStrings__PostgresSQL="Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_staging"
    
    # Run migrations
    dotnet ef database update -p comaiz.data -s comaiz.api
+   
+   # Unset the environment variable after use
+   unset ConnectionStrings__PostgresSQL
    ```
 
 #### Production Database
@@ -140,11 +144,15 @@ Configure the following secrets in your repository (**Settings** → **Secrets a
    ```
 3. Run migrations to create the schema:
    ```bash
-   # Set the production connection string temporarily
+   # Set the production connection string temporarily (use a .env file or directly set for the command)
+   # Note: Avoid putting passwords in shell history - use a .env file or prefix with a space if your shell supports it
    export ConnectionStrings__PostgresSQL="Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_production"
    
    # Run migrations
    dotnet ef database update -p comaiz.data -s comaiz.api
+   
+   # Unset the environment variable after use
+   unset ConnectionStrings__PostgresSQL
    ```
 
 ### Creating a Release (Production Deployment)

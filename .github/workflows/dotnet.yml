@@ -79,6 +79,7 @@ jobs:
               -e ConnectionStrings__PostgresSQL=${{ secrets.STAGING_CONNECTION_STRING }} \
               ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }}
           EOF
+          rm -f private_key
 
   deploy-production:
     needs: build
@@ -112,3 +113,4 @@ jobs:
               -e ConnectionStrings__PostgresSQL=${{ secrets.PRODUCTION_CONNECTION_STRING }} \
               ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }}
           EOF
+          rm -f private_key
