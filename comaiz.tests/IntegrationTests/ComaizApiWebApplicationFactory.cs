@@ -53,7 +53,7 @@ public class ComaizApiWebApplicationFactory : WebApplicationFactory<Program>, IA
         });
     }
 
-    private static async Task SeedRolesAndUser(RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
+    private static async System.Threading.Tasks.Task SeedRolesAndUser(RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
     {
         // Create roles
         if (!await roleManager.RoleExistsAsync("Admin"))
@@ -82,7 +82,7 @@ public class ComaizApiWebApplicationFactory : WebApplicationFactory<Program>, IA
         }
     }
 
-    public async Task InitializeAsync()
+    public async System.Threading.Tasks.Task InitializeAsync()
     {
         _postgresContainer = new PostgreSqlBuilder()
             .WithImage("postgres:16")
@@ -95,7 +95,7 @@ public class ComaizApiWebApplicationFactory : WebApplicationFactory<Program>, IA
         await _postgresContainer.StartAsync();
     }
 
-    public new async Task DisposeAsync()
+    public new async System.Threading.Tasks.Task DisposeAsync()
     {
         if (_postgresContainer != null)
         {

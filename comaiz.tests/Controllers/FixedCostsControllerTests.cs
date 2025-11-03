@@ -23,7 +23,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetCosts_ReturnsAllFixedCosts()
+        public async System.Threading.Tasks.Task GetCosts_ReturnsAllFixedCosts()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -43,7 +43,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetCost_WithValidId_ReturnsFixedCost()
+        public async System.Threading.Tasks.Task GetCost_WithValidId_ReturnsFixedCost()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -63,7 +63,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task GetCost_WithInvalidId_ReturnsNotFound()
+        public async System.Threading.Tasks.Task GetCost_WithInvalidId_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -77,7 +77,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PostCost_WithValidFixedCost_ReturnsCreatedAtAction()
+        public async System.Threading.Tasks.Task PostCost_WithValidFixedCost_ReturnsCreatedAtAction()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -98,7 +98,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PutCost_WithValidFixedCost_ReturnsNoContent()
+        public async System.Threading.Tasks.Task PutCost_WithValidFixedCost_ReturnsNoContent()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -123,7 +123,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task PutCost_WhenFixedCostNotExists_ReturnsNotFound()
+        public async System.Threading.Tasks.Task PutCost_WhenFixedCostNotExists_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -138,7 +138,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task DeleteCost_WithValidId_ReturnsNoContent()
+        public async System.Threading.Tasks.Task DeleteCost_WithValidId_ReturnsNoContent()
         {
             // Arrange
             using var context = CreateInMemoryContext();
@@ -159,7 +159,7 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
-        public async Task DeleteCost_WithInvalidId_ReturnsNotFound()
+        public async System.Threading.Tasks.Task DeleteCost_WithInvalidId_ReturnsNotFound()
         {
             // Arrange
             using var context = CreateInMemoryContext();

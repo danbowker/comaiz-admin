@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using comaiz.data;
@@ -11,9 +12,11 @@ using comaiz.data;
 namespace comaiz.data.Migrations
 {
     [DbContext(typeof(ComaizContext))]
-    partial class ComaizContextModelSnapshot : ModelSnapshot
+    [Migration("20251030094246_AddContractToTask")]
+    partial class AddContractToTask
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -430,9 +433,6 @@ namespace comaiz.data.Migrations
                     b.Property<int?>("ContractId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ContractRateId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -440,8 +440,6 @@ namespace comaiz.data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ContractId");
-
-                    b.HasIndex("ContractRateId");
 
                     b.ToTable("Task", (string)null);
                 });
@@ -634,13 +632,7 @@ namespace comaiz.data.Migrations
                         .WithMany()
                         .HasForeignKey("ContractId");
 
-                    b.HasOne("comaiz.data.Models.ContractRate", "ContractRate")
-                        .WithMany()
-                        .HasForeignKey("ContractRateId");
-
                     b.Navigation("Contract");
-
-                    b.Navigation("ContractRate");
                 });
 
             modelBuilder.Entity("comaiz.data.Models.WorkRecord", b =>

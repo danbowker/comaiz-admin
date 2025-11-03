@@ -33,6 +33,13 @@ export interface ContractRate {
   rate?: number;
 }
 
+export interface Task {
+  id: number;
+  name: string;
+  contractId?: number;
+  contractRateId?: number;
+}
+
 export interface FixedCost {
   id: number;
   contractId: number;
@@ -43,13 +50,12 @@ export interface FixedCost {
 
 export interface WorkRecord {
   id: number;
-  contractId: number;
-  invoiceItemId?: number;
   startDate: string;
   endDate: string;
   hours: number;
   applicationUserId?: string;
-  contractRateId?: number;
+  taskId?: number;
+  invoiceItemId?: number;
 }
 
 export interface Invoice {
@@ -62,7 +68,8 @@ export interface Invoice {
 export interface InvoiceItem {
   id: number;
   invoiceId: number;
-  costId: number;
+  taskId?: number;
+  fixedCostId?: number;
   quantity: number;
   unit: number;
   rate: number;
