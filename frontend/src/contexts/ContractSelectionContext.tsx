@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { contractsService } from '../services/entityService';
 import { Contract } from '../types';
@@ -21,8 +21,15 @@ export const ContractSelectionProvider: React.FC<{ children: React.ReactNode }> 
   const [error, setError] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
+  const loadingRef = useRef<number | null>(null);
 
   const loadContract = useCallback(async (contractId: number) => {
+    // Prevent duplicate loads
+    if (loadingRef.current === contractId) {
+      return;
+    }
+    
+    loadingRef.current = contractId;
     setIsLoading(true);
     setError(null);
     try {
@@ -35,13 +42,16 @@ export const ContractSelectionProvider: React.FC<{ children: React.ReactNode }> 
       setSelectedContractId(null);
       setSelectedContractState(null);
       // Remove invalid contract from URL
-      const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.delete('contract');
-      setSearchParams(newSearchParams, { replace: true });
+      setSearchParams((params) => {
+        const newParams = new URLSearchParams(params);
+        newParams.delete('contract');
+        return newParams;
+      }, { replace: true });
     } finally {
       setIsLoading(false);
+      loadingRef.current = null;
     }
-  }, [searchParams, setSearchParams]);
+  }, [setSearchParams]);
 
   // Initialize from URL on mount and when location changes
   useEffect(() => {
@@ -59,30 +69,34 @@ export const ContractSelectionProvider: React.FC<{ children: React.ReactNode }> 
     }
   }, [location.search, loadContract, searchParams, selectedContractId]);
 
-  const setSelectedContract = (contractId: number | null) => {
+  const clearSelectedContract = useCallback(() => {
+    setSelectedContractId(null);
+    setSelectedContractState(null);
+    setError(null);
+    
+    // Remove contract param from URL
+    setSearchParams((params) => {
+      const newParams = new URLSearchParams(params);
+      newParams.delete('contract');
+      return newParams;
+    }, { replace: true });
+  }, [setSearchParams]);
+
+  const setSelectedContract = useCallback((contractId: number | null) => {
     if (contractId === null) {
       clearSelectedContract();
       return;
     }
 
     // Update URL with contract param using replaceState to avoid history spam
-    const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.set('contract', contractId.toString());
-    setSearchParams(newSearchParams, { replace: true });
+    setSearchParams((params) => {
+      const newParams = new URLSearchParams(params);
+      newParams.set('contract', contractId.toString());
+      return newParams;
+    }, { replace: true });
     
     // The useEffect will handle loading the contract when URL changes
-  };
-
-  const clearSelectedContract = () => {
-    setSelectedContractId(null);
-    setSelectedContractState(null);
-    setError(null);
-    
-    // Remove contract param from URL
-    const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.delete('contract');
-    setSearchParams(newSearchParams, { replace: true });
-  };
+  }, [clearSelectedContract, setSearchParams]);
 
   return (
     <ContractSelectionContext.Provider

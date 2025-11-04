@@ -23,7 +23,10 @@ namespace comaiz.api.Controllers
         {
             if (dbContext.InvoiceItems == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var query = dbContext.InvoiceItems.AsQueryable();
+            var query = dbContext.InvoiceItems
+                .Include(ii => ii.Task)
+                .Include(ii => ii.FixedCost)
+                .AsQueryable();
             
             if (contractId.HasValue)
             {
