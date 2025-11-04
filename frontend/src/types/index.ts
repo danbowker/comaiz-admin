@@ -31,6 +31,8 @@ export interface ContractRate {
   contractId: number;
   description: string;
   rate?: number;
+  applicationUserId?: string;
+  applicationUser?: ApplicationUser;
 }
 
 export interface Task {

@@ -22,7 +22,7 @@ namespace comaiz.api.Controllers
         {
             if(dbContext.ContractRates == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var query = dbContext.ContractRates.AsQueryable();
+            var query = dbContext.ContractRates.Include(cr => cr.ApplicationUser).AsQueryable();
             
             if (contractId.HasValue)
             {
@@ -37,7 +37,9 @@ namespace comaiz.api.Controllers
         {
             if (dbContext.ContractRates == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var contractRate = await dbContext.ContractRates.FindAsync(id);
+            var contractRate = await dbContext.ContractRates
+                .Include(cr => cr.ApplicationUser)
+                .FirstOrDefaultAsync(cr => cr.Id == id);
 
             if (contractRate == null)
             {
