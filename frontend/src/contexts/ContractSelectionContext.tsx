@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { contractsService } from '../services/entityService';
 import { Contract } from '../types';
 
@@ -20,7 +20,6 @@ export const ContractSelectionProvider: React.FC<{ children: React.ReactNode }> 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
-  const location = useLocation();
   const loadingRef = useRef<number | null>(null);
 
   const loadContract = useCallback(async (contractId: number) => {
@@ -58,7 +57,7 @@ export const ContractSelectionProvider: React.FC<{ children: React.ReactNode }> 
     const contractParam = searchParams.get('contract');
     if (contractParam) {
       const contractId = parseInt(contractParam, 10);
-      if (!isNaN(contractId) && contractId !== selectedContractId) {
+      if (!isNaN(contractId) && contractId > 0 && contractId !== selectedContractId) {
         loadContract(contractId);
       }
     } else if (selectedContractId !== null) {
@@ -67,7 +66,7 @@ export const ContractSelectionProvider: React.FC<{ children: React.ReactNode }> 
       setSelectedContractState(null);
       setError(null);
     }
-  }, [location.search, loadContract, searchParams, selectedContractId]);
+  }, [searchParams, loadContract, selectedContractId]);
 
   const clearSelectedContract = useCallback(() => {
     setSelectedContractId(null);

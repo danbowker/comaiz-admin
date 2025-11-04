@@ -27,18 +27,18 @@ namespace comaiz.api.Controllers
             if (contractId.HasValue)
             {
                 // Filter invoices by the client associated with the contract
-                var clientId = await dbContext.Contracts
+                var contract = await dbContext.Contracts
                     .Where(c => c.Id == contractId.Value)
-                    .Select(c => c.ClientId)
+                    .Select(c => new { c.ClientId })
                     .FirstOrDefaultAsync();
                 
-                if (clientId == 0)
+                if (contract == null)
                 {
                     // If contract not found, return empty list
                     return new List<Invoice>();
                 }
                 
-                query = query.Where(i => i.ClientId == clientId);
+                query = query.Where(i => i.ClientId == contract.ClientId);
             }
 
             return await query.ToListAsync();
