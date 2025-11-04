@@ -116,3 +116,5 @@ Potential improvements not included in this implementation:
 - Contract-specific permissions
 - Creating new contracts from the picker
 - Multiple contract selection
+- Caching contract-to-client mappings for invoice filtering performance
+- Upper bound validation for contract IDs (beyond Number.MAX_SAFE_INTEGER)
