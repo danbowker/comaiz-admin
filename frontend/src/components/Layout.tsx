@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ContractPicker from './ContractPicker';
 import './Layout.css';
@@ -7,10 +7,20 @@ import './Layout.css';
 const Layout: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  // Helper function to build link with preserved contract parameter
+  const buildLink = (path: string): string => {
+    const contractParam = searchParams.get('contract');
+    if (contractParam) {
+      return `${path}?contract=${contractParam}`;
+    }
+    return path;
   };
 
   return (
@@ -20,15 +30,15 @@ const Layout: React.FC = () => {
           <h1>Comaiz Admin</h1>
         </div>
         <div className="navbar-menu">
-          <Link to="/">Dashboard</Link>
-          <Link to="/clients">Clients</Link>
-          <Link to="/contracts">Contracts</Link>
-          <Link to="/contract-rates">Contract Rates</Link>
-          <Link to="/fixed-costs">Fixed Costs</Link>
-          <Link to="/tasks">Tasks</Link>
-          <Link to="/work-records">Work Records</Link>
-          <Link to="/invoices">Invoices</Link>
-          <Link to="/invoice-items">Invoice Items</Link>
+          <Link to={buildLink('/')}>Dashboard</Link>
+          <Link to={buildLink('/clients')}>Clients</Link>
+          <Link to={buildLink('/contracts')}>Contracts</Link>
+          <Link to={buildLink('/contract-rates')}>Contract Rates</Link>
+          <Link to={buildLink('/fixed-costs')}>Fixed Costs</Link>
+          <Link to={buildLink('/tasks')}>Tasks</Link>
+          <Link to={buildLink('/work-records')}>Work Records</Link>
+          <Link to={buildLink('/invoices')}>Invoices</Link>
+          <Link to={buildLink('/invoice-items')}>Invoice Items</Link>
         </div>
         <div className="navbar-controls">
           <ContractPicker />
