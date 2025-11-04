@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
 import { tasksService, contractsService, contractRatesService } from '../services/entityService';
 import { Task, Contract, ContractRate } from '../types';
+import { useContractSelection } from '../contexts/ContractSelectionContext';
 
 const TasksPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
@@ -10,23 +11,32 @@ const TasksPage: React.FC = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [contractRates, setContractRates] = useState<ContractRate[]>([]);
+  const { selectedContractId } = useContractSelection();
 
-  useEffect(() => {
-    loadRelatedData();
-  }, []);
-
-  const loadRelatedData = async () => {
+  const loadRelatedData = useCallback(async () => {
     try {
+      const filterParams = selectedContractId ? { contractId: selectedContractId } : undefined;
       const [contractsData, ratesData] = await Promise.all([
         contractsService.getAll(),
-        contractRatesService.getAll(),
+        contractRatesService.getAll(filterParams),
       ]);
       setContracts(contractsData);
       setContractRates(ratesData);
     } catch (err) {
       console.error('Failed to load related data', err);
     }
-  };
+  }, [selectedContractId]);
+
+  useEffect(() => {
+    loadRelatedData();
+  }, [loadRelatedData]);
+
+  const queryParams = useMemo(() => {
+    if (selectedContractId) {
+      return { contractId: selectedContractId };
+    }
+    return {};
+  }, [selectedContractId]);
 
   const columns = [
     { key: 'id' as keyof Task, label: 'ID' },
@@ -63,6 +73,7 @@ const TasksPage: React.FC = () => {
       type: 'select',
       required: false,
       options: contracts.map((c) => ({ value: c.id, label: c.description || `Contract ${c.id}` })),
+      defaultValue: selectedContractId || undefined,
     },
     {
       name: 'contractRateId',
@@ -106,6 +117,7 @@ const TasksPage: React.FC = () => {
         onEdit={handleEdit}
         onCreate={handleCreate}
         onDelete={handleDelete}
+        queryParams={queryParams}
       />
       {showForm && (
         <EntityForm

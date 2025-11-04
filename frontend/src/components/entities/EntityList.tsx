@@ -15,6 +15,7 @@ interface EntityListProps<T extends { id: number }> {
   onEdit: (item: T) => void;
   onCreate: () => void;
   onDelete: (id: number) => void;
+  queryParams?: Record<string, any>;
 }
 
 function EntityList<T extends { id: number }>({
@@ -24,6 +25,7 @@ function EntityList<T extends { id: number }>({
   onEdit,
   onCreate,
   onDelete,
+  queryParams,
 }: EntityListProps<T>) {
   const [items, setItems] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +34,7 @@ function EntityList<T extends { id: number }>({
   const loadItems = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await service.getAll();
+      const data = await service.getAll(queryParams);
       setItems(data);
       setError('');
     } catch (err: any) {
@@ -40,7 +42,7 @@ function EntityList<T extends { id: number }>({
     } finally {
       setLoading(false);
     }
-  }, [service]);
+  }, [service, queryParams]);
 
   useEffect(() => {
     loadItems();

@@ -1,0 +1,158 @@
+.contract-picker {
+  position: relative;
+  min-width: 200px;
+  max-width: 300px;
+}
+
+.contract-picker-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.2s;
+}
+
+.contract-picker-trigger:hover {
+  border-color: #4CAF50;
+}
+
+.selected-contract-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+  color: #333;
+}
+
+.placeholder {
+  flex: 1;
+  color: #999;
+}
+
+.clear-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: #999;
+  padding: 0 4px;
+  transition: color 0.2s;
+}
+
+.clear-btn:hover {
+  color: #f44336;
+}
+
+.dropdown-arrow {
+  font-size: 12px;
+  color: #999;
+  transition: transform 0.2s;
+}
+
+.contract-picker-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  max-height: 400px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.contract-picker-search {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.contract-picker-search input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.contract-picker-search input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.contract-picker-list {
+  overflow-y: auto;
+  max-height: 300px;
+}
+
+.contract-picker-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.contract-picker-item:last-child {
+  border-bottom: none;
+}
+
+.contract-picker-item:hover {
+  background-color: #f5f5f5;
+}
+
+.contract-picker-item.selected {
+  background-color: #e8f5e9;
+}
+
+.contract-picker-item-name {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.contract-picker-item-meta {
+  font-size: 12px;
+  color: #999;
+}
+
+.contract-picker-loading,
+.contract-picker-empty {
+  padding: 16px;
+  text-align: center;
+  color: #999;
+}
+
+.contract-picker-error {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  background: #ffebee;
+  color: #c62828;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  margin-top: 2px;
+  z-index: 999;
+}
+
+@media (max-width: 768px) {
+  .contract-picker {
+    min-width: 150px;
+  }
+  
+  .contract-picker-trigger {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+}

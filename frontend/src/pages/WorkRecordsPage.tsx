@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
 import { workRecordsService, usersService, tasksService } from '../services/entityService';
 import { WorkRecord, ApplicationUser, Task } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import { useContractSelection } from '../contexts/ContractSelectionContext';
 
 const WorkRecordsPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
@@ -12,15 +13,13 @@ const WorkRecordsPage: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<ApplicationUser[]>([]);
   const { user } = useAuth();
+  const { selectedContractId } = useContractSelection();
 
-  useEffect(() => {
-    loadRelatedData();
-  }, []);
-
-  const loadRelatedData = async () => {
+  const loadRelatedData = useCallback(async () => {
     try {
+      const filterParams = selectedContractId ? { contractId: selectedContractId } : undefined;
       const [tasksData, usersData] = await Promise.all([
-        tasksService.getAll(),
+        tasksService.getAll(filterParams),
         usersService.getAll(),
       ]);
       setTasks(tasksData);
@@ -28,7 +27,18 @@ const WorkRecordsPage: React.FC = () => {
     } catch (err) {
       console.error('Failed to load related data', err);
     }
-  };
+  }, [selectedContractId]);
+
+  useEffect(() => {
+    loadRelatedData();
+  }, [loadRelatedData]);
+
+  const queryParams = useMemo(() => {
+    if (selectedContractId) {
+      return { contractId: selectedContractId };
+    }
+    return {};
+  }, [selectedContractId]);
 
   const columns = [
     { key: 'id' as keyof WorkRecord, label: 'ID' },
@@ -116,6 +126,7 @@ const WorkRecordsPage: React.FC = () => {
         onEdit={handleEdit}
         onCreate={handleCreate}
         onDelete={handleDelete}
+        queryParams={queryParams}
       />
       {showForm && (
         <EntityForm
