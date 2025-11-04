@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
 import { invoiceItemsService, tasksService, fixedCostsService } from '../services/entityService';
@@ -13,22 +13,23 @@ const InvoiceItemsPage: React.FC = () => {
   const [fixedCosts, setFixedCosts] = useState<FixedCost[]>([]);
   const { selectedContractId } = useContractSelection();
 
-  useEffect(() => {
-    loadRelatedData();
-  }, []);
-
-  const loadRelatedData = async () => {
+  const loadRelatedData = useCallback(async () => {
     try {
+      const filterParams = selectedContractId ? { contractId: selectedContractId } : undefined;
       const [tasksData, fixedCostsData] = await Promise.all([
-        tasksService.getAll(),
-        fixedCostsService.getAll(),
+        tasksService.getAll(filterParams),
+        fixedCostsService.getAll(filterParams),
       ]);
       setTasks(tasksData);
       setFixedCosts(fixedCostsData);
     } catch (err) {
       console.error('Failed to load related data', err);
     }
-  };
+  }, [selectedContractId]);
+
+  useEffect(() => {
+    loadRelatedData();
+  }, [loadRelatedData]);
 
   const queryParams = useMemo(() => {
     return selectedContractId ? { contractId: selectedContractId } : undefined;

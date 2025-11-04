@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
 import { workRecordsService, usersService, tasksService } from '../services/entityService';
@@ -15,14 +15,11 @@ const WorkRecordsPage: React.FC = () => {
   const { user } = useAuth();
   const { selectedContractId } = useContractSelection();
 
-  useEffect(() => {
-    loadRelatedData();
-  }, []);
-
-  const loadRelatedData = async () => {
+  const loadRelatedData = useCallback(async () => {
     try {
+      const filterParams = selectedContractId ? { contractId: selectedContractId } : undefined;
       const [tasksData, usersData] = await Promise.all([
-        tasksService.getAll(),
+        tasksService.getAll(filterParams),
         usersService.getAll(),
       ]);
       setTasks(tasksData);
@@ -30,7 +27,11 @@ const WorkRecordsPage: React.FC = () => {
     } catch (err) {
       console.error('Failed to load related data', err);
     }
-  };
+  }, [selectedContractId]);
+
+  useEffect(() => {
+    loadRelatedData();
+  }, [loadRelatedData]);
 
   const queryParams = useMemo(() => {
     return selectedContractId ? { contractId: selectedContractId } : undefined;
