@@ -18,11 +18,18 @@ namespace comaiz.api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<WorkRecord>>> GetWorkRecords()
+        public async Task<ActionResult<IEnumerable<WorkRecord>>> GetWorkRecords([FromQuery] int? contractId)
         {
             if (dbContext.WorkRecords == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            return await dbContext.WorkRecords.ToListAsync();
+            var query = dbContext.WorkRecords.AsQueryable();
+            
+            if (contractId.HasValue)
+            {
+                query = query.Where(wr => wr.Task != null && wr.Task.ContractId == contractId.Value);
+            }
+
+            return await query.ToListAsync();
         }
 
         [HttpGet("{id}")]

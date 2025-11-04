@@ -34,7 +34,7 @@ namespace comaiz.tests.Controllers
             var controller = new InvoiceItemsController(context);
 
             // Act
-            var result = await controller.GetInvoiceItems();
+            var result = await controller.GetInvoiceItems(null);
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<InvoiceItem>>>(result);

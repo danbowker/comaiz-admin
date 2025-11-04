@@ -34,7 +34,7 @@ namespace comaiz.tests.Controllers
             var controller = new FixedCostsController(context);
 
             // Act
-            var result = await controller.GetCosts();
+            var result = await controller.GetCosts(null);
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<Cost>>>(result);

@@ -17,11 +17,18 @@ namespace comaiz.api.Controllers
         }
 
         [HttpGet]
-        public async System.Threading.Tasks.Task<ActionResult<IEnumerable<comaiz.data.Models.Task>>> GetTasks()
+        public async System.Threading.Tasks.Task<ActionResult<IEnumerable<comaiz.data.Models.Task>>> GetTasks([FromQuery] int? contractId)
         {
             if (dbContext.Tasks == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            return await dbContext.Tasks.ToListAsync();
+            var query = dbContext.Tasks.AsQueryable();
+            
+            if (contractId.HasValue)
+            {
+                query = query.Where(t => t.ContractId == contractId.Value);
+            }
+
+            return await query.ToListAsync();
         }
 
         [HttpGet("{id}")]

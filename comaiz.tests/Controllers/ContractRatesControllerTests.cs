@@ -34,7 +34,7 @@ namespace comaiz.tests.Controllers
             var controller = new ContractRatesController(context);
 
             // Act
-            var result = await controller.GetContractRates();
+            var result = await controller.GetContractRates(null);
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<ContractRate>>>(result);

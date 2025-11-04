@@ -19,11 +19,21 @@ namespace comaiz.api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<InvoiceItem>>> GetInvoiceItems()
+        public async Task<ActionResult<IEnumerable<InvoiceItem>>> GetInvoiceItems([FromQuery] int? contractId)
         {
             if (dbContext.InvoiceItems == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            return await dbContext.InvoiceItems.ToListAsync();
+            var query = dbContext.InvoiceItems.AsQueryable();
+            
+            if (contractId.HasValue)
+            {
+                query = query.Where(ii => 
+                    (ii.Task != null && ii.Task.ContractId == contractId.Value) ||
+                    (ii.FixedCost != null && ii.FixedCost.ContractId == contractId.Value)
+                );
+            }
+
+            return await query.ToListAsync();
         }
 
         [HttpGet("{id}")]
