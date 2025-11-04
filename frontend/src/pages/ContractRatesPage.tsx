@@ -36,6 +36,11 @@ const ContractRatesPage: React.FC = () => {
     }
   };
 
+  const getUserDisplayName = (user: ApplicationUser | undefined): string => {
+    if (!user) return '';
+    return user.userName || user.email || user.id;
+  };
+
   const queryParams = useMemo(() => {
     if (selectedContractId) {
       return { contractId: selectedContractId };
@@ -60,11 +65,11 @@ const ContractRatesPage: React.FC = () => {
       label: 'User',
       render: (item: ContractRate) => {
         if (item.applicationUser) {
-          return item.applicationUser.userName || item.applicationUser.email || item.applicationUserId;
+          return getUserDisplayName(item.applicationUser);
         }
         if (item.applicationUserId) {
           const user = users.find(u => u.id === item.applicationUserId);
-          return user?.userName || user?.email || item.applicationUserId;
+          return getUserDisplayName(user);
         }
         return '';
       }
@@ -87,7 +92,7 @@ const ContractRatesPage: React.FC = () => {
       label: 'User',
       type: 'select',
       required: false,
-      options: users.map((u) => ({ value: u.id, label: u.userName || u.email || u.id })),
+      options: users.map((u) => ({ value: u.id, label: getUserDisplayName(u) })),
     },
   ];
 
