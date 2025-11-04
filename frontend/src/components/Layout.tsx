@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import ContractPicker from './ContractPicker';
 import './Layout.css';
 
 const Layout: React.FC = () => {
@@ -29,9 +30,12 @@ const Layout: React.FC = () => {
           <Link to="/invoices">Invoices</Link>
           <Link to="/invoice-items">Invoice Items</Link>
         </div>
-        <div className="navbar-user">
-          <span>Welcome, {user?.username}</span>
-          <button onClick={handleLogout}>Logout</button>
+        <div className="navbar-controls">
+          <ContractPicker />
+          <div className="navbar-user">
+            <span>Welcome, {user?.username}</span>
+            <button onClick={handleLogout}>Logout</button>
+          </div>
         </div>
       </nav>
       <main className="main-content">

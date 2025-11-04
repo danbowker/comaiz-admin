@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
 import { invoicesService, clientsService } from '../services/entityService';
 import { Invoice, Client } from '../types';
+import { useContractSelection } from '../contexts/ContractSelectionContext';
 
 const InvoicesPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Invoice | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [clients, setClients] = useState<Client[]>([]);
+  const { selectedContractId } = useContractSelection();
 
   useEffect(() => {
     loadClients();
@@ -22,6 +24,10 @@ const InvoicesPage: React.FC = () => {
       console.error('Failed to load clients', err);
     }
   };
+
+  const queryParams = useMemo(() => {
+    return selectedContractId ? { contractId: selectedContractId } : undefined;
+  }, [selectedContractId]);
 
   const columns = [
     { key: 'id' as keyof Invoice, label: 'ID' },
@@ -82,6 +88,7 @@ const InvoicesPage: React.FC = () => {
         onEdit={handleEdit}
         onCreate={handleCreate}
         onDelete={handleDelete}
+        queryParams={queryParams}
       />
       {showForm && (
         <EntityForm

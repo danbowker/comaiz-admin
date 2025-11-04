@@ -39,6 +39,12 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
+.navbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .navbar-user {
   display: flex;
   align-items: center;
@@ -87,6 +93,11 @@
 
   .navbar-menu a {
     text-align: center;
+  }
+
+  .navbar-controls {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .navbar-user {

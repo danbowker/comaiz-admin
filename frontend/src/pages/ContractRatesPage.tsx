@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
 import { contractRatesService, contractsService } from '../services/entityService';
 import { ContractRate, Contract } from '../types';
+import { useContractSelection } from '../contexts/ContractSelectionContext';
 
 const ContractRatesPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ContractRate | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [contracts, setContracts] = useState<Contract[]>([]);
+  const { selectedContractId } = useContractSelection();
 
   useEffect(() => {
     loadContracts();
@@ -22,6 +24,10 @@ const ContractRatesPage: React.FC = () => {
       console.error('Failed to load contracts', err);
     }
   };
+
+  const queryParams = useMemo(() => {
+    return selectedContractId ? { contractId: selectedContractId } : undefined;
+  }, [selectedContractId]);
 
   const columns = [
     { key: 'id' as keyof ContractRate, label: 'ID' },
@@ -44,6 +50,7 @@ const ContractRatesPage: React.FC = () => {
       type: 'select',
       required: true,
       options: contracts.map((c) => ({ value: c.id, label: c.description || `Contract ${c.id}` })),
+      defaultValue: selectedContractId || undefined,
     },
     { name: 'description', label: 'Description', type: 'text', required: true },
     { name: 'rate', label: 'Rate', type: 'number' },
@@ -82,6 +89,7 @@ const ContractRatesPage: React.FC = () => {
         onEdit={handleEdit}
         onCreate={handleCreate}
         onDelete={handleDelete}
+        queryParams={queryParams}
       />
       {showForm && (
         <EntityForm
