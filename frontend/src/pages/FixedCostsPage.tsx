@@ -26,7 +26,10 @@ const FixedCostsPage: React.FC = () => {
   };
 
   const queryParams = useMemo(() => {
-    return selectedContractId ? { contractId: selectedContractId } : undefined;
+    if (selectedContractId) {
+      return { contractId: selectedContractId };
+    }
+    return {};
   }, [selectedContractId]);
 
   const columns = [

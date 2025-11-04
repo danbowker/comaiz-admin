@@ -32,7 +32,10 @@ const InvoiceItemsPage: React.FC = () => {
   }, [loadRelatedData]);
 
   const queryParams = useMemo(() => {
-    return selectedContractId ? { contractId: selectedContractId } : undefined;
+    if (selectedContractId) {
+      return { contractId: selectedContractId };
+    }
+    return {};
   }, [selectedContractId]);
 
   const columns = [
