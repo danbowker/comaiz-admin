@@ -86,7 +86,6 @@ namespace comaiz.api.Controllers
                 foreach (var tcr in task.TaskContractRates)
                 {
                     tcr.TaskId = existingTask.Id;
-                    tcr.Id = 0; // Ensure new ID is generated
                     dbContext.TaskContractRates!.Add(tcr);
                 }
             }
