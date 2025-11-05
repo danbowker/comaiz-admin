@@ -85,8 +85,13 @@ namespace comaiz.api.Controllers
             {
                 foreach (var tcr in task.TaskContractRates)
                 {
-                    tcr.TaskId = existingTask.Id;
-                    dbContext.TaskContractRates!.Add(tcr);
+                    // Create new entity with only foreign keys to avoid inserting navigation properties
+                    var newTaskContractRate = new TaskContractRate
+                    {
+                        TaskId = existingTask.Id,
+                        ContractRateId = tcr.ContractRateId
+                    };
+                    dbContext.TaskContractRates!.Add(newTaskContractRate);
                 }
             }
 
@@ -117,6 +122,21 @@ namespace comaiz.api.Controllers
         public async System.Threading.Tasks.Task<ActionResult<comaiz.data.Models.Task>> PostTask(comaiz.data.Models.Task task)
         {
             if (dbContext.Tasks == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
+            // Clean up navigation properties in TaskContractRates to avoid inserting related entities
+            if (task.TaskContractRates != null && task.TaskContractRates.Any())
+            {
+                var contractRateIds = task.TaskContractRates.Select(tcr => tcr.ContractRateId).ToList();
+                task.TaskContractRates.Clear();
+                
+                foreach (var contractRateId in contractRateIds)
+                {
+                    task.TaskContractRates.Add(new TaskContractRate
+                    {
+                        ContractRateId = contractRateId
+                    });
+                }
+            }
 
             dbContext.Tasks.Add(task);
             await dbContext.SaveChangesAsync();
