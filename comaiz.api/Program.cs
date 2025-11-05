@@ -18,7 +18,11 @@ var connectionString = builder.Configuration.GetConnectionString("PostgresSQL");
 Console.WriteLine($"Connection string: {connectionString}"); ;
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddDbContext<ComaizContext>(options =>
 {
     options.UseNpgsql(connectionString.GetNpgsqlConnectionString());

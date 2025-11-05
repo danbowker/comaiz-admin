@@ -51,6 +51,10 @@ public static class TestDataSeeder
         // Clear any existing data
         context.Clients?.RemoveRange(context.Clients);
         context.Workers?.RemoveRange(context.Workers);
+        context.Contracts?.RemoveRange(context.Contracts);
+        context.ContractRates?.RemoveRange(context.ContractRates);
+        context.Tasks?.RemoveRange(context.Tasks);
+        context.TaskContractRates?.RemoveRange(context.TaskContractRates);
         context.SaveChanges();
 
         // Seed Clients
@@ -61,6 +65,26 @@ public static class TestDataSeeder
             new Client { ShortName = "INNO", Name = "Innovation Labs" }
         };
         context.Clients?.AddRange(clients);
+        context.SaveChanges();
+
+        // Seed Contracts
+        var contracts = new List<Contract>
+        {
+            new Contract { ClientId = clients[0].Id, Description = "ACME Contract", ChargeType = ChargeType.TimeAndMaterials },
+            new Contract { ClientId = clients[1].Id, Description = "TECH Contract", ChargeType = ChargeType.TimeAndMaterials },
+        };
+        context.Contracts?.AddRange(contracts);
+        context.SaveChanges();
+
+        // Seed Contract Rates
+        var contractRates = new List<ContractRate>
+        {
+            new ContractRate { ContractId = contracts[0].Id, Description = "Developer Rate", Rate = 100 },
+            new ContractRate { ContractId = contracts[0].Id, Description = "Tester Rate", Rate = 80 },
+            new ContractRate { ContractId = contracts[0].Id, Description = "Designer Rate", Rate = 90 },
+            new ContractRate { ContractId = contracts[1].Id, Description = "Senior Dev Rate", Rate = 120 },
+        };
+        context.ContractRates?.AddRange(contractRates);
 
         // Seed Workers
         var workers = new List<Worker>
@@ -83,6 +107,10 @@ public static class TestDataSeeder
             context.Invoices.RemoveRange(context.Invoices);
         if (context.WorkRecords != null)
             context.WorkRecords.RemoveRange(context.WorkRecords);
+        if (context.TaskContractRates != null)
+            context.TaskContractRates.RemoveRange(context.TaskContractRates);
+        if (context.Tasks != null)
+            context.Tasks.RemoveRange(context.Tasks);
         if (context.ContractRates != null)
             context.ContractRates.RemoveRange(context.ContractRates);
         if (context.Contracts != null)
