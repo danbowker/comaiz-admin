@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using comaiz.data;
 using comaiz.data.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace comaiz.api.Controllers
 {
@@ -21,7 +22,10 @@ namespace comaiz.api.Controllers
         {
             if (dbContext.Tasks == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var query = dbContext.Tasks.AsQueryable();
+            var query = dbContext.Tasks
+                .Include(t => t.TaskContractRates!)
+                    .ThenInclude(tcr => tcr.ContractRate)
+                .AsQueryable();
             
             if (contractId.HasValue)
             {
@@ -36,7 +40,10 @@ namespace comaiz.api.Controllers
         {
             if (dbContext.Tasks == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var task = await dbContext.Tasks.FindAsync(id);
+            var task = await dbContext.Tasks
+                .Include(t => t.TaskContractRates!)
+                    .ThenInclude(tcr => tcr.ContractRate)
+                .FirstOrDefaultAsync(t => t.Id == id);
 
             if (task == null)
             {
@@ -51,7 +58,38 @@ namespace comaiz.api.Controllers
         {
             if (dbContext.Tasks == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            dbContext.Entry(task).State = EntityState.Modified;
+            // Load the existing task with its contract rates
+            var existingTask = await dbContext.Tasks
+                .Include(t => t.TaskContractRates)
+                .FirstOrDefaultAsync(t => t.Id == task.Id);
+
+            if (existingTask == null)
+            {
+                return NotFound();
+            }
+
+            // Update simple properties
+            existingTask.Name = task.Name;
+            existingTask.ContractId = task.ContractId;
+            existingTask.ContractRateId = task.ContractRateId;
+
+            // Update TaskContractRates collection
+            if (existingTask.TaskContractRates != null)
+            {
+                // Remove existing contract rates
+                dbContext.TaskContractRates!.RemoveRange(existingTask.TaskContractRates);
+            }
+
+            // Add new contract rates
+            if (task.TaskContractRates != null && task.TaskContractRates.Any())
+            {
+                foreach (var tcr in task.TaskContractRates)
+                {
+                    tcr.TaskId = existingTask.Id;
+                    tcr.Id = 0; // Ensure new ID is generated
+                    dbContext.TaskContractRates!.Add(tcr);
+                }
+            }
 
             try
             {
@@ -63,6 +101,7 @@ namespace comaiz.api.Controllers
                 {
                     return NotFound();
                 }
+                throw;
             }
 
             return NoContent();

@@ -8,5 +8,6 @@ namespace comaiz.data.Models
         public Contract? Contract { get; set; }
         public int? ContractRateId { get; set; }
         public ContractRate? ContractRate { get; set; }
+        public ICollection<TaskContractRate>? TaskContractRates { get; set; }
     }
 }
