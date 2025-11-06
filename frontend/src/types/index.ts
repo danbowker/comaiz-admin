@@ -40,6 +40,14 @@ export interface Task {
   name: string;
   contractId?: number;
   contractRateId?: number;
+  taskContractRates?: TaskContractRate[];
+}
+
+export interface TaskContractRate {
+  id?: number;
+  taskId?: number;
+  contractRateId: number;
+  contractRate?: ContractRate;
 }
 
 export interface FixedCost {
