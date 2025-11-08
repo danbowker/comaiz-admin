@@ -123,10 +123,30 @@ Configure the following secrets in your repository (**Settings** → **Secrets a
    Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_staging
    ```
 3. Run migrations to create the schema:
+
+   **Option 1: Using a .env file (Recommended)**
    ```bash
-   # Set the staging connection string temporarily (use a .env file or directly set for the command)
-   # Note: Avoid putting passwords in shell history - use a .env file or prefix with a space if your shell supports it
-   export ConnectionStrings__PostgresSQL="Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_staging"
+   # Create a .env file with the connection string
+   cat > .env << 'EOF'
+   ConnectionStrings__PostgresSQL="Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_staging"
+   EOF
+   
+   # Load environment variables from .env file
+   set -a
+   source .env
+   set +a
+   
+   # Run migrations
+   dotnet ef database update -p comaiz.data -s comaiz.api
+   
+   # Clean up
+   rm .env
+   ```
+
+   **Option 2: Direct environment variable (Quick but less secure)**
+   ```bash
+   # Prefix with space to avoid shell history (if your shell supports it)
+    export ConnectionStrings__PostgresSQL="Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_staging"
    
    # Run migrations
    dotnet ef database update -p comaiz.data -s comaiz.api
@@ -143,10 +163,30 @@ Configure the following secrets in your repository (**Settings** → **Secrets a
    Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_production
    ```
 3. Run migrations to create the schema:
+
+   **Option 1: Using a .env file (Recommended)**
    ```bash
-   # Set the production connection string temporarily (use a .env file or directly set for the command)
-   # Note: Avoid putting passwords in shell history - use a .env file or prefix with a space if your shell supports it
-   export ConnectionStrings__PostgresSQL="Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_production"
+   # Create a .env file with the connection string
+   cat > .env << 'EOF'
+   ConnectionStrings__PostgresSQL="Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_production"
+   EOF
+   
+   # Load environment variables from .env file
+   set -a
+   source .env
+   set +a
+   
+   # Run migrations
+   dotnet ef database update -p comaiz.data -s comaiz.api
+   
+   # Clean up
+   rm .env
+   ```
+
+   **Option 2: Direct environment variable (Quick but less secure)**
+   ```bash
+   # Prefix with space to avoid shell history (if your shell supports it)
+    export ConnectionStrings__PostgresSQL="Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_production"
    
    # Run migrations
    dotnet ef database update -p comaiz.data -s comaiz.api
