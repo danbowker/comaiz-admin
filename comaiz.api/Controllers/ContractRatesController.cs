@@ -18,11 +18,18 @@ namespace comaiz.api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ContractRate>>> GetContractRates()
+        public async Task<ActionResult<IEnumerable<ContractRate>>> GetContractRates([FromQuery] int? contractId)
         {
             if(dbContext.ContractRates == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            return await dbContext.ContractRates.ToListAsync();
+            var query = dbContext.ContractRates.Include(cr => cr.ApplicationUser).AsQueryable();
+            
+            if (contractId.HasValue)
+            {
+                query = query.Where(cr => cr.ContractId == contractId.Value);
+            }
+
+            return await query.ToListAsync();
         }
 
         [HttpGet("{id}")]
@@ -30,7 +37,9 @@ namespace comaiz.api.Controllers
         {
             if (dbContext.ContractRates == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var contractRate = await dbContext.ContractRates.FindAsync(id);
+            var contractRate = await dbContext.ContractRates
+                .Include(cr => cr.ApplicationUser)
+                .FirstOrDefaultAsync(cr => cr.Id == id);
 
             if (contractRate == null)
             {

@@ -19,8 +19,18 @@ export class EntityService<T> {
     this.endpoint = endpoint;
   }
 
-  async getAll(): Promise<T[]> {
-    const response = await api.get<T[]>(`/${this.endpoint}`);
+  async getAll(params?: Record<string, any>): Promise<T[]> {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          queryParams.append(key, String(value));
+        }
+      });
+    }
+    const queryString = queryParams.toString();
+    const url = queryString ? `/${this.endpoint}?${queryString}` : `/${this.endpoint}`;
+    const response = await api.get<T[]>(url);
     return response.data;
   }
 

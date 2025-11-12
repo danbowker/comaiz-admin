@@ -17,11 +17,18 @@ namespace comaiz.api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cost>>> GetCosts()
+        public async Task<ActionResult<IEnumerable<Cost>>> GetCosts([FromQuery] int? contractId)
         {
             if (dbContext.FixedCosts == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            return await dbContext.FixedCosts.ToListAsync();
+            var query = dbContext.FixedCosts.AsQueryable();
+            
+            if (contractId.HasValue)
+            {
+                query = query.Where(fc => fc.ContractId == contractId.Value);
+            }
+
+            return await query.ToListAsync();
         }
 
         [HttpGet("{id}")]

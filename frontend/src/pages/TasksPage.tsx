@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import EntityList from '../components/entities/EntityList';
-import EntityForm, { FormField } from '../components/entities/EntityForm';
+import TaskForm from '../components/entities/TaskForm';
 import { tasksService, contractsService, contractRatesService } from '../services/entityService';
 import { Task, Contract, ContractRate } from '../types';
+import { useContractSelection } from '../contexts/ContractSelectionContext';
 
 const TasksPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
@@ -10,23 +11,32 @@ const TasksPage: React.FC = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [contractRates, setContractRates] = useState<ContractRate[]>([]);
+  const { selectedContractId } = useContractSelection();
 
-  useEffect(() => {
-    loadRelatedData();
-  }, []);
-
-  const loadRelatedData = async () => {
+  const loadRelatedData = useCallback(async () => {
     try {
+      const filterParams = selectedContractId ? { contractId: selectedContractId } : undefined;
       const [contractsData, ratesData] = await Promise.all([
         contractsService.getAll(),
-        contractRatesService.getAll(),
+        contractRatesService.getAll(filterParams),
       ]);
       setContracts(contractsData);
       setContractRates(ratesData);
     } catch (err) {
       console.error('Failed to load related data', err);
     }
-  };
+  }, [selectedContractId]);
+
+  useEffect(() => {
+    loadRelatedData();
+  }, [loadRelatedData]);
+
+  const queryParams = useMemo(() => {
+    if (selectedContractId) {
+      return { contractId: selectedContractId };
+    }
+    return {};
+  }, [selectedContractId]);
 
   const columns = [
     { key: 'id' as keyof Task, label: 'ID' },
@@ -43,33 +53,17 @@ const TasksPage: React.FC = () => {
       }
     },
     { 
-      key: 'contractRateId' as keyof Task, 
-      label: 'Contract Rate',
+      key: 'taskContractRates' as keyof Task, 
+      label: 'Contract Rates',
       render: (item: Task) => {
-        if (item.contractRateId) {
-          const rate = contractRates.find(r => r.id === item.contractRateId);
-          return rate?.description || `Rate ${item.contractRateId}`;
+        if (item.taskContractRates && item.taskContractRates.length > 0) {
+          return item.taskContractRates.map(tcr => {
+            const rate = tcr.contractRate || contractRates.find(r => r.id === tcr.contractRateId);
+            return rate?.description || `Rate ${tcr.contractRateId}`;
+          }).join(', ');
         }
-        return 'N/A';
+        return 'None';
       }
-    },
-  ];
-
-  const fields: FormField<Task>[] = [
-    { name: 'name', label: 'Name', type: 'text', required: true },
-    {
-      name: 'contractId',
-      label: 'Contract',
-      type: 'select',
-      required: false,
-      options: contracts.map((c) => ({ value: c.id, label: c.description || `Contract ${c.id}` })),
-    },
-    {
-      name: 'contractRateId',
-      label: 'Contract Rate',
-      type: 'select',
-      required: false,
-      options: contractRates.map((r) => ({ value: r.id, label: r.description })),
     },
   ];
 
@@ -106,15 +100,16 @@ const TasksPage: React.FC = () => {
         onEdit={handleEdit}
         onCreate={handleCreate}
         onDelete={handleDelete}
+        queryParams={queryParams}
       />
       {showForm && (
-        <EntityForm
-          title={selectedItem ? 'Edit Task' : 'Create Task'}
-          service={tasksService}
-          fields={fields}
-          item={selectedItem}
+        <TaskForm
+          task={selectedItem}
+          contracts={contracts}
+          contractRates={contractRates}
           onClose={handleClose}
           onSave={handleSave}
+          defaultContractId={selectedContractId || undefined}
         />
       )}
     </>
@@ -122,3 +117,4 @@ const TasksPage: React.FC = () => {
 };
 
 export default TasksPage;
+

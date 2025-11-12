@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
 import { invoiceItemsService, tasksService, fixedCostsService } from '../services/entityService';
 import { InvoiceItem, Task, FixedCost } from '../types';
+import { useContractSelection } from '../contexts/ContractSelectionContext';
 
 const InvoiceItemsPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
@@ -10,23 +11,32 @@ const InvoiceItemsPage: React.FC = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [fixedCosts, setFixedCosts] = useState<FixedCost[]>([]);
+  const { selectedContractId } = useContractSelection();
 
-  useEffect(() => {
-    loadRelatedData();
-  }, []);
-
-  const loadRelatedData = async () => {
+  const loadRelatedData = useCallback(async () => {
     try {
+      const filterParams = selectedContractId ? { contractId: selectedContractId } : undefined;
       const [tasksData, fixedCostsData] = await Promise.all([
-        tasksService.getAll(),
-        fixedCostsService.getAll(),
+        tasksService.getAll(filterParams),
+        fixedCostsService.getAll(filterParams),
       ]);
       setTasks(tasksData);
       setFixedCosts(fixedCostsData);
     } catch (err) {
       console.error('Failed to load related data', err);
     }
-  };
+  }, [selectedContractId]);
+
+  useEffect(() => {
+    loadRelatedData();
+  }, [loadRelatedData]);
+
+  const queryParams = useMemo(() => {
+    if (selectedContractId) {
+      return { contractId: selectedContractId };
+    }
+    return {};
+  }, [selectedContractId]);
 
   const columns = [
     { key: 'id' as keyof InvoiceItem, label: 'ID' },
@@ -114,6 +124,7 @@ const InvoiceItemsPage: React.FC = () => {
         onEdit={handleEdit}
         onCreate={handleCreate}
         onDelete={handleDelete}
+        queryParams={queryParams}
       />
       {showForm && (
         <EntityForm

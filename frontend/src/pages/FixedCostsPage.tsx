@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
 import { fixedCostsService, contractsService } from '../services/entityService';
 import { FixedCost, Contract } from '../types';
+import { useContractSelection } from '../contexts/ContractSelectionContext';
 
 const FixedCostsPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedItem, setSelectedItem] = useState<FixedCost | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [contracts, setContracts] = useState<Contract[]>([]);
+  const { selectedContractId } = useContractSelection();
 
   useEffect(() => {
     loadContracts();
@@ -22,6 +24,13 @@ const FixedCostsPage: React.FC = () => {
       console.error('Failed to load contracts', err);
     }
   };
+
+  const queryParams = useMemo(() => {
+    if (selectedContractId) {
+      return { contractId: selectedContractId };
+    }
+    return {};
+  }, [selectedContractId]);
 
   const columns = [
     { key: 'id' as keyof FixedCost, label: 'ID' },
@@ -44,6 +53,7 @@ const FixedCostsPage: React.FC = () => {
       type: 'select',
       required: true,
       options: contracts.map((c) => ({ value: c.id, label: c.description || `Contract ${c.id}` })),
+      defaultValue: selectedContractId || undefined,
     },
     { name: 'name', label: 'Name', type: 'text' },
     { name: 'amount', label: 'Amount', type: 'number' },
@@ -82,6 +92,7 @@ const FixedCostsPage: React.FC = () => {
         onEdit={handleEdit}
         onCreate={handleCreate}
         onDelete={handleDelete}
+        queryParams={queryParams}
       />
       {showForm && (
         <EntityForm

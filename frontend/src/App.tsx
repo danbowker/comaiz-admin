@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { ContractSelectionProvider } from './contexts/ContractSelectionContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Login from './components/auth/Login';
 import Layout from './components/Layout';
@@ -19,28 +20,30 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Layout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Dashboard />} />
-            <Route path="clients" element={<ClientsPage />} />
-            <Route path="contracts" element={<ContractsPage />} />
-            <Route path="contract-rates" element={<ContractRatesPage />} />
-            <Route path="fixed-costs" element={<FixedCostsPage />} />
-            <Route path="work-records" element={<WorkRecordsPage />} />
-            <Route path="invoices" element={<InvoicesPage />} />
-            <Route path="invoice-items" element={<InvoiceItemsPage />} />
-            <Route path="tasks" element={<TasksPage />} />
-          </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <ContractSelectionProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Layout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Dashboard />} />
+              <Route path="clients" element={<ClientsPage />} />
+              <Route path="contracts" element={<ContractsPage />} />
+              <Route path="contract-rates" element={<ContractRatesPage />} />
+              <Route path="fixed-costs" element={<FixedCostsPage />} />
+              <Route path="work-records" element={<WorkRecordsPage />} />
+              <Route path="invoices" element={<InvoicesPage />} />
+              <Route path="invoice-items" element={<InvoiceItemsPage />} />
+              <Route path="tasks" element={<TasksPage />} />
+            </Route>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </ContractSelectionProvider>
       </Router>
     </AuthProvider>
   );

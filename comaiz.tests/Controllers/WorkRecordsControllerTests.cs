@@ -37,7 +37,7 @@ namespace comaiz.tests.Controllers
             var controller = new WorkRecordsController(context);
 
             // Act
-            var result = await controller.GetWorkRecords();
+            var result = await controller.GetWorkRecords(null);
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<WorkRecord>>>(result);
