@@ -9,10 +9,15 @@ on:
     branches: ["master"]
     paths-ignore:
       - 'powershell/**'
+  release:
+    types: [created]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - uses: actions/checkout@v4
@@ -35,22 +40,110 @@ jobs:
       - name: Test
         run: dotnet test --no-build --verbosity normal
       - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository }}/comaiz-admin:latest .
+        run: docker build -t ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }} .
       - name: Log in to GitHub Container Registry
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Push Docker image
-        run: docker push ghcr.io/${{ github.repository }}/comaiz-admin:latest
-      - name: Deploy to server
+        if: github.event_name != 'pull_request'
+        run: docker push ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }}
+      - name: Tag and push latest
+        if: github.event_name == 'release'
+        run: |
+          docker tag ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }} ghcr.io/${{ github.repository }}/comaiz-admin:latest
+          docker push ghcr.io/${{ github.repository }}/comaiz-admin:latest
+
+  deploy-staging:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    environment:
+      name: staging
+      url: https://staging.comaiz.co.uk
+
+    steps:
+      - name: Deploy to staging
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SERVER_IP: ${{ secrets.SERVER_IP }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
+          STAGING_CONNECTION_STRING: ${{ secrets.STAGING_CONNECTION_STRING }}
+          JWT_AUTHORITY: ${{ secrets.JWT_AUTHORITY }}
+          JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
         run: |
           echo "$SSH_PRIVATE_KEY" > private_key
           chmod 600 private_key
+          # Create env file with secrets
+          cat > deploy.env << ENVEOF
+          JWT_AUTHORITY=${JWT_AUTHORITY}
+          JWT_AUDIENCE=${JWT_AUDIENCE}
+          STAGING_CONNECTION_STRING=${STAGING_CONNECTION_STRING}
+          ENVEOF
+          # Transfer env file to remote server
+          scp -o StrictHostKeyChecking=no -i private_key deploy.env $SERVER_USER@$SERVER_IP:/tmp/deploy-staging.env
+          rm -f deploy.env
+          # Execute deployment with env file
           ssh -o StrictHostKeyChecking=no -i private_key $SERVER_USER@$SERVER_IP << 'EOF'
-            docker pull ghcr.io/${{ github.repository }}/comaiz-admin:latest
+            source /tmp/deploy-staging.env
+            docker pull ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }}
+            docker stop comaiz-admin-staging || true
+            docker rm comaiz-admin-staging || true
+            docker run -d \
+              --name comaiz-admin-staging \
+              -p 8081:8080 \
+              -e "Jwt__Authority=${JWT_AUTHORITY}" \
+              -e "Jwt__Audience=${JWT_AUDIENCE}" \
+              -e "ConnectionStrings__PostgresSQL=${STAGING_CONNECTION_STRING}" \
+              ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }}
+            rm -f /tmp/deploy-staging.env
+          EOF
+          rm -f private_key
+
+  deploy-production:
+    needs: build
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    environment:
+      name: production
+      url: https://comaiz.co.uk
+
+    steps:
+      - name: Deploy to production
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          PRODUCTION_CONNECTION_STRING: ${{ secrets.PRODUCTION_CONNECTION_STRING }}
+          JWT_AUTHORITY: ${{ secrets.JWT_AUTHORITY }}
+          JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" > private_key
+          chmod 600 private_key
+          # Create env file with secrets
+          cat > deploy.env << ENVEOF
+          JWT_AUTHORITY=${JWT_AUTHORITY}
+          JWT_AUDIENCE=${JWT_AUDIENCE}
+          PRODUCTION_CONNECTION_STRING=${PRODUCTION_CONNECTION_STRING}
+          ENVEOF
+          # Transfer env file to remote server
+          scp -o StrictHostKeyChecking=no -i private_key deploy.env $SERVER_USER@$SERVER_IP:/tmp/deploy-production.env
+          rm -f deploy.env
+          # Execute deployment with env file
+          ssh -o StrictHostKeyChecking=no -i private_key $SERVER_USER@$SERVER_IP << 'EOF'
+            source /tmp/deploy-production.env
+            docker pull ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }}
             docker stop comaiz-admin || true
             docker rm comaiz-admin || true
-            docker run -d --name comaiz-admin -p 8080:8080 -e Jwt__Authority=${{ secrets.JWT_AUTHORITY }} -e Jwt__Audience=${{ secrets.JWT_AUDIENCE }} -e ConnectionStrings__PostgresSQL=${{ secrets.CONNECTION_STRING }} ghcr.io/${{ github.repository }}/comaiz-admin:latest
+            docker run -d \
+              --name comaiz-admin \
+              -p 8080:8080 \
+              -e "Jwt__Authority=${JWT_AUTHORITY}" \
+              -e "Jwt__Audience=${JWT_AUDIENCE}" \
+              -e "ConnectionStrings__PostgresSQL=${PRODUCTION_CONNECTION_STRING}" \
+              ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }}
+            rm -f /tmp/deploy-production.env
           EOF
+          rm -f private_key

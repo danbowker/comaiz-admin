@@ -68,28 +68,192 @@ To set up the DB:
 
 ## Deployment
 
-This will deploy to any server running docker with ssh access. 
+This application uses GitHub Actions to deploy to both staging and production environments on a server running Docker with SSH access.
 
-### GitHub Actions Secrets
+### Deployment Strategy
 
-The following secrets are required for the GitHub Actions workflow:
+The deployment workflow follows these rules:
 
-**For Codespaces (Development)**:
-- Development environment variables are pre-configured in the devcontainer
-- No additional secrets needed for development
+1. **Staging Deployment**: Every push to the `master` branch automatically deploys to the staging environment
+   - Accessible at: `https://staging.comaiz.co.uk`
+   - Uses a separate staging database
+   - Runs on port 8081 on the server
 
-**For Production Deployment**:
-- `CONNECTION_STRING`: PostgreSQL connection string for production database
-- `SSH_PRIVATE_KEY`: Private key for SSH access to deployment server
-- `SERVER_IP`: IP address of the deployment server  
+2. **Production Deployment**: Only triggered when a GitHub release is created
+   - Accessible at: `https://comaiz.co.uk`
+   - Uses the production database
+   - Runs on port 8080 on the server
+
+### Setting Up GitHub Environments
+
+To enable environment-specific deployments, configure GitHub environments:
+
+1. Go to your repository on GitHub
+2. Navigate to **Settings** → **Environments**
+3. Create two environments:
+   - **staging**: For staging deployments
+   - **production**: For production deployments (recommended to add protection rules)
+
+**Recommended Protection Rules for Production**:
+- Enable "Required reviewers" to require manual approval before production deployment
+- Enable "Wait timer" if you want a delay before deployment
+
+### GitHub Secrets Configuration
+
+Configure the following secrets in your repository (**Settings** → **Secrets and variables** → **Actions**):
+
+**Required for Both Environments**:
+- `SSH_PRIVATE_KEY`: Private SSH key for accessing the deployment server
+- `SERVER_IP`: IP address or hostname of the deployment server
 - `SERVER_USER`: SSH username for the deployment server
+- `JWT_AUTHORITY`: JWT authority for authentication (optional, if using external auth)
+- `JWT_AUDIENCE`: JWT audience for authentication (optional, if using external auth)
 
-### Production Database
+**Environment-Specific Secrets**:
+- `STAGING_CONNECTION_STRING`: PostgreSQL connection string for the staging database
+- `PRODUCTION_CONNECTION_STRING`: PostgreSQL connection string for the production database
 
-Set up a PostgreSQL database and configure the `CONNECTION_STRING` secret with your production database connection string in the format:
+### Database Setup
+
+#### Staging Database
+
+1. Create a PostgreSQL database for staging (e.g., `comaiz_staging`)
+2. Configure the `STAGING_CONNECTION_STRING` secret in the format:
+   ```
+   Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_staging
+   ```
+3. Run migrations to create the schema:
+
+   **Option 1: Using a .env file (Recommended)**
+   ```bash
+   # Create a .env file with the connection string
+   cat > .env << 'EOF'
+   ConnectionStrings__PostgresSQL="Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_staging"
+   EOF
+   
+   # Load environment variables from .env file
+   set -a
+   source .env
+   set +a
+   
+   # Run migrations
+   dotnet ef database update -p comaiz.data -s comaiz.api
+   
+   # Clean up
+   rm .env
+   ```
+
+   **Option 2: Direct environment variable (Quick but less secure)**
+   ```bash
+   # Prefix with space to avoid shell history (if your shell supports it)
+    export ConnectionStrings__PostgresSQL="Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_staging"
+   
+   # Run migrations
+   dotnet ef database update -p comaiz.data -s comaiz.api
+   
+   # Unset the environment variable after use
+   unset ConnectionStrings__PostgresSQL
+   ```
+
+#### Production Database
+
+1. Create a PostgreSQL database for production (e.g., `comaiz_production`)
+2. Configure the `PRODUCTION_CONNECTION_STRING` secret in the format:
+   ```
+   Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_production
+   ```
+3. Run migrations to create the schema:
+
+   **Option 1: Using a .env file (Recommended)**
+   ```bash
+   # Create a .env file with the connection string
+   cat > .env << 'EOF'
+   ConnectionStrings__PostgresSQL="Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_production"
+   EOF
+   
+   # Load environment variables from .env file
+   set -a
+   source .env
+   set +a
+   
+   # Run migrations
+   dotnet ef database update -p comaiz.data -s comaiz.api
+   
+   # Clean up
+   rm .env
+   ```
+
+   **Option 2: Direct environment variable (Quick but less secure)**
+   ```bash
+   # Prefix with space to avoid shell history (if your shell supports it)
+    export ConnectionStrings__PostgresSQL="Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=comaiz_production"
+   
+   # Run migrations
+   dotnet ef database update -p comaiz.data -s comaiz.api
+   
+   # Unset the environment variable after use
+   unset ConnectionStrings__PostgresSQL
+   ```
+
+### Creating a Release (Production Deployment)
+
+To deploy to production, create a GitHub release:
+
+#### Option 1: Using GitHub Web Interface
+
+1. Go to your repository on GitHub
+2. Click on **Releases** in the right sidebar
+3. Click **Draft a new release**
+4. Create a new tag (e.g., `v1.0.0`, `v1.1.0`) following [semantic versioning](https://semver.org/)
+5. Enter a release title (e.g., "Version 1.0.0")
+6. Add release notes describing the changes
+7. Click **Publish release**
+
+The workflow will automatically:
+- Build and test the application
+- Create a Docker image tagged with the commit SHA and `latest`
+- Deploy to the production environment
+
+#### Option 2: Using GitHub CLI
+
+```bash
+# Install GitHub CLI if you haven't already
+# https://cli.github.com/
+
+# Create and publish a release
+gh release create v1.0.0 --title "Version 1.0.0" --notes "Release notes here"
 ```
-Host=your-db-host;Port=5432;Username=your-username;Password=your-password;Database=your-database
+
+#### Option 3: Using Git Tags
+
+```bash
+# Create a tag
+git tag -a v1.0.0 -m "Version 1.0.0"
+
+# Push the tag
+git push origin v1.0.0
 ```
+
+**Important**: After pushing the tag, you must create a release from it on GitHub (using the web interface or CLI) to trigger the production deployment. Simply pushing a tag alone will not deploy to production.
+
+### Server Configuration
+
+On your deployment server, ensure:
+
+1. Docker is installed and running
+2. The server has ports 8080 (production) and 8081 (staging) available
+3. A reverse proxy (like nginx) is configured to route:
+   - `comaiz.co.uk` → `localhost:8080` (production)
+   - `staging.comaiz.co.uk` → `localhost:8081` (staging)
+4. SSL certificates are configured for both domains
+
+### Monitoring Deployments
+
+You can monitor deployment status:
+
+1. Go to **Actions** tab in your GitHub repository
+2. View workflow runs for build and deployment status
+3. Check the **Environments** section in your repository to see deployment history
 
 ## Usage
 
