@@ -232,9 +232,9 @@ git tag -a v1.0.0 -m "Version 1.0.0"
 
 # Push the tag
 git push origin v1.0.0
-
-# Then create the release from the tag on GitHub
 ```
+
+**Important**: After pushing the tag, you must create a release from it on GitHub (using the web interface or CLI) to trigger the production deployment. Simply pushing a tag alone will not deploy to production.
 
 ### Server Configuration
 
