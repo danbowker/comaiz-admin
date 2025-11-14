@@ -40,7 +40,7 @@ jobs:
           # For other commits: 1.2.3-next.4+gabcdef (if tag exists) or 0.0.0-dev.123+gabcdef (no tags)
           if git describe --tags --exact-match 2>/dev/null; then
             # This is a tagged release
-            VERSION=$(git describe --tags --exact-match)
+            VERSION=$(git describe --tags --exact-match | sed 's/^v//')
           elif git describe --tags --long 2>/dev/null; then
             # There are previous tags
             DESCRIBE=$(git describe --tags --long)
