@@ -18,6 +18,7 @@ namespace comaiz.Extensions
 
                 connStringBuilder.Host = databaseUrl.Host;
                 connStringBuilder.Port = databaseUrl.Port;
+                connStringBuilder.Database = databaseUrl.AbsolutePath.TrimStart('/');
                 var items = databaseUrl.UserInfo.Split(new[] { ':' });
                 if (items.Length > 0) connStringBuilder.Username = items[0];
                 if (items.Length > 1) connStringBuilder.Password = items[1];
