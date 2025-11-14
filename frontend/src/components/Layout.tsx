@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ContractPicker from './ContractPicker';
+import VersionInfo from './VersionInfo';
 import './Layout.css';
 
 const Layout: React.FC = () => {
@@ -46,6 +47,7 @@ const Layout: React.FC = () => {
             <span>Welcome, {user?.username}</span>
             <button onClick={handleLogout}>Logout</button>
           </div>
+          <VersionInfo />
         </div>
       </nav>
       <main className="main-content">

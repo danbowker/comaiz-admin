@@ -29,9 +29,53 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Generate version information
+        id: version
+        run: |
+          # Fetch all tags to ensure git describe works correctly
+          git fetch --tags --force || true
+          
+          # Generate version string using git describe
+          # For tagged commits: v1.2.3
+          # For other commits: 1.2.3-next.4+gabcdef (if tag exists) or 0.0.0-dev.123+gabcdef (no tags)
+          if git describe --tags --exact-match 2>/dev/null; then
+            # This is a tagged release
+            VERSION=$(git describe --tags --exact-match | sed 's/^v//')
+          elif git describe --tags --long 2>/dev/null; then
+            # There are previous tags
+            DESCRIBE=$(git describe --tags --long)
+            TAG=$(echo $DESCRIBE | sed 's/\([^-]*\)-\([0-9]*\)-g\(.*\)/\1/')
+            COMMITS=$(echo $DESCRIBE | sed 's/\([^-]*\)-\([0-9]*\)-g\(.*\)/\2/')
+            SHA=$(echo $DESCRIBE | sed 's/\([^-]*\)-\([0-9]*\)-g\(.*\)/\3/')
+            # Remove 'v' prefix if present for the base version
+            TAG_NUM=$(echo $TAG | sed 's/^v//')
+            VERSION="${TAG_NUM}-next.${COMMITS}+g${SHA}"
+          else
+            # No tags exist yet
+            COMMITS=$(git rev-list --count HEAD)
+            SHA=$(git rev-parse --short HEAD)
+            VERSION="0.0.0-dev.${COMMITS}+g${SHA}"
+          fi
+          
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Generated version: $VERSION"
       - name: Install frontend dependencies
         run: cd frontend && npm ci
+      - name: Create version.json
+        run: |
+          mkdir -p frontend/public
+          cat > frontend/public/version.json << EOF
+          {
+            "version": "${{ steps.version.outputs.VERSION }}",
+            "commit": "${{ github.sha }}",
+            "buildTime": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "branch": "${{ github.ref_name }}"
+          }
+          EOF
+          cat frontend/public/version.json
       - name: Build frontend
+        env:
+          REACT_APP_VERSION: ${{ steps.version.outputs.VERSION }}
         run: cd frontend && npm run build
       - name: Restore dependencies
         run: dotnet restore

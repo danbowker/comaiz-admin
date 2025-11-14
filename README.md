@@ -36,6 +36,20 @@ The devcontainer includes development-ready environment variables:
 
 📚 **For detailed Codespaces usage instructions, see [CODESPACES.md](CODESPACES.md)**
 
+## Version Information
+
+The application uses semantic versioning based on git tags. The current version is displayed in the UI navbar and is available at `/version.json`.
+
+- **Release versions**: Created from git tags (e.g., `v1.2.3` → version `1.2.3`)
+- **Development versions**: Auto-generated from commits (e.g., `1.2.3-next.4+gabcdef`)
+
+To check the version of a running instance:
+```bash
+curl https://your-domain.com/version.json
+```
+
+📚 **For detailed versioning and release process, see [VERSIONING.md](VERSIONING.md)**
+
 ## Installation (Local Development)
 
 If you prefer local development instead of Codespaces, follow these steps:
@@ -197,9 +211,9 @@ Configure the following secrets in your repository (**Settings** → **Secrets a
 
 ### Creating a Release (Production Deployment)
 
-To deploy to production, create a GitHub release:
+To deploy to production, create a GitHub release with a version tag. See [VERSIONING.md](VERSIONING.md) for detailed release process.
 
-#### Option 1: Using GitHub Web Interface
+#### Quick Steps:
 
 1. Go to your repository on GitHub
 2. Click on **Releases** in the right sidebar
@@ -210,9 +224,10 @@ To deploy to production, create a GitHub release:
 7. Click **Publish release**
 
 The workflow will automatically:
-- Build and test the application
+- Build and test the application with the release version
 - Create a Docker image tagged with the commit SHA and `latest`
 - Deploy to the production environment
+- Generate version.json with release information
 
 #### Option 2: Using GitHub CLI
 
