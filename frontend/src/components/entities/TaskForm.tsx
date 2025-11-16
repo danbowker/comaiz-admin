@@ -221,7 +221,6 @@ const TaskForm: React.FC<TaskFormProps> = ({
                   {filteredContractRates.map((cr) => (
                     <option key={cr.id} value={cr.id}>
                       {cr.description}
-                      {cr.applicationUser && ` (${cr.applicationUser.userName})`}
                     </option>
                   ))}
                 </select>
