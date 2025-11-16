@@ -98,3 +98,24 @@ export interface AuthResponse {
   email: string;
   roles: string[];
 }
+
+export interface TaskHours {
+  taskId?: number;
+  taskName: string;
+  hours: number;
+}
+
+export interface DailySummary {
+  date: string;
+  taskHours: TaskHours[];
+  totalHours: number;
+}
+
+export interface WeeklySummaryResponse {
+  weekStartDate: string;
+  weekEndDate: string;
+  userId?: string;
+  dailySummaries: DailySummary[];
+  taskWeeklyTotals: TaskHours[];
+  weekTotalHours: number;
+}
