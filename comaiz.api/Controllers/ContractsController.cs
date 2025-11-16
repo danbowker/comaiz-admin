@@ -18,11 +18,18 @@ namespace comaiz.api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Contract>>> GetContractsAsync()
+        public async Task<ActionResult<IEnumerable<Contract>>> GetContractsAsync([FromQuery] RecordState? state)
         {
             if (dbContext.Contracts == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            return await dbContext.Contracts.ToListAsync();
+            var query = dbContext.Contracts.AsQueryable();
+            
+            if (state.HasValue)
+            {
+                query = query.Where(c => c.State == state.Value);
+            }
+
+            return await query.ToListAsync();
         }
 
         [HttpGet("{id}")]

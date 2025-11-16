@@ -34,7 +34,7 @@ namespace comaiz.tests.Controllers
             var controller = new ContractsController(context);
 
             // Act
-            var result = await controller.GetContractsAsync();
+            var result = await controller.GetContractsAsync(null);
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<Contract>>>(result);

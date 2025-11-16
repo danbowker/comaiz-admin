@@ -34,7 +34,7 @@ namespace comaiz.tests.Controllers
             var controller = new TasksController(context);
 
             // Act
-            var result = await controller.GetTasks(null);
+            var result = await controller.GetTasks(null, null);
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<comaiz.data.Models.Task>>>(result);
