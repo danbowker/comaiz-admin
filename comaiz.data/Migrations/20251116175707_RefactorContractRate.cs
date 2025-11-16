@@ -11,18 +11,7 @@ namespace comaiz.data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_ContractRate_AspNetUsers_ApplicationUserId",
-                table: "ContractRate");
-
-            migrationBuilder.DropIndex(
-                name: "IX_ContractRate_ApplicationUserId",
-                table: "ContractRate");
-
-            migrationBuilder.DropColumn(
-                name: "ApplicationUserId",
-                table: "ContractRate");
-
+            // Add InvoiceDescription column first
             migrationBuilder.AddColumn<string>(
                 name: "InvoiceDescription",
                 table: "ContractRate",
@@ -65,23 +54,50 @@ namespace comaiz.data.Migrations
                 name: "IX_UserContractRate_ContractRateId",
                 table: "UserContractRate",
                 column: "ContractRateId");
+
+            // Migrate existing user assignments to UserContractRate table
+            migrationBuilder.Sql(@"
+                INSERT INTO ""UserContractRate"" (""ContractRateId"", ""ApplicationUserId"")
+                SELECT ""Id"", ""ApplicationUserId""
+                FROM ""ContractRate""
+                WHERE ""ApplicationUserId"" IS NOT NULL;
+            ");
+
+            // Now safe to drop the foreign key, index, and column
+            migrationBuilder.DropForeignKey(
+                name: "FK_ContractRate_AspNetUsers_ApplicationUserId",
+                table: "ContractRate");
+
+            migrationBuilder.DropIndex(
+                name: "IX_ContractRate_ApplicationUserId",
+                table: "ContractRate");
+
+            migrationBuilder.DropColumn(
+                name: "ApplicationUserId",
+                table: "ContractRate");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "UserContractRate");
-
-            migrationBuilder.DropColumn(
-                name: "InvoiceDescription",
-                table: "ContractRate");
-
             migrationBuilder.AddColumn<string>(
                 name: "ApplicationUserId",
                 table: "ContractRate",
                 type: "text",
                 nullable: true);
+
+            // Migrate first user assignment back to ContractRate
+            // Note: If multiple users are assigned, only the first will be migrated back
+            migrationBuilder.Sql(@"
+                UPDATE ""ContractRate"" cr
+                SET ""ApplicationUserId"" = ucr.""ApplicationUserId""
+                FROM (
+                    SELECT DISTINCT ON (""ContractRateId"") ""ContractRateId"", ""ApplicationUserId""
+                    FROM ""UserContractRate""
+                    ORDER BY ""ContractRateId"", ""Id""
+                ) ucr
+                WHERE cr.""Id"" = ucr.""ContractRateId"";
+            ");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ContractRate_ApplicationUserId",
@@ -94,6 +110,13 @@ namespace comaiz.data.Migrations
                 column: "ApplicationUserId",
                 principalTable: "AspNetUsers",
                 principalColumn: "Id");
+
+            migrationBuilder.DropTable(
+                name: "UserContractRate");
+
+            migrationBuilder.DropColumn(
+                name: "InvoiceDescription",
+                table: "ContractRate");
         }
     }
 }
