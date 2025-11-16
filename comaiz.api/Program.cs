@@ -157,16 +157,13 @@ if (args.Length >= 4 && args[0] == "--create-user")
     }
 }
 
-// Seed database with roles and default users (only in Development)
+// Seed database with default roles (for all deployments)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        var environment = services.GetRequiredService<IWebHostEnvironment>();
-        var isDevelopment = environment.IsDevelopment();
-        
-        await DatabaseSeeder.SeedDefaultRolesAndUser(services, isDevelopment);
+        await DatabaseSeeder.SeedDefaultRoles(services);
     }
     catch (Exception ex)
     {
