@@ -12,17 +12,8 @@ public static class TestDataSeeder
         var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
         
-        // Create Admin role if it doesn't exist
-        if (!await roleManager.RoleExistsAsync("Admin"))
-        {
-            await roleManager.CreateAsync(new ApplicationRole { Name = "Admin" });
-        }
-        
-        // Create User role if it doesn't exist
-        if (!await roleManager.RoleExistsAsync("User"))
-        {
-            await roleManager.CreateAsync(new ApplicationRole { Name = "User" });
-        }
+        // Ensure default roles exist using the centralized DatabaseSeeder
+        await comaiz.api.Services.DatabaseSeeder.SeedDefaultRoles(serviceProvider);
 
         // Create test user
         var testUsername = "testuser";
