@@ -96,6 +96,29 @@ namespace comaiz.api.Controllers
             return NoContent();
         }
 
+        [HttpPost("{id}/duplicate")]
+        public async Task<ActionResult<Client>> DuplicateClient(int id)
+        {
+            if (dbContext.Clients == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
+            var client = await dbContext.Clients.FindAsync(id);
+            if (client == null)
+            {
+                return NotFound();
+            }
+
+            var duplicatedClient = new Client
+            {
+                ShortName = client.ShortName,
+                Name = client.Name != null ? $"{client.Name} (Copy)" : null
+            };
+
+            dbContext.Clients.Add(duplicatedClient);
+            await dbContext.SaveChangesAsync();
+
+            return CreatedAtAction("GetClient", new { id = duplicatedClient.Id }, duplicatedClient);
+        }
+
         private bool ClientExists(int id)
         {
             if (dbContext.Clients == null) return false;

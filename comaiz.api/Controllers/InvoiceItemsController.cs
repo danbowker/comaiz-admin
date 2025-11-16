@@ -110,5 +110,34 @@ namespace comaiz.api.Controllers
 
             return NoContent();
         }
+
+        [HttpPost("{id}/duplicate")]
+        public async Task<ActionResult<InvoiceItem>> DuplicateInvoiceItem(int id)
+        {
+            if (dbContext.InvoiceItems == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
+            var invoiceItem = await dbContext.InvoiceItems.FindAsync(id);
+            if (invoiceItem == null)
+            {
+                return NotFound();
+            }
+
+            var duplicatedInvoiceItem = new InvoiceItem
+            {
+                InvoiceId = invoiceItem.InvoiceId,
+                TaskId = invoiceItem.TaskId,
+                FixedCostId = invoiceItem.FixedCostId,
+                Quantity = invoiceItem.Quantity,
+                Unit = invoiceItem.Unit,
+                Rate = invoiceItem.Rate,
+                VATRate = invoiceItem.VATRate,
+                Price = invoiceItem.Price
+            };
+
+            dbContext.InvoiceItems.Add(duplicatedInvoiceItem);
+            await dbContext.SaveChangesAsync();
+
+            return CreatedAtAction("GetInvoiceItem", new { id = duplicatedInvoiceItem.Id }, duplicatedInvoiceItem);
+        }
     }
 }

@@ -115,5 +115,51 @@ namespace comaiz.api.Controllers
 
             return NoContent();
         }
+
+        [HttpPost("{id}/duplicate")]
+        public async Task<ActionResult<Invoice>> DuplicateInvoice(int id)
+        {
+            if (dbContext.Invoices == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
+            var invoice = await dbContext.Invoices
+                .Include(i => i.InvoiceItems)
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+            if (invoice == null)
+            {
+                return NotFound();
+            }
+
+            var duplicatedInvoice = new Invoice
+            {
+                Date = invoice.Date,
+                PurchaseOrder = invoice.PurchaseOrder,
+                ClientId = invoice.ClientId
+            };
+
+            // Copy invoice items if they exist
+            if (invoice.InvoiceItems != null && invoice.InvoiceItems.Any())
+            {
+                foreach (var item in invoice.InvoiceItems)
+                {
+                    duplicatedInvoice.InvoiceItems ??= new List<InvoiceItem>();
+                    duplicatedInvoice.InvoiceItems.Add(new InvoiceItem
+                    {
+                        TaskId = item.TaskId,
+                        FixedCostId = item.FixedCostId,
+                        Quantity = item.Quantity,
+                        Unit = item.Unit,
+                        Rate = item.Rate,
+                        VATRate = item.VATRate,
+                        Price = item.Price
+                    });
+                }
+            }
+
+            dbContext.Invoices.Add(duplicatedInvoice);
+            await dbContext.SaveChangesAsync();
+
+            return CreatedAtAction("GetInvoice", new { id = duplicatedInvoice.Id }, duplicatedInvoice);
+        }
     }
 }
