@@ -171,5 +171,48 @@ namespace comaiz.tests.Controllers
             // Assert
             Assert.IsType<NotFoundResult>(result);
         }
+
+        [Fact]
+        public async System.Threading.Tasks.Task GetContractsAsync_WithStateFilter_ReturnsFilteredContracts()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            context.Contracts!.Add(new Contract { Id = 1, Description = "Active Contract", ClientId = 1, State = RecordState.Active });
+            context.Contracts.Add(new Contract { Id = 2, Description = "Complete Contract", ClientId = 1, State = RecordState.Complete });
+            await context.SaveChangesAsync();
+            
+            var controller = new ContractsController(context);
+
+            // Act - Filter for active contracts
+            var resultActive = await controller.GetContractsAsync(RecordState.Active);
+            var activeContracts = Assert.IsAssignableFrom<IEnumerable<Contract>>(resultActive.Value);
+            
+            // Act - Filter for complete contracts
+            var resultComplete = await controller.GetContractsAsync(RecordState.Complete);
+            var completeContracts = Assert.IsAssignableFrom<IEnumerable<Contract>>(resultComplete.Value);
+
+            // Assert
+            Assert.Single(activeContracts);
+            Assert.Equal(1, activeContracts.First().Id);
+            Assert.Single(completeContracts);
+            Assert.Equal(2, completeContracts.First().Id);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PostContract_DefaultStateIsActive()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var contract = new Contract { Description = "New Contract", ClientId = 1 };
+            var controller = new ContractsController(context);
+
+            // Act
+            var result = await controller.PostContract(contract);
+
+            // Assert
+            var savedContract = await context.Contracts!.FindAsync(contract.Id);
+            Assert.NotNull(savedContract);
+            Assert.Equal(RecordState.Active, savedContract.State);
+        }
     }
 }
