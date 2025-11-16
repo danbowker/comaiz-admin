@@ -8,9 +8,10 @@ This document summarizes the changes made to implement a staging and production 
 
 ### 1. GitHub Actions Workflow (.github/workflows/dotnet.yml)
 
-#### Added Release Trigger
-- The workflow now triggers on `release` events (specifically when a release is created)
-- This enables production deployments only when releases are published
+#### Added Tag-Based Production Trigger
+- The workflow triggers on version tag pushes (e.g., `v1.2.3`)
+- This enables production deployments automatically when version tags are pushed
+- No manual release creation is required
 
 #### Docker Image Tagging
 - Images are now tagged with the commit SHA (`${{ github.sha }}`) for traceability
@@ -21,7 +22,7 @@ The workflow now has three main jobs:
 
 1. **build**: Builds, tests, and creates Docker image (runs for all events)
 2. **deploy-staging**: Deploys to staging environment (runs only on master branch pushes)
-3. **deploy-production**: Deploys to production environment (runs only on release creation)
+3. **deploy-production**: Deploys to production environment (runs only on version tag pushes)
 
 #### Environment Configuration
 Both deployment jobs use GitHub Environments:
@@ -56,11 +57,11 @@ Updated secret requirements:
 - Example connection strings with clear naming conventions (`comaiz_staging`, `comaiz_production`)
 - Migration commands for setting up database schema
 
-#### Creating a Release (Production Deployment)
-Three options documented:
-1. **GitHub Web Interface**: Step-by-step guide with screenshots reference
-2. **GitHub CLI**: Command-line approach using `gh` tool
-3. **Git Tags**: Traditional git tag approach
+#### Deploying to Production
+Simple process documented:
+1. Create and push a version tag (e.g., `git tag -a v1.0.0 -m "Release 1.0.0"` and `git push origin v1.0.0`)
+2. GitHub Actions automatically builds and deploys to production
+3. No manual release creation needed
 
 #### Server Configuration
 - Requirements for Docker installation
@@ -120,7 +121,7 @@ On your deployment server:
 ### 5. Test the Workflow
 
 1. Push a commit to master → Should deploy to staging only
-2. Create a release → Should deploy to production
+2. Push a version tag (e.g., `v1.0.0`) → Should deploy to production
 
 ## Benefits of This Approach
 
@@ -139,9 +140,10 @@ On your deployment server:
 - Review GitHub Actions logs for errors
 
 ### Production deployment not triggering
-- Ensure you're creating a release, not just a tag
-- Verify the release is published (not a draft)
-- Check that the workflow has `release: types: [created]` trigger
+- Ensure you're pushing a version tag (e.g., `v1.0.0`)
+- Verify the tag matches the pattern `v[0-9]+.[0-9]+.[0-9]+`
+- Check that the workflow has the tag trigger configured
+- Review GitHub Actions logs for errors
 
 ### Container conflicts on server
 - If staging and production conflict, check port mappings (8080 vs 8081)
