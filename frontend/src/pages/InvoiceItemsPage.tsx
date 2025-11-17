@@ -114,6 +114,11 @@ const InvoiceItemsPage: React.FC = () => {
     await invoiceItemsService.delete(id);
   };
 
+  const handleDuplicate = async (id: number) => {
+    await invoiceItemsService.duplicate(id);
+    setRefreshKey((prev) => prev + 1);
+  };
+
   return (
     <>
       <EntityList
@@ -124,6 +129,7 @@ const InvoiceItemsPage: React.FC = () => {
         onEdit={handleEdit}
         onCreate={handleCreate}
         onDelete={handleDelete}
+        onDuplicate={handleDuplicate}
         queryParams={queryParams}
       />
       {showForm && (

@@ -82,6 +82,11 @@ const FixedCostsPage: React.FC = () => {
     await fixedCostsService.delete(id);
   };
 
+  const handleDuplicate = async (id: number) => {
+    await fixedCostsService.duplicate(id);
+    setRefreshKey((prev) => prev + 1);
+  };
+
   return (
     <>
       <EntityList
@@ -92,6 +97,7 @@ const FixedCostsPage: React.FC = () => {
         onEdit={handleEdit}
         onCreate={handleCreate}
         onDelete={handleDelete}
+        onDuplicate={handleDuplicate}
         queryParams={queryParams}
       />
       {showForm && (

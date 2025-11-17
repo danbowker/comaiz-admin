@@ -116,6 +116,11 @@ const WorkRecordsPage: React.FC = () => {
     await workRecordsService.delete(id);
   };
 
+  const handleDuplicate = async (id: number) => {
+    await workRecordsService.duplicate(id);
+    setRefreshKey((prev) => prev + 1);
+  };
+
   return (
     <>
       <EntityList
@@ -126,6 +131,7 @@ const WorkRecordsPage: React.FC = () => {
         onEdit={handleEdit}
         onCreate={handleCreate}
         onDelete={handleDelete}
+        onDuplicate={handleDuplicate}
         queryParams={queryParams}
       />
       {showForm && (

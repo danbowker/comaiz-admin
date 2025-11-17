@@ -90,6 +90,11 @@ const TasksPage: React.FC = () => {
     await tasksService.delete(id);
   };
 
+  const handleDuplicate = async (id: number) => {
+    await tasksService.duplicate(id);
+    setRefreshKey((prev) => prev + 1);
+  };
+
   return (
     <>
       <EntityList
@@ -100,6 +105,7 @@ const TasksPage: React.FC = () => {
         onEdit={handleEdit}
         onCreate={handleCreate}
         onDelete={handleDelete}
+        onDuplicate={handleDuplicate}
         queryParams={queryParams}
       />
       {showForm && (
