@@ -91,7 +91,9 @@ const TasksPage: React.FC = () => {
   };
 
   const handleDuplicate = async (id: number) => {
-    await tasksService.duplicate(id);
+    const duplicatedItem = await tasksService.duplicate(id);
+    setSelectedItem(duplicatedItem);
+    setShowForm(true);
     setRefreshKey((prev) => prev + 1);
   };
 

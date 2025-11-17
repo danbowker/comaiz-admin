@@ -115,7 +115,9 @@ const InvoiceItemsPage: React.FC = () => {
   };
 
   const handleDuplicate = async (id: number) => {
-    await invoiceItemsService.duplicate(id);
+    const duplicatedItem = await invoiceItemsService.duplicate(id);
+    setSelectedItem(duplicatedItem);
+    setShowForm(true);
     setRefreshKey((prev) => prev + 1);
   };
 

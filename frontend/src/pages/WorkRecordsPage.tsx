@@ -117,7 +117,9 @@ const WorkRecordsPage: React.FC = () => {
   };
 
   const handleDuplicate = async (id: number) => {
-    await workRecordsService.duplicate(id);
+    const duplicatedItem = await workRecordsService.duplicate(id);
+    setSelectedItem(duplicatedItem);
+    setShowForm(true);
     setRefreshKey((prev) => prev + 1);
   };
 

@@ -44,7 +44,9 @@ const ClientsPage: React.FC = () => {
   };
 
   const handleDuplicate = async (id: number) => {
-    await clientsService.duplicate(id);
+    const duplicatedItem = await clientsService.duplicate(id);
+    setSelectedItem(duplicatedItem);
+    setShowForm(true);
     setRefreshKey((prev) => prev + 1);
   };
 

@@ -120,7 +120,9 @@ const ContractRatesPage: React.FC = () => {
   };
 
   const handleDuplicate = async (id: number) => {
-    await contractRatesService.duplicate(id);
+    const duplicatedItem = await contractRatesService.duplicate(id);
+    setSelectedItem(duplicatedItem);
+    setShowForm(true);
     setRefreshKey((prev) => prev + 1);
   };
 

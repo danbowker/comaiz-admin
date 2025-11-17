@@ -83,7 +83,9 @@ const FixedCostsPage: React.FC = () => {
   };
 
   const handleDuplicate = async (id: number) => {
-    await fixedCostsService.duplicate(id);
+    const duplicatedItem = await fixedCostsService.duplicate(id);
+    setSelectedItem(duplicatedItem);
+    setShowForm(true);
     setRefreshKey((prev) => prev + 1);
   };
 
