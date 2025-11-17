@@ -88,6 +88,13 @@ const ContractsPage: React.FC = () => {
     await contractsService.delete(id);
   };
 
+  const handleDuplicate = async (id: number) => {
+    const duplicatedItem = await contractsService.duplicate(id);
+    setSelectedItem(duplicatedItem);
+    setShowForm(true);
+    setRefreshKey((prev) => prev + 1);
+  };
+
   return (
     <>
       <EntityList
@@ -98,6 +105,7 @@ const ContractsPage: React.FC = () => {
         onEdit={handleEdit}
         onCreate={handleCreate}
         onDelete={handleDelete}
+        onDuplicate={handleDuplicate}
       />
       {showForm && (
         <EntityForm

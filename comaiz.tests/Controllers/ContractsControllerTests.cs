@@ -171,5 +171,59 @@ namespace comaiz.tests.Controllers
             // Assert
             Assert.IsType<NotFoundResult>(result);
         }
+
+        [Fact]
+        public async System.Threading.Tasks.Task DuplicateContract_WithValidId_ReturnsCreatedAtAction()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var contract = new Contract 
+            { 
+                Id = 1, 
+                Description = "Test Contract", 
+                ClientId = 1, 
+                Price = 1000.00m,
+                Schedule = "Monthly",
+                ChargeType = ChargeType.TimeAndMaterials
+            };
+            context.Contracts!.Add(contract);
+            await context.SaveChangesAsync();
+            
+            var controller = new ContractsController(context);
+
+            // Act
+            var result = await controller.DuplicateContract(1);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<Contract>>(result);
+            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
+            Assert.Equal("GetContract", createdAtActionResult.ActionName);
+            
+            var duplicatedContract = Assert.IsType<Contract>(createdAtActionResult.Value);
+            Assert.NotEqual(1, duplicatedContract.Id);
+            Assert.Equal("Test Contract (Copy)", duplicatedContract.Description);
+            Assert.Equal(1, duplicatedContract.ClientId);
+            Assert.Equal(1000.00m, duplicatedContract.Price);
+            Assert.Equal("Monthly", duplicatedContract.Schedule);
+            Assert.Equal(ChargeType.TimeAndMaterials, duplicatedContract.ChargeType);
+            
+            // Verify both contracts exist in the database
+            var allContracts = await context.Contracts.ToListAsync();
+            Assert.Equal(2, allContracts.Count);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task DuplicateContract_WithInvalidId_ReturnsNotFound()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var controller = new ContractsController(context);
+
+            // Act
+            var result = await controller.DuplicateContract(999);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
     }
 }
