@@ -287,11 +287,11 @@ namespace comaiz.data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("PlannedEnd")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly?>("PlannedEnd")
+                        .HasColumnType("date");
 
-                    b.Property<DateTime?>("PlannedStart")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly?>("PlannedStart")
+                        .HasColumnType("date");
 
                     b.Property<decimal?>("Price")
                         .HasColumnType("numeric");

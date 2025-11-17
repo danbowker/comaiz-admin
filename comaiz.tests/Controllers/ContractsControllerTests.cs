@@ -103,8 +103,8 @@ namespace comaiz.tests.Controllers
         {
             // Arrange
             using var context = CreateInMemoryContext();
-            var plannedStart = new DateTime(2025, 1, 1);
-            var plannedEnd = new DateTime(2025, 12, 31);
+            var plannedStart = new DateOnly(2025, 1, 1);
+            var plannedEnd = new DateOnly(2025, 12, 31);
             var contract = new Contract 
             { 
                 Description = "Contract with Dates", 
@@ -178,8 +178,8 @@ namespace comaiz.tests.Controllers
             
             context.Entry(contract).State = EntityState.Detached;
             
-            var plannedStart = new DateTime(2025, 6, 1);
-            var plannedEnd = new DateTime(2025, 12, 31);
+            var plannedStart = new DateOnly(2025, 6, 1);
+            var plannedEnd = new DateOnly(2025, 12, 31);
             var updatedContract = new Contract 
             { 
                 Id = 1, 

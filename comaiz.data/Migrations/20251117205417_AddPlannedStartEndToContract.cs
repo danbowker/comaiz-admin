@@ -11,16 +11,16 @@ namespace comaiz.data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<DateTime>(
+            migrationBuilder.AddColumn<DateOnly>(
                 name: "PlannedEnd",
                 table: "Contract",
-                type: "timestamp with time zone",
+                type: "date",
                 nullable: true);
 
-            migrationBuilder.AddColumn<DateTime>(
+            migrationBuilder.AddColumn<DateOnly>(
                 name: "PlannedStart",
                 table: "Contract",
-                type: "timestamp with time zone",
+                type: "date",
                 nullable: true);
         }
 
