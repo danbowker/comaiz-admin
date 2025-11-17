@@ -24,7 +24,11 @@ namespace comaiz.api.Controllers
 
             var query = dbContext.Tasks
                 .Include(t => t.TaskContractRates!)
-                    .ThenInclude(tcr => tcr.ContractRate)
+                    .ThenInclude(tcr => tcr.UserContractRate)
+                        .ThenInclude(ucr => ucr!.ContractRate)
+                .Include(t => t.TaskContractRates!)
+                    .ThenInclude(tcr => tcr.UserContractRate)
+                        .ThenInclude(ucr => ucr!.ApplicationUser)
                 .AsQueryable();
             
             if (contractId.HasValue)
@@ -42,7 +46,11 @@ namespace comaiz.api.Controllers
 
             var task = await dbContext.Tasks
                 .Include(t => t.TaskContractRates!)
-                    .ThenInclude(tcr => tcr.ContractRate)
+                    .ThenInclude(tcr => tcr.UserContractRate)
+                        .ThenInclude(ucr => ucr!.ContractRate)
+                .Include(t => t.TaskContractRates!)
+                    .ThenInclude(tcr => tcr.UserContractRate)
+                        .ThenInclude(ucr => ucr!.ApplicationUser)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (task == null)
@@ -89,7 +97,7 @@ namespace comaiz.api.Controllers
                     var newTaskContractRate = new TaskContractRate
                     {
                         TaskId = existingTask.Id,
-                        ContractRateId = tcr.ContractRateId
+                        UserContractRateId = tcr.UserContractRateId
                     };
                     dbContext.TaskContractRates!.Add(newTaskContractRate);
                 }
@@ -126,14 +134,14 @@ namespace comaiz.api.Controllers
             // Clean up navigation properties in TaskContractRates to avoid inserting related entities
             if (task.TaskContractRates != null && task.TaskContractRates.Any())
             {
-                var contractRateIds = task.TaskContractRates.Select(tcr => tcr.ContractRateId).ToList();
+                var userContractRateIds = task.TaskContractRates.Select(tcr => tcr.UserContractRateId).ToList();
                 task.TaskContractRates.Clear();
                 
-                foreach (var contractRateId in contractRateIds)
+                foreach (var userContractRateId in userContractRateIds)
                 {
                     task.TaskContractRates.Add(new TaskContractRate
                     {
-                        ContractRateId = contractRateId
+                        UserContractRateId = userContractRateId
                     });
                 }
             }

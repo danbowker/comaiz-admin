@@ -54,8 +54,8 @@ export interface Task {
 export interface TaskContractRate {
   id?: number;
   taskId?: number;
-  contractRateId: number;
-  contractRate?: ContractRate;
+  userContractRateId: number;
+  userContractRate?: UserContractRate;
 }
 
 export interface FixedCost {

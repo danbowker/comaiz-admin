@@ -7,5 +7,6 @@ namespace comaiz.data.Models
         public ContractRate? ContractRate { get; set; }
         public string ApplicationUserId { get; set; } = string.Empty;
         public ApplicationUser? ApplicationUser { get; set; }
+        public ICollection<TaskContractRate>? TaskContractRates { get; set; }
     }
 }

@@ -53,6 +53,7 @@ public static class TestDataSeeder
         context.Workers?.RemoveRange(context.Workers);
         context.Contracts?.RemoveRange(context.Contracts);
         context.ContractRates?.RemoveRange(context.ContractRates);
+        context.UserContractRates?.RemoveRange(context.UserContractRates);
         context.Tasks?.RemoveRange(context.Tasks);
         context.TaskContractRates?.RemoveRange(context.TaskContractRates);
         context.SaveChanges();
@@ -79,12 +80,37 @@ public static class TestDataSeeder
         // Seed Contract Rates
         var contractRates = new List<ContractRate>
         {
-            new ContractRate { ContractId = contracts[0].Id, Description = "Developer Rate", Rate = 100 },
-            new ContractRate { ContractId = contracts[0].Id, Description = "Tester Rate", Rate = 80 },
-            new ContractRate { ContractId = contracts[0].Id, Description = "Designer Rate", Rate = 90 },
-            new ContractRate { ContractId = contracts[1].Id, Description = "Senior Dev Rate", Rate = 120 },
+            new ContractRate { ContractId = contracts[0].Id, Description = "Developer Rate", InvoiceDescription = "Software Development", Rate = 100 },
+            new ContractRate { ContractId = contracts[0].Id, Description = "Tester Rate", InvoiceDescription = "Quality Assurance", Rate = 80 },
+            new ContractRate { ContractId = contracts[0].Id, Description = "Designer Rate", InvoiceDescription = "UI/UX Design", Rate = 90 },
+            new ContractRate { ContractId = contracts[1].Id, Description = "Senior Dev Rate", InvoiceDescription = "Senior Development", Rate = 120 },
         };
         context.ContractRates?.AddRange(contractRates);
+        context.SaveChanges();
+
+        // Get or create a test user for UserContractRates
+        var testUser = context.Users!.FirstOrDefault(u => u.UserName == "testuser");
+        if (testUser == null)
+        {
+            testUser = new ApplicationUser
+            {
+                UserName = "testuser",
+                Email = "testuser@test.com",
+                EmailConfirmed = true
+            };
+            context.Users!.Add(testUser);
+            context.SaveChanges();
+        }
+
+        // Seed UserContractRates - associate the test user with all contract rates
+        var userContractRates = new List<UserContractRate>
+        {
+            new UserContractRate { ContractRateId = contractRates[0].Id, ApplicationUserId = testUser.Id },
+            new UserContractRate { ContractRateId = contractRates[1].Id, ApplicationUserId = testUser.Id },
+            new UserContractRate { ContractRateId = contractRates[2].Id, ApplicationUserId = testUser.Id },
+            new UserContractRate { ContractRateId = contractRates[3].Id, ApplicationUserId = testUser.Id },
+        };
+        context.UserContractRates?.AddRange(userContractRates);
 
         // Seed Workers
         var workers = new List<Worker>
@@ -111,6 +137,8 @@ public static class TestDataSeeder
             context.TaskContractRates.RemoveRange(context.TaskContractRates);
         if (context.Tasks != null)
             context.Tasks.RemoveRange(context.Tasks);
+        if (context.UserContractRates != null)
+            context.UserContractRates.RemoveRange(context.UserContractRates);
         if (context.ContractRates != null)
             context.ContractRates.RemoveRange(context.ContractRates);
         if (context.Contracts != null)
