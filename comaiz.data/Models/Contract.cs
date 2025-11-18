@@ -13,6 +13,8 @@
         public ICollection<ContractRate>? ContractRates { get; set; }
         public string? Schedule { get; set; }
         public ChargeType ChargeType { get; set; }
+        public DateOnly? PlannedStart { get; set; }
+        public DateOnly? PlannedEnd { get; set; }
     }
     public enum ChargeType
     {

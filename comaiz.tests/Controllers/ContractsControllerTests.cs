@@ -99,6 +99,36 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
+        public async System.Threading.Tasks.Task PostContract_WithPlannedDates_SavesDatesCorrectly()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var plannedStart = new DateOnly(2025, 1, 1);
+            var plannedEnd = new DateOnly(2025, 12, 31);
+            var contract = new Contract 
+            { 
+                Description = "Contract with Dates", 
+                ClientId = 1,
+                PlannedStart = plannedStart,
+                PlannedEnd = plannedEnd
+            };
+            var controller = new ContractsController(context);
+
+            // Act
+            var result = await controller.PostContract(contract);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<Contract>>(result);
+            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
+            
+            // Verify dates were saved correctly
+            var savedContract = await context.Contracts!.FindAsync(contract.Id);
+            Assert.NotNull(savedContract);
+            Assert.Equal(plannedStart, savedContract.PlannedStart);
+            Assert.Equal(plannedEnd, savedContract.PlannedEnd);
+        }
+
+        [Fact]
         public async System.Threading.Tasks.Task PutContract_WithValidContract_ReturnsNoContent()
         {
             // Arrange
@@ -135,6 +165,41 @@ namespace comaiz.tests.Controllers
 
             // Assert
             Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PutContract_UpdatesPlannedDates()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var contract = new Contract { Id = 1, Description = "Original", ClientId = 1 };
+            context.Contracts!.Add(contract);
+            await context.SaveChangesAsync();
+            
+            context.Entry(contract).State = EntityState.Detached;
+            
+            var plannedStart = new DateOnly(2025, 6, 1);
+            var plannedEnd = new DateOnly(2025, 12, 31);
+            var updatedContract = new Contract 
+            { 
+                Id = 1, 
+                Description = "Updated", 
+                ClientId = 1,
+                PlannedStart = plannedStart,
+                PlannedEnd = plannedEnd
+            };
+            var controller = new ContractsController(context);
+
+            // Act
+            var result = await controller.PutContract(updatedContract);
+
+            // Assert
+            Assert.IsType<NoContentResult>(result);
+            
+            var savedContract = await context.Contracts.FindAsync(1);
+            Assert.Equal("Updated", savedContract!.Description);
+            Assert.Equal(plannedStart, savedContract.PlannedStart);
+            Assert.Equal(plannedEnd, savedContract.PlannedEnd);
         }
 
         [Fact]
