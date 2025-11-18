@@ -315,6 +315,108 @@ namespace comaiz.tests.Controllers
         }
 
         [Fact]
+        public async System.Threading.Tasks.Task DuplicateTask_WithValidId_ReturnsCreatedAtAction()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var task = new comaiz.data.Models.Task
+            {
+                Id = 1,
+                Name = "Development Task",
+                ContractId = 1,
+                ContractRateId = 1
+            };
+            context.Tasks!.Add(task);
+            await context.SaveChangesAsync();
+
+            var controller = new TasksController(context);
+
+            // Act
+            var result = await controller.DuplicateTask(1);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<comaiz.data.Models.Task>>(result);
+            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
+            Assert.Equal("GetTask", createdAtActionResult.ActionName);
+
+            var duplicatedTask = Assert.IsType<comaiz.data.Models.Task>(createdAtActionResult.Value);
+            Assert.NotEqual(1, duplicatedTask.Id);
+            Assert.Equal("Development Task (Copy)", duplicatedTask.Name);
+            Assert.Equal(1, duplicatedTask.ContractId);
+            Assert.Equal(1, duplicatedTask.ContractRateId);
+
+            // Verify both tasks exist in the database
+            var allTasks = await context.Tasks.ToListAsync();
+            Assert.Equal(2, allTasks.Count);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task DuplicateTask_WithTaskContractRates_CopiesCollection()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+
+            var contract = new Contract { Id = 1, ClientId = 1, Description = "Test Contract", ChargeType = ChargeType.TimeAndMaterials };
+            context.Contracts!.Add(contract);
+
+            var contractRate1 = new ContractRate { Id = 1, ContractId = 1, Description = "Developer Rate", Rate = 100 };
+            var contractRate2 = new ContractRate { Id = 2, ContractId = 1, Description = "Tester Rate", Rate = 80 };
+            context.ContractRates!.Add(contractRate1);
+            context.ContractRates.Add(contractRate2);
+
+            var task = new comaiz.data.Models.Task
+            {
+                Id = 1,
+                Name = "Development",
+                ContractId = 1,
+                TaskContractRates = new List<TaskContractRate>
+                {
+                    new TaskContractRate { TaskId = 1, ContractRateId = 1 },
+                    new TaskContractRate { TaskId = 1, ContractRateId = 2 }
+                }
+            };
+            context.Tasks!.Add(task);
+            await context.SaveChangesAsync();
+
+            var controller = new TasksController(context);
+
+            // Act
+            var result = await controller.DuplicateTask(1);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<comaiz.data.Models.Task>>(result);
+            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
+
+            var duplicatedTask = Assert.IsType<comaiz.data.Models.Task>(createdAtActionResult.Value);
+
+            // Load the duplicated task with its TaskContractRates
+            var savedTask = await context.Tasks
+                .Include(t => t.TaskContractRates)
+                .FirstOrDefaultAsync(t => t.Id == duplicatedTask.Id);
+
+            Assert.NotNull(savedTask);
+            Assert.Equal("Development (Copy)", savedTask.Name);
+            Assert.NotNull(savedTask.TaskContractRates);
+            Assert.Equal(2, savedTask.TaskContractRates.Count);
+            Assert.Contains(savedTask.TaskContractRates, tcr => tcr.ContractRateId == 1);
+            Assert.Contains(savedTask.TaskContractRates, tcr => tcr.ContractRateId == 2);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task DuplicateTask_WithInvalidId_ReturnsNotFound()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var controller = new TasksController(context);
+
+            // Act
+            var result = await controller.DuplicateTask(999);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
+
+        [Fact]
         public async System.Threading.Tasks.Task PostTask_ToCompleteContract_ReturnsBadRequest()
         {
             // Arrange

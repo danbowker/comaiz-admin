@@ -129,5 +129,32 @@ namespace comaiz.api.Controllers
 
             return NoContent();
         }
+
+        [HttpPost("{id}/duplicate")]
+        public async Task<ActionResult<WorkRecord>> DuplicateWorkRecord(int id)
+        {
+            if (dbContext.WorkRecords == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
+            var workRecord = await dbContext.WorkRecords.FindAsync(id);
+            if (workRecord == null)
+            {
+                return NotFound();
+            }
+
+            var duplicatedWorkRecord = new WorkRecord
+            {
+                StartDate = workRecord.StartDate,
+                EndDate = workRecord.EndDate,
+                Hours = workRecord.Hours,
+                ApplicationUserId = workRecord.ApplicationUserId,
+                TaskId = workRecord.TaskId,
+                InvoiceItemId = null // Don't copy the invoice item association
+            };
+
+            dbContext.WorkRecords.Add(duplicatedWorkRecord);
+            await dbContext.SaveChangesAsync();
+
+            return CreatedAtAction("GetWorkRecord", new { id = duplicatedWorkRecord.Id }, duplicatedWorkRecord);
+        }
     }
 }

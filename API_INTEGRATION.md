@@ -27,6 +27,46 @@ Response:
 }
 ```
 
+### Entity Duplication
+
+All entities support duplication via a dedicated endpoint:
+
+```
+POST /api/{entity}/{id}/duplicate
+Authorization: Bearer {token}
+```
+
+When duplicating an entity:
+- A new entity is created with all properties copied from the source
+- The new entity gets a new ID
+- Name/description fields get a " (Copy)" suffix
+- Related collections (e.g., TaskContractRates, InvoiceItems) are duplicated
+- Invoice associations are excluded to prevent data inconsistencies
+
+**Example: Duplicate a Client**
+```
+POST /api/clients/5/duplicate
+Authorization: Bearer eyJhbGci...
+
+Response: 201 Created
+{
+  "id": 10,
+  "shortName": "ACME",
+  "name": "ACME Corporation (Copy)"
+}
+```
+
+**Supported Entities:**
+- Clients
+- Contracts
+- ContractRates
+- Tasks (includes TaskContractRates)
+- WorkRecords
+- Invoices (includes InvoiceItems)
+- InvoiceItems
+- FixedCosts
+- Workers
+
 ### Clients
 
 - `GET /api/clients` - Get all clients
@@ -34,6 +74,7 @@ Response:
 - `POST /api/clients` - Create new client
 - `PUT /api/clients` - Update existing client
 - `DELETE /api/clients/{id}` - Delete client
+- `POST /api/clients/{id}/duplicate` - Duplicate an existing client
 
 Example Client object:
 ```json
@@ -51,6 +92,7 @@ Example Client object:
 - `POST /api/workers` - Create new worker
 - `PUT /api/workers` - Update existing worker
 - `DELETE /api/workers/{id}` - Delete worker
+- `POST /api/workers/{id}/duplicate` - Duplicate an existing worker
 
 Example Worker object:
 ```json
@@ -67,6 +109,7 @@ Example Worker object:
 - `POST /api/contracts` - Create new contract
 - `PUT /api/contracts` - Update existing contract
 - `DELETE /api/contracts/{id}` - Delete contract
+- `POST /api/contracts/{id}/duplicate` - Duplicate an existing contract
 
 Example Contract object:
 ```json
@@ -91,6 +134,7 @@ ChargeType enum:
 - `POST /api/contractrates` - Create new contract rate
 - `PUT /api/contractrates` - Update existing contract rate
 - `DELETE /api/contractrates/{id}` - Delete contract rate
+- `POST /api/contractrates/{id}/duplicate` - Duplicate an existing contract rate
 
 Example ContractRate object:
 ```json
@@ -109,6 +153,7 @@ Example ContractRate object:
 - `POST /api/fixedcosts` - Create new fixed cost
 - `PUT /api/fixedcosts` - Update existing fixed cost
 - `DELETE /api/fixedcosts/{id}` - Delete fixed cost
+- `POST /api/fixedcosts/{id}/duplicate` - Duplicate an existing fixed cost
 
 Example FixedCost object:
 ```json
@@ -128,6 +173,7 @@ Example FixedCost object:
 - `POST /api/workrecords` - Create new work record
 - `PUT /api/workrecords` - Update existing work record
 - `DELETE /api/workrecords/{id}` - Delete work record
+- `POST /api/workrecords/{id}/duplicate` - Duplicate an existing work record
 
 Example WorkRecord object:
 ```json
@@ -150,6 +196,7 @@ Example WorkRecord object:
 - `POST /api/invoices` - Create new invoice
 - `PUT /api/invoices` - Update existing invoice
 - `DELETE /api/invoices/{id}` - Delete invoice
+- `POST /api/invoices/{id}/duplicate` - Duplicate an existing invoice (includes all invoice items)
 
 Example Invoice object:
 ```json
@@ -168,6 +215,7 @@ Example Invoice object:
 - `POST /api/invoiceitems` - Create new invoice item
 - `PUT /api/invoiceitems` - Update existing invoice item
 - `DELETE /api/invoiceitems/{id}` - Delete invoice item
+- `POST /api/invoiceitems/{id}/duplicate` - Duplicate an existing invoice item
 
 Example InvoiceItem object:
 ```json

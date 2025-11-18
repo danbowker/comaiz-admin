@@ -188,5 +188,48 @@ namespace comaiz.tests.Controllers
             // Assert
             Assert.IsType<NotFoundResult>(result);
         }
+
+        [Fact]
+        public async System.Threading.Tasks.Task DuplicateClient_WithValidId_ReturnsCreatedAtAction()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var client = new Client { Id = 1, ShortName = "ABC", Name = "ABC Company" };
+            context.Clients!.Add(client);
+            await context.SaveChangesAsync();
+            
+            var controller = new ClientsController(context);
+
+            // Act
+            var result = await controller.DuplicateClient(1);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<Client>>(result);
+            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
+            Assert.Equal("GetClient", createdAtActionResult.ActionName);
+            
+            var duplicatedClient = Assert.IsType<Client>(createdAtActionResult.Value);
+            Assert.NotEqual(1, duplicatedClient.Id);
+            Assert.Equal("ABC", duplicatedClient.ShortName);
+            Assert.Equal("ABC Company (Copy)", duplicatedClient.Name);
+            
+            // Verify both clients exist in the database
+            var allClients = await context.Clients.ToListAsync();
+            Assert.Equal(2, allClients.Count);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task DuplicateClient_WithInvalidId_ReturnsNotFound()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var controller = new ClientsController(context);
+
+            // Act
+            var result = await controller.DuplicateClient(999);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
     }
 }

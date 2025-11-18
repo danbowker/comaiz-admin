@@ -106,5 +106,31 @@ namespace comaiz.api.Controllers
 
             return NoContent();
         }
+
+        [HttpPost("{id}/duplicate")]
+        public async Task<ActionResult<Contract>> DuplicateContract(int id)
+        {
+            if (dbContext.Contracts == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
+            var contract = await dbContext.Contracts.FindAsync(id);
+            if (contract == null)
+            {
+                return NotFound();
+            }
+
+            var duplicatedContract = new Contract
+            {
+                ClientId = contract.ClientId,
+                Description = contract.Description != null ? $"{contract.Description} (Copy)" : null,
+                Price = contract.Price,
+                Schedule = contract.Schedule,
+                ChargeType = contract.ChargeType
+            };
+
+            dbContext.Contracts.Add(duplicatedContract);
+            await dbContext.SaveChangesAsync();
+
+            return CreatedAtAction("GetContract", new { id = duplicatedContract.Id }, duplicatedContract);
+        }
     }
 }

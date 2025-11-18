@@ -51,6 +51,11 @@ export class EntityService<T> {
   async delete(id: number | string): Promise<void> {
     await api.delete(`/${this.endpoint}/${id}`);
   }
+
+  async duplicate(id: number | string): Promise<T> {
+    const response = await api.post<T>(`/${this.endpoint}/${id}/duplicate`);
+    return response.data;
+  }
 }
 
 // Export services for all entities with proper types

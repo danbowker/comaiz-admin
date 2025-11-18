@@ -184,5 +184,45 @@ namespace comaiz.api.Controllers
 
             return NoContent();
         }
+
+        [HttpPost("{id}/duplicate")]
+        public async System.Threading.Tasks.Task<ActionResult<comaiz.data.Models.Task>> DuplicateTask(int id)
+        {
+            if (dbContext.Tasks == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
+            var task = await dbContext.Tasks
+                .Include(t => t.TaskContractRates)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            var duplicatedTask = new comaiz.data.Models.Task
+            {
+                Name = $"{task.Name} (Copy)",
+                ContractId = task.ContractId,
+                ContractRateId = task.ContractRateId
+            };
+
+            // Copy TaskContractRates if they exist
+            if (task.TaskContractRates != null && task.TaskContractRates.Any())
+            {
+                foreach (var tcr in task.TaskContractRates)
+                {
+                    duplicatedTask.TaskContractRates ??= new List<TaskContractRate>();
+                    duplicatedTask.TaskContractRates.Add(new TaskContractRate
+                    {
+                        ContractRateId = tcr.ContractRateId
+                    });
+                }
+            }
+
+            dbContext.Tasks.Add(duplicatedTask);
+            await dbContext.SaveChangesAsync();
+
+            return CreatedAtAction("GetTask", new { id = duplicatedTask.Id }, duplicatedTask);
+        }
     }
 }
