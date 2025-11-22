@@ -32,8 +32,16 @@ export interface ContractRate {
   id: number;
   contractId: number;
   description: string;
+  invoiceDescription: string;
   rate?: number;
-  applicationUserId?: string;
+  userContractRates?: UserContractRate[];
+}
+
+export interface UserContractRate {
+  id: number;
+  contractRateId: number;
+  contractRate?: ContractRate;
+  applicationUserId: string;
   applicationUser?: ApplicationUser;
 }
 
@@ -48,8 +56,8 @@ export interface Task {
 export interface TaskContractRate {
   id?: number;
   taskId?: number;
-  contractRateId: number;
-  contractRate?: ContractRate;
+  userContractRateId: number;
+  userContractRate?: UserContractRate;
 }
 
 export interface FixedCost {

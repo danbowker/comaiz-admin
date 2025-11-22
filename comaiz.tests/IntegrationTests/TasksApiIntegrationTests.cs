@@ -50,14 +50,17 @@ public class TasksApiIntegrationTests : IClassFixture<ComaizApiWebApplicationFac
         
         var contract = context.Contracts!.First();
         var contractRates = context.ContractRates!.Where(cr => cr.ContractId == contract.Id).Take(2).ToList();
+        var userContractRates = context.UserContractRates!
+            .Where(ucr => contractRates.Select(cr => cr.Id).Contains(ucr.ContractRateId))
+            .ToList();
 
         var newTask = new comaiz.data.Models.Task
         {
             Name = "Integration Test Task",
             ContractId = contract.Id,
-            TaskContractRates = contractRates.Select(cr => new TaskContractRate
+            TaskContractRates = userContractRates.Select(ucr => new TaskContractRate
             {
-                ContractRateId = cr.Id
+                UserContractRateId = ucr.Id
             }).ToList()
         };
 
@@ -91,7 +94,10 @@ public class TasksApiIntegrationTests : IClassFixture<ComaizApiWebApplicationFac
         
         var contract = context.Contracts!.First();
         var allContractRates = context.ContractRates!.Where(cr => cr.ContractId == contract.Id).ToList();
-        var initialRate = allContractRates.First();
+        var allUserContractRates = context.UserContractRates!
+            .Where(ucr => allContractRates.Select(cr => cr.Id).Contains(ucr.ContractRateId))
+            .ToList();
+        var initialUserContractRate = allUserContractRates.First();
 
         var task = new comaiz.data.Models.Task
         {
@@ -99,7 +105,7 @@ public class TasksApiIntegrationTests : IClassFixture<ComaizApiWebApplicationFac
             ContractId = contract.Id,
             TaskContractRates = new List<TaskContractRate>
             {
-                new TaskContractRate { ContractRateId = initialRate.Id }
+                new TaskContractRate { UserContractRateId = initialUserContractRate.Id }
             }
         };
 
@@ -107,12 +113,12 @@ public class TasksApiIntegrationTests : IClassFixture<ComaizApiWebApplicationFac
         createResponse.EnsureSuccessStatusCode();
         var createdTask = await createResponse.Content.ReadFromJsonAsync<comaiz.data.Models.Task>();
 
-        // Update with different contract rates
+        // Update with different user contract rates
         createdTask!.Name = "Updated Task Name";
-        createdTask.TaskContractRates = allContractRates.Skip(1).Take(2).Select(cr => new TaskContractRate
+        createdTask.TaskContractRates = allUserContractRates.Skip(1).Take(2).Select(ucr => new TaskContractRate
         {
             TaskId = createdTask.Id,
-            ContractRateId = cr.Id
+            UserContractRateId = ucr.Id
         }).ToList();
 
         // Act
@@ -129,7 +135,7 @@ public class TasksApiIntegrationTests : IClassFixture<ComaizApiWebApplicationFac
         Assert.Equal("Updated Task Name", updatedTask.Name);
         Assert.NotNull(updatedTask.TaskContractRates);
         Assert.Equal(2, updatedTask.TaskContractRates.Count);
-        Assert.DoesNotContain(updatedTask.TaskContractRates, tcr => tcr.ContractRateId == initialRate.Id);
+        Assert.DoesNotContain(updatedTask.TaskContractRates, tcr => tcr.UserContractRateId == initialUserContractRate.Id);
     }
 
     [Fact]
@@ -141,6 +147,7 @@ public class TasksApiIntegrationTests : IClassFixture<ComaizApiWebApplicationFac
         
         var contract = context.Contracts!.First();
         var contractRate = context.ContractRates!.First(cr => cr.ContractId == contract.Id);
+        var userContractRate = context.UserContractRates!.First(ucr => ucr.ContractRateId == contractRate.Id);
 
         var task = new comaiz.data.Models.Task
         {
@@ -148,7 +155,7 @@ public class TasksApiIntegrationTests : IClassFixture<ComaizApiWebApplicationFac
             ContractId = contract.Id,
             TaskContractRates = new List<TaskContractRate>
             {
-                new TaskContractRate { ContractRateId = contractRate.Id }
+                new TaskContractRate { UserContractRateId = userContractRate.Id }
             }
         };
 
@@ -177,6 +184,7 @@ public class TasksApiIntegrationTests : IClassFixture<ComaizApiWebApplicationFac
         
         var contract = context.Contracts!.First();
         var contractRate = context.ContractRates!.First(cr => cr.ContractId == contract.Id);
+        var userContractRate = context.UserContractRates!.First(ucr => ucr.ContractRateId == contractRate.Id);
 
         var task = new comaiz.data.Models.Task
         {
@@ -184,7 +192,7 @@ public class TasksApiIntegrationTests : IClassFixture<ComaizApiWebApplicationFac
             ContractId = contract.Id,
             TaskContractRates = new List<TaskContractRate>
             {
-                new TaskContractRate { ContractRateId = contractRate.Id }
+                new TaskContractRate { UserContractRateId = userContractRate.Id }
             }
         };
 
