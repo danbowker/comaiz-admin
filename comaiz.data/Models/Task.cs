@@ -9,5 +9,6 @@ namespace comaiz.data.Models
         public int? ContractRateId { get; set; }
         public ContractRate? ContractRate { get; set; }
         public ICollection<TaskContractRate>? TaskContractRates { get; set; }
+        public RecordState State { get; set; } = RecordState.Active;
     }
 }

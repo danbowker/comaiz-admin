@@ -18,18 +18,32 @@ namespace comaiz.api.Controllers
         }
 
         [HttpGet]
-        public async System.Threading.Tasks.Task<ActionResult<IEnumerable<comaiz.data.Models.Task>>> GetTasks([FromQuery] int? contractId)
+        public async System.Threading.Tasks.Task<ActionResult<IEnumerable<comaiz.data.Models.Task>>> GetTasks([FromQuery] int? contractId, [FromQuery] RecordState? state)
         {
             if (dbContext.Tasks == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             var query = dbContext.Tasks
                 .Include(t => t.TaskContractRates!)
                     .ThenInclude(tcr => tcr.ContractRate)
+                .Include(t => t.Contract)
                 .AsQueryable();
             
             if (contractId.HasValue)
             {
                 query = query.Where(t => t.ContractId == contractId.Value);
+            }
+            
+            if (state.HasValue)
+            {
+                // Tasks that belong to a complete contract behave as complete tasks
+                if (state.Value == RecordState.Active)
+                {
+                    query = query.Where(t => t.State == RecordState.Active && (t.Contract == null || t.Contract.State == RecordState.Active));
+                }
+                else
+                {
+                    query = query.Where(t => t.State == RecordState.Complete || (t.Contract != null && t.Contract.State == RecordState.Complete));
+                }
             }
 
             return await query.ToListAsync();
@@ -122,6 +136,16 @@ namespace comaiz.api.Controllers
         public async System.Threading.Tasks.Task<ActionResult<comaiz.data.Models.Task>> PostTask(comaiz.data.Models.Task task)
         {
             if (dbContext.Tasks == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
+            // Validate that the contract is not complete
+            if (task.ContractId.HasValue)
+            {
+                var contract = await dbContext.Contracts!.FindAsync(task.ContractId.Value);
+                if (contract != null && contract.State == RecordState.Complete)
+                {
+                    return BadRequest("Cannot add tasks to a complete contract.");
+                }
+            }
 
             // Clean up navigation properties in TaskContractRates to avoid inserting related entities
             if (task.TaskContractRates != null && task.TaskContractRates.Any())
