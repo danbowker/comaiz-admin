@@ -105,5 +105,30 @@ namespace comaiz.api.Controllers
 
             return NoContent();
         }
+
+        [HttpPost("{id}/duplicate")]
+        public async Task<ActionResult<ContractRate>> DuplicateContractRate(int id)
+        {
+            if (dbContext.ContractRates == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
+            var contractRate = await dbContext.ContractRates.FindAsync(id);
+            if (contractRate == null)
+            {
+                return NotFound();
+            }
+
+            var duplicatedContractRate = new ContractRate
+            {
+                ContractId = contractRate.ContractId,
+                Description = $"{contractRate.Description} (Copy)",
+                Rate = contractRate.Rate,
+                ApplicationUserId = contractRate.ApplicationUserId
+            };
+
+            dbContext.ContractRates.Add(duplicatedContractRate);
+            await dbContext.SaveChangesAsync();
+
+            return CreatedAtAction("GetContractRate", new { id = duplicatedContractRate.Id }, duplicatedContractRate);
+        }
     }
 }

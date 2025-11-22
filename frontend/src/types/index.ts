@@ -19,6 +19,8 @@ export interface Contract {
   price?: number;
   schedule?: string;
   chargeType: ChargeType;
+  plannedStart?: string;
+  plannedEnd?: string;
 }
 
 export enum ChargeType {

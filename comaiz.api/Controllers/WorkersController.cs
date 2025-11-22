@@ -98,5 +98,27 @@ namespace comaiz.api.Controllers
 
             return NoContent();
         }
+
+        [HttpPost("{id}/duplicate")]
+        public async Task<ActionResult<Worker>> DuplicateWorker(int id)
+        {
+            if (dbContext.Workers == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
+            var worker = await dbContext.Workers.FindAsync(id);
+            if (worker == null)
+            {
+                return NotFound();
+            }
+
+            var duplicatedWorker = new Worker
+            {
+                Name = worker.Name != null ? $"{worker.Name} (Copy)" : null
+            };
+
+            dbContext.Workers.Add(duplicatedWorker);
+            await dbContext.SaveChangesAsync();
+
+            return CreatedAtAction("GetWorker", new { id = duplicatedWorker.Id }, duplicatedWorker);
+        }
     }
 }

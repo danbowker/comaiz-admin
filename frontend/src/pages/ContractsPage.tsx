@@ -40,6 +40,16 @@ const ContractsPage: React.FC = () => {
       label: 'Charge Type',
       render: (item: Contract) => ChargeType[item.chargeType]
     },
+    { 
+      key: 'plannedStart' as keyof Contract, 
+      label: 'Planned Start',
+      render: (item: Contract) => item.plannedStart ? new Date(item.plannedStart).toLocaleDateString() : ''
+    },
+    { 
+      key: 'plannedEnd' as keyof Contract, 
+      label: 'Planned End',
+      render: (item: Contract) => item.plannedEnd ? new Date(item.plannedEnd).toLocaleDateString() : ''
+    },
   ];
 
   const fields: FormField<Contract>[] = [
@@ -63,6 +73,8 @@ const ContractsPage: React.FC = () => {
         { value: ChargeType.TimeAndMaterials, label: 'Time and Materials' },
       ],
     },
+    { name: 'plannedStart', label: 'Planned Start', type: 'date' },
+    { name: 'plannedEnd', label: 'Planned End', type: 'date' },
   ];
 
   const handleEdit = (item: Contract) => {
@@ -88,6 +100,13 @@ const ContractsPage: React.FC = () => {
     await contractsService.delete(id);
   };
 
+  const handleDuplicate = async (id: number) => {
+    const duplicatedItem = await contractsService.duplicate(id);
+    setSelectedItem(duplicatedItem);
+    setShowForm(true);
+    setRefreshKey((prev) => prev + 1);
+  };
+
   return (
     <>
       <EntityList
@@ -98,6 +117,7 @@ const ContractsPage: React.FC = () => {
         onEdit={handleEdit}
         onCreate={handleCreate}
         onDelete={handleDelete}
+        onDuplicate={handleDuplicate}
       />
       {showForm && (
         <EntityForm
