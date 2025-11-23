@@ -121,8 +121,8 @@ namespace comaiz.api.Controllers
             {
                 ContractId = contractRate.ContractId,
                 Description = $"{contractRate.Description} (Copy)",
-                Rate = contractRate.Rate,
-                ApplicationUserId = contractRate.ApplicationUserId
+                InvoiceDescription = contractRate.InvoiceDescription,
+                Rate = contractRate.Rate
             };
 
             dbContext.ContractRates.Add(duplicatedContractRate);

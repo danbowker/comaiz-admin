@@ -19,6 +19,7 @@ export interface Contract {
   price?: number;
   schedule?: string;
   chargeType: ChargeType;
+  state: RecordState;
   plannedStart?: string;
   plannedEnd?: string;
 }
@@ -26,6 +27,11 @@ export interface Contract {
 export enum ChargeType {
   Fixed = 0,
   TimeAndMaterials = 1,
+}
+
+export enum RecordState {
+  Active = 0,
+  Complete = 1,
 }
 
 export interface ContractRate {
@@ -50,6 +56,7 @@ export interface Task {
   name: string;
   contractId?: number;
   contractRateId?: number;
+  state: RecordState;
   taskContractRates?: TaskContractRate[];
 }
 

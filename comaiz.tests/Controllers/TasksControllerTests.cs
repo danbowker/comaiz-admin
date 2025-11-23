@@ -34,7 +34,7 @@ namespace comaiz.tests.Controllers
             var controller = new TasksController(context);
 
             // Act
-            var result = await controller.GetTasks(null);
+            var result = await controller.GetTasks(null, null);
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<comaiz.data.Models.Task>>>(result);
@@ -347,16 +347,16 @@ namespace comaiz.tests.Controllers
         {
             // Arrange
             using var context = CreateInMemoryContext();
-            var task = new comaiz.data.Models.Task 
-            { 
-                Id = 1, 
+            var task = new comaiz.data.Models.Task
+            {
+                Id = 1,
                 Name = "Development Task",
                 ContractId = 1,
                 ContractRateId = 1
             };
             context.Tasks!.Add(task);
             await context.SaveChangesAsync();
-            
+
             var controller = new TasksController(context);
 
             // Act
@@ -366,13 +366,13 @@ namespace comaiz.tests.Controllers
             var actionResult = Assert.IsType<ActionResult<comaiz.data.Models.Task>>(result);
             var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
             Assert.Equal("GetTask", createdAtActionResult.ActionName);
-            
+
             var duplicatedTask = Assert.IsType<comaiz.data.Models.Task>(createdAtActionResult.Value);
             Assert.NotEqual(1, duplicatedTask.Id);
             Assert.Equal("Development Task (Copy)", duplicatedTask.Name);
             Assert.Equal(1, duplicatedTask.ContractId);
             Assert.Equal(1, duplicatedTask.ContractRateId);
-            
+
             // Verify both tasks exist in the database
             var allTasks = await context.Tasks.ToListAsync();
             Assert.Equal(2, allTasks.Count);
@@ -383,29 +383,38 @@ namespace comaiz.tests.Controllers
         {
             // Arrange
             using var context = CreateInMemoryContext();
-            
+
             var contract = new Contract { Id = 1, ClientId = 1, Description = "Test Contract", ChargeType = ChargeType.TimeAndMaterials };
             context.Contracts!.Add(contract);
-            
-            var contractRate1 = new ContractRate { Id = 1, ContractId = 1, Description = "Developer Rate", Rate = 100 };
-            var contractRate2 = new ContractRate { Id = 2, ContractId = 1, Description = "Tester Rate", Rate = 80 };
+
+            var user = new ApplicationUser { Id = "test-user-dup", UserName = "testuser", Email = "test@test.com" };
+            context.Users!.Add(user);
+
+            var contractRate1 = new ContractRate { Id = 1, ContractId = 1, Description = "Developer Rate", InvoiceDescription = "Development", Rate = 100 };
+            var contractRate2 = new ContractRate { Id = 2, ContractId = 1, Description = "Tester Rate", InvoiceDescription = "Testing", Rate = 80 };
             context.ContractRates!.Add(contractRate1);
             context.ContractRates.Add(contractRate2);
-            
-            var task = new comaiz.data.Models.Task 
-            { 
-                Id = 1, 
+            await context.SaveChangesAsync();
+
+            var userContractRate1 = new UserContractRate { Id = 1, ContractRateId = 1, ApplicationUserId = user.Id };
+            var userContractRate2 = new UserContractRate { Id = 2, ContractRateId = 2, ApplicationUserId = user.Id };
+            context.UserContractRates!.Add(userContractRate1);
+            context.UserContractRates.Add(userContractRate2);
+
+            var task = new comaiz.data.Models.Task
+            {
+                Id = 1,
                 Name = "Development",
                 ContractId = 1,
                 TaskContractRates = new List<TaskContractRate>
                 {
-                    new TaskContractRate { TaskId = 1, ContractRateId = 1 },
-                    new TaskContractRate { TaskId = 1, ContractRateId = 2 }
+                    new TaskContractRate { TaskId = 1, UserContractRateId = 1 },
+                    new TaskContractRate { TaskId = 1, UserContractRateId = 2 }
                 }
             };
             context.Tasks!.Add(task);
             await context.SaveChangesAsync();
-            
+
             var controller = new TasksController(context);
 
             // Act
@@ -414,20 +423,20 @@ namespace comaiz.tests.Controllers
             // Assert
             var actionResult = Assert.IsType<ActionResult<comaiz.data.Models.Task>>(result);
             var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
-            
+
             var duplicatedTask = Assert.IsType<comaiz.data.Models.Task>(createdAtActionResult.Value);
-            
+
             // Load the duplicated task with its TaskContractRates
             var savedTask = await context.Tasks
                 .Include(t => t.TaskContractRates)
                 .FirstOrDefaultAsync(t => t.Id == duplicatedTask.Id);
-            
+
             Assert.NotNull(savedTask);
             Assert.Equal("Development (Copy)", savedTask.Name);
             Assert.NotNull(savedTask.TaskContractRates);
             Assert.Equal(2, savedTask.TaskContractRates.Count);
-            Assert.Contains(savedTask.TaskContractRates, tcr => tcr.ContractRateId == 1);
-            Assert.Contains(savedTask.TaskContractRates, tcr => tcr.ContractRateId == 2);
+            Assert.Contains(savedTask.TaskContractRates, tcr => tcr.UserContractRateId == 1);
+            Assert.Contains(savedTask.TaskContractRates, tcr => tcr.UserContractRateId == 2);
         }
 
         [Fact]
@@ -442,6 +451,99 @@ namespace comaiz.tests.Controllers
 
             // Assert
             Assert.IsType<NotFoundResult>(result.Result);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PostTask_ToCompleteContract_ReturnsBadRequest()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var contract = new Contract { Id = 1, ClientId = 1, Description = "Complete Contract", State = RecordState.Complete };
+            context.Contracts!.Add(contract);
+            await context.SaveChangesAsync();
+
+            var task = new comaiz.data.Models.Task { Name = "New Task", ContractId = 1 };
+            var controller = new TasksController(context);
+
+            // Act
+            var result = await controller.PostTask(task);
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("Cannot add tasks to a complete contract.", badRequestResult.Value);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PostTask_ToActiveContract_Succeeds()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var contract = new Contract { Id = 1, ClientId = 1, Description = "Active Contract", State = RecordState.Active };
+            context.Contracts!.Add(contract);
+            await context.SaveChangesAsync();
+
+            var task = new comaiz.data.Models.Task { Name = "New Task", ContractId = 1 };
+            var controller = new TasksController(context);
+
+            // Act
+            var result = await controller.PostTask(task);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<comaiz.data.Models.Task>>(result);
+            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
+            Assert.Equal("GetTask", createdAtActionResult.ActionName);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task GetTasks_WithStateFilter_ReturnsFilteredTasks()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var activeContract = new Contract { Id = 1, ClientId = 1, Description = "Active Contract", State = RecordState.Active };
+            var completeContract = new Contract { Id = 2, ClientId = 1, Description = "Complete Contract", State = RecordState.Complete };
+            context.Contracts!.Add(activeContract);
+            context.Contracts.Add(completeContract);
+            
+            context.Tasks!.Add(new comaiz.data.Models.Task { Id = 1, Name = "Active Task", ContractId = 1, State = RecordState.Active });
+            context.Tasks.Add(new comaiz.data.Models.Task { Id = 2, Name = "Complete Task", State = RecordState.Complete });
+            context.Tasks.Add(new comaiz.data.Models.Task { Id = 3, Name = "Task in Complete Contract", ContractId = 2, State = RecordState.Active });
+            await context.SaveChangesAsync();
+            
+            var controller = new TasksController(context);
+
+            // Act - Filter for active tasks
+            var resultActive = await controller.GetTasks(null, RecordState.Active);
+            var activeTasks = Assert.IsAssignableFrom<IEnumerable<comaiz.data.Models.Task>>(resultActive.Value);
+            
+            // Act - Filter for complete tasks
+            var resultComplete = await controller.GetTasks(null, RecordState.Complete);
+            var completeTasks = Assert.IsAssignableFrom<IEnumerable<comaiz.data.Models.Task>>(resultComplete.Value);
+
+            // Assert - only truly active task should be returned (task 1)
+            Assert.Single(activeTasks);
+            Assert.Equal(1, activeTasks.First().Id);
+            
+            // Assert - complete tasks include task marked as complete and task in complete contract (tasks 2 and 3)
+            Assert.Equal(2, completeTasks.Count());
+            Assert.Contains(completeTasks, t => t.Id == 2);
+            Assert.Contains(completeTasks, t => t.Id == 3);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PostTask_DefaultStateIsActive()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var task = new comaiz.data.Models.Task { Name = "New Task" };
+            var controller = new TasksController(context);
+
+            // Act
+            var result = await controller.PostTask(task);
+
+            // Assert
+            var savedTask = await context.Tasks!.FindAsync(task.Id);
+            Assert.NotNull(savedTask);
+            Assert.Equal(RecordState.Active, savedTask.State);
         }
     }
 }

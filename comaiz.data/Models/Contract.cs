@@ -13,6 +13,7 @@
         public ICollection<ContractRate>? ContractRates { get; set; }
         public string? Schedule { get; set; }
         public ChargeType ChargeType { get; set; }
+        public RecordState State { get; set; } = RecordState.Active;
         public DateOnly? PlannedStart { get; set; }
         public DateOnly? PlannedEnd { get; set; }
     }

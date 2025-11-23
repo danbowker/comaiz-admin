@@ -34,7 +34,7 @@ namespace comaiz.tests.Controllers
             var controller = new ContractsController(context);
 
             // Act
-            var result = await controller.GetContractsAsync();
+            var result = await controller.GetContractsAsync(null);
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<Contract>>>(result);
@@ -242,18 +242,18 @@ namespace comaiz.tests.Controllers
         {
             // Arrange
             using var context = CreateInMemoryContext();
-            var contract = new Contract 
-            { 
-                Id = 1, 
-                Description = "Test Contract", 
-                ClientId = 1, 
+            var contract = new Contract
+            {
+                Id = 1,
+                Description = "Test Contract",
+                ClientId = 1,
                 Price = 1000.00m,
                 Schedule = "Monthly",
                 ChargeType = ChargeType.TimeAndMaterials
             };
             context.Contracts!.Add(contract);
             await context.SaveChangesAsync();
-            
+
             var controller = new ContractsController(context);
 
             // Act
@@ -263,7 +263,7 @@ namespace comaiz.tests.Controllers
             var actionResult = Assert.IsType<ActionResult<Contract>>(result);
             var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
             Assert.Equal("GetContract", createdAtActionResult.ActionName);
-            
+
             var duplicatedContract = Assert.IsType<Contract>(createdAtActionResult.Value);
             Assert.NotEqual(1, duplicatedContract.Id);
             Assert.Equal("Test Contract (Copy)", duplicatedContract.Description);
@@ -271,7 +271,7 @@ namespace comaiz.tests.Controllers
             Assert.Equal(1000.00m, duplicatedContract.Price);
             Assert.Equal("Monthly", duplicatedContract.Schedule);
             Assert.Equal(ChargeType.TimeAndMaterials, duplicatedContract.ChargeType);
-            
+
             // Verify both contracts exist in the database
             var allContracts = await context.Contracts.ToListAsync();
             Assert.Equal(2, allContracts.Count);
@@ -289,6 +289,49 @@ namespace comaiz.tests.Controllers
 
             // Assert
             Assert.IsType<NotFoundResult>(result.Result);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task GetContractsAsync_WithStateFilter_ReturnsFilteredContracts()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            context.Contracts!.Add(new Contract { Id = 1, Description = "Active Contract", ClientId = 1, State = RecordState.Active });
+            context.Contracts.Add(new Contract { Id = 2, Description = "Complete Contract", ClientId = 1, State = RecordState.Complete });
+            await context.SaveChangesAsync();
+            
+            var controller = new ContractsController(context);
+
+            // Act - Filter for active contracts
+            var resultActive = await controller.GetContractsAsync(RecordState.Active);
+            var activeContracts = Assert.IsAssignableFrom<IEnumerable<Contract>>(resultActive.Value);
+            
+            // Act - Filter for complete contracts
+            var resultComplete = await controller.GetContractsAsync(RecordState.Complete);
+            var completeContracts = Assert.IsAssignableFrom<IEnumerable<Contract>>(resultComplete.Value);
+
+            // Assert
+            Assert.Single(activeContracts);
+            Assert.Equal(1, activeContracts.First().Id);
+            Assert.Single(completeContracts);
+            Assert.Equal(2, completeContracts.First().Id);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PostContract_DefaultStateIsActive()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var contract = new Contract { Description = "New Contract", ClientId = 1 };
+            var controller = new ContractsController(context);
+
+            // Act
+            var result = await controller.PostContract(contract);
+
+            // Assert
+            var savedContract = await context.Contracts!.FindAsync(contract.Id);
+            Assert.NotNull(savedContract);
+            Assert.Equal(RecordState.Active, savedContract.State);
         }
     }
 }

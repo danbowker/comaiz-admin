@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using comaiz.data;
@@ -11,9 +12,11 @@ using comaiz.data;
 namespace comaiz.data.Migrations
 {
     [DbContext(typeof(ComaizContext))]
-    partial class ComaizContextModelSnapshot : ModelSnapshot
+    [Migration("20251116180955_AddStateToContractAndTask")]
+    partial class AddStateToContractAndTask
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -287,12 +290,6 @@ namespace comaiz.data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<DateOnly?>("PlannedEnd")
-                        .HasColumnType("date");
-
-                    b.Property<DateOnly?>("PlannedStart")
-                        .HasColumnType("date");
-
                     b.Property<decimal?>("Price")
                         .HasColumnType("numeric");
 
@@ -317,6 +314,9 @@ namespace comaiz.data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("text");
+
                     b.Property<int>("ContractId")
                         .HasColumnType("integer");
 
@@ -324,14 +324,12 @@ namespace comaiz.data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("InvoiceDescription")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<decimal?>("Rate")
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("ContractId");
 
@@ -470,43 +468,19 @@ namespace comaiz.data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("TaskId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserContractRateId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TaskId");
-
-                    b.HasIndex("UserContractRateId");
-
-                    b.ToTable("TaskContractRate", (string)null);
-                });
-
-            modelBuilder.Entity("comaiz.data.Models.UserContractRate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ApplicationUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int>("ContractRateId")
                         .HasColumnType("integer");
 
-                    b.HasKey("Id");
+                    b.Property<int>("TaskId")
+                        .HasColumnType("integer");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasKey("Id");
 
                     b.HasIndex("ContractRateId");
 
-                    b.ToTable("UserContractRate", (string)null);
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("TaskContractRate", (string)null);
                 });
 
             modelBuilder.Entity("comaiz.data.Models.WorkRecord", b =>
@@ -635,11 +609,17 @@ namespace comaiz.data.Migrations
 
             modelBuilder.Entity("comaiz.data.Models.ContractRate", b =>
                 {
+                    b.HasOne("comaiz.data.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId");
+
                     b.HasOne("comaiz.data.Models.Contract", "Contract")
                         .WithMany("ContractRates")
                         .HasForeignKey("ContractId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ApplicationUser");
 
                     b.Navigation("Contract");
                 });
@@ -708,40 +688,21 @@ namespace comaiz.data.Migrations
 
             modelBuilder.Entity("comaiz.data.Models.TaskContractRate", b =>
                 {
+                    b.HasOne("comaiz.data.Models.ContractRate", "ContractRate")
+                        .WithMany()
+                        .HasForeignKey("ContractRateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("comaiz.data.Models.Task", "Task")
                         .WithMany("TaskContractRates")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("comaiz.data.Models.UserContractRate", "UserContractRate")
-                        .WithMany("TaskContractRates")
-                        .HasForeignKey("UserContractRateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("ContractRate");
 
                     b.Navigation("Task");
-
-                    b.Navigation("UserContractRate");
-                });
-
-            modelBuilder.Entity("comaiz.data.Models.UserContractRate", b =>
-                {
-                    b.HasOne("comaiz.data.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("comaiz.data.Models.ContractRate", "ContractRate")
-                        .WithMany("UserContractRates")
-                        .HasForeignKey("ContractRateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("ContractRate");
                 });
 
             modelBuilder.Entity("comaiz.data.Models.WorkRecord", b =>
@@ -769,22 +730,12 @@ namespace comaiz.data.Migrations
                     b.Navigation("ContractRates");
                 });
 
-            modelBuilder.Entity("comaiz.data.Models.ContractRate", b =>
-                {
-                    b.Navigation("UserContractRates");
-                });
-
             modelBuilder.Entity("comaiz.data.Models.Invoice", b =>
                 {
                     b.Navigation("InvoiceItems");
                 });
 
             modelBuilder.Entity("comaiz.data.Models.Task", b =>
-                {
-                    b.Navigation("TaskContractRates");
-                });
-
-            modelBuilder.Entity("comaiz.data.Models.UserContractRate", b =>
                 {
                     b.Navigation("TaskContractRates");
                 });
