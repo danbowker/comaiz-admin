@@ -24,7 +24,11 @@ namespace comaiz.api.Controllers
 
             var query = dbContext.Tasks
                 .Include(t => t.TaskContractRates!)
-                    .ThenInclude(tcr => tcr.ContractRate)
+                    .ThenInclude(tcr => tcr.UserContractRate)
+                        .ThenInclude(ucr => ucr!.ContractRate)
+                .Include(t => t.TaskContractRates!)
+                    .ThenInclude(tcr => tcr.UserContractRate)
+                        .ThenInclude(ucr => ucr!.ApplicationUser)
                 .Include(t => t.Contract)
                 .AsQueryable();
             
@@ -56,7 +60,11 @@ namespace comaiz.api.Controllers
 
             var task = await dbContext.Tasks
                 .Include(t => t.TaskContractRates!)
-                    .ThenInclude(tcr => tcr.ContractRate)
+                    .ThenInclude(tcr => tcr.UserContractRate)
+                        .ThenInclude(ucr => ucr!.ContractRate)
+                .Include(t => t.TaskContractRates!)
+                    .ThenInclude(tcr => tcr.UserContractRate)
+                        .ThenInclude(ucr => ucr!.ApplicationUser)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (task == null)
@@ -86,6 +94,7 @@ namespace comaiz.api.Controllers
             existingTask.Name = task.Name;
             existingTask.ContractId = task.ContractId;
             existingTask.ContractRateId = task.ContractRateId;
+            existingTask.State = task.State;
 
             // Update TaskContractRates collection
             if (existingTask.TaskContractRates != null)
@@ -103,7 +112,7 @@ namespace comaiz.api.Controllers
                     var newTaskContractRate = new TaskContractRate
                     {
                         TaskId = existingTask.Id,
-                        ContractRateId = tcr.ContractRateId
+                        UserContractRateId = tcr.UserContractRateId
                     };
                     dbContext.TaskContractRates!.Add(newTaskContractRate);
                 }
@@ -150,14 +159,14 @@ namespace comaiz.api.Controllers
             // Clean up navigation properties in TaskContractRates to avoid inserting related entities
             if (task.TaskContractRates != null && task.TaskContractRates.Any())
             {
-                var contractRateIds = task.TaskContractRates.Select(tcr => tcr.ContractRateId).ToList();
+                var userContractRateIds = task.TaskContractRates.Select(tcr => tcr.UserContractRateId).ToList();
                 task.TaskContractRates.Clear();
                 
-                foreach (var contractRateId in contractRateIds)
+                foreach (var userContractRateId in userContractRateIds)
                 {
                     task.TaskContractRates.Add(new TaskContractRate
                     {
-                        ContractRateId = contractRateId
+                        UserContractRateId = userContractRateId
                     });
                 }
             }
@@ -203,7 +212,8 @@ namespace comaiz.api.Controllers
             {
                 Name = $"{task.Name} (Copy)",
                 ContractId = task.ContractId,
-                ContractRateId = task.ContractRateId
+                ContractRateId = task.ContractRateId,
+                State = task.State
             };
 
             // Copy TaskContractRates if they exist
@@ -214,7 +224,7 @@ namespace comaiz.api.Controllers
                     duplicatedTask.TaskContractRates ??= new List<TaskContractRate>();
                     duplicatedTask.TaskContractRates.Add(new TaskContractRate
                     {
-                        ContractRateId = tcr.ContractRateId
+                        UserContractRateId = tcr.UserContractRateId
                     });
                 }
             }

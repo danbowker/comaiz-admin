@@ -19,6 +19,7 @@ export interface Contract {
   price?: number;
   schedule?: string;
   chargeType: ChargeType;
+  state: RecordState;
   plannedStart?: string;
   plannedEnd?: string;
 }
@@ -28,12 +29,25 @@ export enum ChargeType {
   TimeAndMaterials = 1,
 }
 
+export enum RecordState {
+  Active = 0,
+  Complete = 1,
+}
+
 export interface ContractRate {
   id: number;
   contractId: number;
   description: string;
+  invoiceDescription: string;
   rate?: number;
-  applicationUserId?: string;
+  userContractRates?: UserContractRate[];
+}
+
+export interface UserContractRate {
+  id: number;
+  contractRateId: number;
+  contractRate?: ContractRate;
+  applicationUserId: string;
   applicationUser?: ApplicationUser;
 }
 
@@ -42,14 +56,15 @@ export interface Task {
   name: string;
   contractId?: number;
   contractRateId?: number;
+  state: RecordState;
   taskContractRates?: TaskContractRate[];
 }
 
 export interface TaskContractRate {
   id?: number;
   taskId?: number;
-  contractRateId: number;
-  contractRate?: ContractRate;
+  userContractRateId: number;
+  userContractRate?: UserContractRate;
 }
 
 export interface FixedCost {

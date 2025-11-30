@@ -4,6 +4,7 @@ import {
   ApplicationUser,
   Contract, 
   ContractRate, 
+  UserContractRate,
   FixedCost, 
   WorkRecord, 
   Invoice, 
@@ -63,6 +64,7 @@ export const clientsService = new EntityService<Client>('clients');
 export const usersService = new EntityService<ApplicationUser>('users');
 export const contractsService = new EntityService<Contract>('contracts');
 export const contractRatesService = new EntityService<ContractRate>('contractrates');
+export const userContractRatesService = new EntityService<UserContractRate>('usercontractrates');
 export const fixedCostsService = new EntityService<FixedCost>('fixedcosts');
 export const workRecordsService = new EntityService<WorkRecord>('workrecords');
 export const invoicesService = new EntityService<Invoice>('invoices');

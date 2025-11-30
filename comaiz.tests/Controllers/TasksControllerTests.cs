@@ -177,14 +177,23 @@ namespace comaiz.tests.Controllers
             // Arrange
             using var context = CreateInMemoryContext();
             
-            // Create a contract and contract rates
+            // Create a contract, contract rates, and user contract rates
             var contract = new Contract { Id = 1, ClientId = 1, Description = "Test Contract", ChargeType = ChargeType.TimeAndMaterials };
             context.Contracts!.Add(contract);
             
-            var contractRate1 = new ContractRate { Id = 1, ContractId = 1, Description = "Developer Rate", Rate = 100 };
-            var contractRate2 = new ContractRate { Id = 2, ContractId = 1, Description = "Tester Rate", Rate = 80 };
+            var user = new ApplicationUser { Id = "test-user-1", UserName = "testuser", Email = "test@test.com" };
+            context.Users!.Add(user);
+            
+            var contractRate1 = new ContractRate { Id = 1, ContractId = 1, Description = "Developer Rate", InvoiceDescription = "Development", Rate = 100 };
+            var contractRate2 = new ContractRate { Id = 2, ContractId = 1, Description = "Tester Rate", InvoiceDescription = "Testing", Rate = 80 };
             context.ContractRates!.Add(contractRate1);
             context.ContractRates.Add(contractRate2);
+            await context.SaveChangesAsync();
+            
+            var userContractRate1 = new UserContractRate { Id = 1, ContractRateId = 1, ApplicationUserId = user.Id };
+            var userContractRate2 = new UserContractRate { Id = 2, ContractRateId = 2, ApplicationUserId = user.Id };
+            context.UserContractRates!.Add(userContractRate1);
+            context.UserContractRates.Add(userContractRate2);
             await context.SaveChangesAsync();
 
             var task = new comaiz.data.Models.Task 
@@ -193,8 +202,8 @@ namespace comaiz.tests.Controllers
                 ContractId = 1,
                 TaskContractRates = new List<TaskContractRate>
                 {
-                    new TaskContractRate { ContractRateId = 1 },
-                    new TaskContractRate { ContractRateId = 2 }
+                    new TaskContractRate { UserContractRateId = 1 },
+                    new TaskContractRate { UserContractRateId = 2 }
                 }
             };
             var controller = new TasksController(context);
@@ -221,16 +230,28 @@ namespace comaiz.tests.Controllers
             // Arrange
             using var context = CreateInMemoryContext();
             
-            // Create contract and contract rates
+            // Create contract, contract rates, and user contract rates
             var contract = new Contract { Id = 1, ClientId = 1, Description = "Test Contract", ChargeType = ChargeType.TimeAndMaterials };
             context.Contracts!.Add(contract);
             
-            var contractRate1 = new ContractRate { Id = 1, ContractId = 1, Description = "Developer Rate", Rate = 100 };
-            var contractRate2 = new ContractRate { Id = 2, ContractId = 1, Description = "Tester Rate", Rate = 80 };
-            var contractRate3 = new ContractRate { Id = 3, ContractId = 1, Description = "Designer Rate", Rate = 90 };
+            var user = new ApplicationUser { Id = "test-user-2", UserName = "testuser2", Email = "test2@test.com" };
+            context.Users!.Add(user);
+            
+            var contractRate1 = new ContractRate { Id = 1, ContractId = 1, Description = "Developer Rate", InvoiceDescription = "Development", Rate = 100 };
+            var contractRate2 = new ContractRate { Id = 2, ContractId = 1, Description = "Tester Rate", InvoiceDescription = "Testing", Rate = 80 };
+            var contractRate3 = new ContractRate { Id = 3, ContractId = 1, Description = "Designer Rate", InvoiceDescription = "Design", Rate = 90 };
             context.ContractRates!.Add(contractRate1);
             context.ContractRates.Add(contractRate2);
             context.ContractRates.Add(contractRate3);
+            await context.SaveChangesAsync();
+            
+            var userContractRate1 = new UserContractRate { Id = 1, ContractRateId = 1, ApplicationUserId = user.Id };
+            var userContractRate2 = new UserContractRate { Id = 2, ContractRateId = 2, ApplicationUserId = user.Id };
+            var userContractRate3 = new UserContractRate { Id = 3, ContractRateId = 3, ApplicationUserId = user.Id };
+            context.UserContractRates!.Add(userContractRate1);
+            context.UserContractRates.Add(userContractRate2);
+            context.UserContractRates.Add(userContractRate3);
+            await context.SaveChangesAsync();
             
             var task = new comaiz.data.Models.Task 
             { 
@@ -239,13 +260,13 @@ namespace comaiz.tests.Controllers
                 ContractId = 1,
                 TaskContractRates = new List<TaskContractRate>
                 {
-                    new TaskContractRate { TaskId = 1, ContractRateId = 1 }
+                    new TaskContractRate { TaskId = 1, UserContractRateId = 1 }
                 }
             };
             context.Tasks!.Add(task);
             await context.SaveChangesAsync();
             
-            // Update task with new contract rates
+            // Update task with new user contract rates
             var updatedTask = new comaiz.data.Models.Task 
             { 
                 Id = 1, 
@@ -253,8 +274,8 @@ namespace comaiz.tests.Controllers
                 ContractId = 1,
                 TaskContractRates = new List<TaskContractRate>
                 {
-                    new TaskContractRate { TaskId = 1, ContractRateId = 2 },
-                    new TaskContractRate { TaskId = 1, ContractRateId = 3 }
+                    new TaskContractRate { TaskId = 1, UserContractRateId = 2 },
+                    new TaskContractRate { TaskId = 1, UserContractRateId = 3 }
                 }
             };
             var controller = new TasksController(context);
@@ -272,8 +293,8 @@ namespace comaiz.tests.Controllers
             Assert.Equal("Development Updated", savedTask.Name);
             Assert.NotNull(savedTask.TaskContractRates);
             Assert.Equal(2, savedTask.TaskContractRates.Count);
-            Assert.Contains(savedTask.TaskContractRates, tcr => tcr.ContractRateId == 2);
-            Assert.Contains(savedTask.TaskContractRates, tcr => tcr.ContractRateId == 3);
+            Assert.Contains(savedTask.TaskContractRates, tcr => tcr.UserContractRateId == 2);
+            Assert.Contains(savedTask.TaskContractRates, tcr => tcr.UserContractRateId == 3);
         }
 
         [Fact]
@@ -285,8 +306,15 @@ namespace comaiz.tests.Controllers
             var contract = new Contract { Id = 1, ClientId = 1, Description = "Test Contract", ChargeType = ChargeType.TimeAndMaterials };
             context.Contracts!.Add(contract);
             
-            var contractRate = new ContractRate { Id = 1, ContractId = 1, Description = "Developer Rate", Rate = 100 };
+            var user = new ApplicationUser { Id = "test-user-3", UserName = "testuser3", Email = "test3@test.com" };
+            context.Users!.Add(user);
+            
+            var contractRate = new ContractRate { Id = 1, ContractId = 1, Description = "Developer Rate", InvoiceDescription = "Development", Rate = 100 };
             context.ContractRates!.Add(contractRate);
+            await context.SaveChangesAsync();
+            
+            var userContractRate = new UserContractRate { Id = 1, ContractRateId = 1, ApplicationUserId = user.Id };
+            context.UserContractRates!.Add(userContractRate);
             
             var task = new comaiz.data.Models.Task 
             { 
@@ -295,7 +323,7 @@ namespace comaiz.tests.Controllers
                 ContractId = 1,
                 TaskContractRates = new List<TaskContractRate>
                 {
-                    new TaskContractRate { TaskId = 1, ContractRateId = 1 }
+                    new TaskContractRate { TaskId = 1, UserContractRateId = 1 }
                 }
             };
             context.Tasks!.Add(task);
@@ -359,10 +387,19 @@ namespace comaiz.tests.Controllers
             var contract = new Contract { Id = 1, ClientId = 1, Description = "Test Contract", ChargeType = ChargeType.TimeAndMaterials };
             context.Contracts!.Add(contract);
 
-            var contractRate1 = new ContractRate { Id = 1, ContractId = 1, Description = "Developer Rate", Rate = 100 };
-            var contractRate2 = new ContractRate { Id = 2, ContractId = 1, Description = "Tester Rate", Rate = 80 };
+            var user = new ApplicationUser { Id = "test-user-dup", UserName = "testuser", Email = "test@test.com" };
+            context.Users!.Add(user);
+
+            var contractRate1 = new ContractRate { Id = 1, ContractId = 1, Description = "Developer Rate", InvoiceDescription = "Development", Rate = 100 };
+            var contractRate2 = new ContractRate { Id = 2, ContractId = 1, Description = "Tester Rate", InvoiceDescription = "Testing", Rate = 80 };
             context.ContractRates!.Add(contractRate1);
             context.ContractRates.Add(contractRate2);
+            await context.SaveChangesAsync();
+
+            var userContractRate1 = new UserContractRate { Id = 1, ContractRateId = 1, ApplicationUserId = user.Id };
+            var userContractRate2 = new UserContractRate { Id = 2, ContractRateId = 2, ApplicationUserId = user.Id };
+            context.UserContractRates!.Add(userContractRate1);
+            context.UserContractRates.Add(userContractRate2);
 
             var task = new comaiz.data.Models.Task
             {
@@ -371,8 +408,8 @@ namespace comaiz.tests.Controllers
                 ContractId = 1,
                 TaskContractRates = new List<TaskContractRate>
                 {
-                    new TaskContractRate { TaskId = 1, ContractRateId = 1 },
-                    new TaskContractRate { TaskId = 1, ContractRateId = 2 }
+                    new TaskContractRate { TaskId = 1, UserContractRateId = 1 },
+                    new TaskContractRate { TaskId = 1, UserContractRateId = 2 }
                 }
             };
             context.Tasks!.Add(task);
@@ -398,8 +435,8 @@ namespace comaiz.tests.Controllers
             Assert.Equal("Development (Copy)", savedTask.Name);
             Assert.NotNull(savedTask.TaskContractRates);
             Assert.Equal(2, savedTask.TaskContractRates.Count);
-            Assert.Contains(savedTask.TaskContractRates, tcr => tcr.ContractRateId == 1);
-            Assert.Contains(savedTask.TaskContractRates, tcr => tcr.ContractRateId == 2);
+            Assert.Contains(savedTask.TaskContractRates, tcr => tcr.UserContractRateId == 1);
+            Assert.Contains(savedTask.TaskContractRates, tcr => tcr.UserContractRateId == 2);
         }
 
         [Fact]
