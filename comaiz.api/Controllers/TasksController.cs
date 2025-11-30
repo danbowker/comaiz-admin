@@ -18,18 +18,36 @@ namespace comaiz.api.Controllers
         }
 
         [HttpGet]
-        public async System.Threading.Tasks.Task<ActionResult<IEnumerable<comaiz.data.Models.Task>>> GetTasks([FromQuery] int? contractId)
+        public async System.Threading.Tasks.Task<ActionResult<IEnumerable<comaiz.data.Models.Task>>> GetTasks([FromQuery] int? contractId, [FromQuery] RecordState? state)
         {
             if (dbContext.Tasks == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             var query = dbContext.Tasks
                 .Include(t => t.TaskContractRates!)
-                    .ThenInclude(tcr => tcr.ContractRate)
+                    .ThenInclude(tcr => tcr.UserContractRate)
+                        .ThenInclude(ucr => ucr!.ContractRate)
+                .Include(t => t.TaskContractRates!)
+                    .ThenInclude(tcr => tcr.UserContractRate)
+                        .ThenInclude(ucr => ucr!.ApplicationUser)
+                .Include(t => t.Contract)
                 .AsQueryable();
             
             if (contractId.HasValue)
             {
                 query = query.Where(t => t.ContractId == contractId.Value);
+            }
+            
+            if (state.HasValue)
+            {
+                // Tasks that belong to a complete contract behave as complete tasks
+                if (state.Value == RecordState.Active)
+                {
+                    query = query.Where(t => t.State == RecordState.Active && (t.Contract == null || t.Contract.State == RecordState.Active));
+                }
+                else
+                {
+                    query = query.Where(t => t.State == RecordState.Complete || (t.Contract != null && t.Contract.State == RecordState.Complete));
+                }
             }
 
             return await query.ToListAsync();
@@ -42,7 +60,11 @@ namespace comaiz.api.Controllers
 
             var task = await dbContext.Tasks
                 .Include(t => t.TaskContractRates!)
-                    .ThenInclude(tcr => tcr.ContractRate)
+                    .ThenInclude(tcr => tcr.UserContractRate)
+                        .ThenInclude(ucr => ucr!.ContractRate)
+                .Include(t => t.TaskContractRates!)
+                    .ThenInclude(tcr => tcr.UserContractRate)
+                        .ThenInclude(ucr => ucr!.ApplicationUser)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (task == null)
@@ -72,6 +94,7 @@ namespace comaiz.api.Controllers
             existingTask.Name = task.Name;
             existingTask.ContractId = task.ContractId;
             existingTask.ContractRateId = task.ContractRateId;
+            existingTask.State = task.State;
 
             // Update TaskContractRates collection
             if (existingTask.TaskContractRates != null)
@@ -89,7 +112,7 @@ namespace comaiz.api.Controllers
                     var newTaskContractRate = new TaskContractRate
                     {
                         TaskId = existingTask.Id,
-                        ContractRateId = tcr.ContractRateId
+                        UserContractRateId = tcr.UserContractRateId
                     };
                     dbContext.TaskContractRates!.Add(newTaskContractRate);
                 }
@@ -123,17 +146,27 @@ namespace comaiz.api.Controllers
         {
             if (dbContext.Tasks == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
+            // Validate that the contract is not complete
+            if (task.ContractId.HasValue)
+            {
+                var contract = await dbContext.Contracts!.FindAsync(task.ContractId.Value);
+                if (contract != null && contract.State == RecordState.Complete)
+                {
+                    return BadRequest("Cannot add tasks to a complete contract.");
+                }
+            }
+
             // Clean up navigation properties in TaskContractRates to avoid inserting related entities
             if (task.TaskContractRates != null && task.TaskContractRates.Any())
             {
-                var contractRateIds = task.TaskContractRates.Select(tcr => tcr.ContractRateId).ToList();
+                var userContractRateIds = task.TaskContractRates.Select(tcr => tcr.UserContractRateId).ToList();
                 task.TaskContractRates.Clear();
                 
-                foreach (var contractRateId in contractRateIds)
+                foreach (var userContractRateId in userContractRateIds)
                 {
                     task.TaskContractRates.Add(new TaskContractRate
                     {
-                        ContractRateId = contractRateId
+                        UserContractRateId = userContractRateId
                     });
                 }
             }
@@ -159,6 +192,47 @@ namespace comaiz.api.Controllers
             await dbContext.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpPost("{id}/duplicate")]
+        public async System.Threading.Tasks.Task<ActionResult<comaiz.data.Models.Task>> DuplicateTask(int id)
+        {
+            if (dbContext.Tasks == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
+            var task = await dbContext.Tasks
+                .Include(t => t.TaskContractRates)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            var duplicatedTask = new comaiz.data.Models.Task
+            {
+                Name = $"{task.Name} (Copy)",
+                ContractId = task.ContractId,
+                ContractRateId = task.ContractRateId,
+                State = task.State
+            };
+
+            // Copy TaskContractRates if they exist
+            if (task.TaskContractRates != null && task.TaskContractRates.Any())
+            {
+                foreach (var tcr in task.TaskContractRates)
+                {
+                    duplicatedTask.TaskContractRates ??= new List<TaskContractRate>();
+                    duplicatedTask.TaskContractRates.Add(new TaskContractRate
+                    {
+                        UserContractRateId = tcr.UserContractRateId
+                    });
+                }
+            }
+
+            dbContext.Tasks.Add(duplicatedTask);
+            await dbContext.SaveChangesAsync();
+
+            return CreatedAtAction("GetTask", new { id = duplicatedTask.Id }, duplicatedTask);
         }
     }
 }

@@ -4,6 +4,7 @@ import {
   ApplicationUser,
   Contract, 
   ContractRate, 
+  UserContractRate,
   FixedCost, 
   WorkRecord, 
   Invoice, 
@@ -51,6 +52,11 @@ export class EntityService<T> {
   async delete(id: number | string): Promise<void> {
     await api.delete(`/${this.endpoint}/${id}`);
   }
+
+  async duplicate(id: number | string): Promise<T> {
+    const response = await api.post<T>(`/${this.endpoint}/${id}/duplicate`);
+    return response.data;
+  }
 }
 
 // Export services for all entities with proper types
@@ -58,6 +64,7 @@ export const clientsService = new EntityService<Client>('clients');
 export const usersService = new EntityService<ApplicationUser>('users');
 export const contractsService = new EntityService<Contract>('contracts');
 export const contractRatesService = new EntityService<ContractRate>('contractrates');
+export const userContractRatesService = new EntityService<UserContractRate>('usercontractrates');
 export const fixedCostsService = new EntityService<FixedCost>('fixedcosts');
 export const workRecordsService = new EntityService<WorkRecord>('workrecords');
 export const invoicesService = new EntityService<Invoice>('invoices');

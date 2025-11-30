@@ -28,10 +28,28 @@ RUN dotnet publish "comaiz.api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /
 
 # Build frontend
 FROM node:20 AS frontend-build
+ARG VERSION=0.0.0-dev
+ARG COMMIT=unknown
+ARG BUILD_TIME=unknown
+ARG BRANCH=unknown
+
 WORKDIR /frontend
 COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend/ ./
+
+# Generate version.json with build-time information
+RUN mkdir -p public && \
+    echo "{" > public/version.json && \
+    echo "  \"version\": \"${VERSION}\"," >> public/version.json && \
+    echo "  \"commit\": \"${COMMIT}\"," >> public/version.json && \
+    echo "  \"buildTime\": \"${BUILD_TIME}\"," >> public/version.json && \
+    echo "  \"branch\": \"${BRANCH}\"" >> public/version.json && \
+    echo "}" >> public/version.json && \
+    cat public/version.json
+
+# Build with version info
+ENV REACT_APP_VERSION=${VERSION}
 RUN npm run build
 
 FROM base AS final

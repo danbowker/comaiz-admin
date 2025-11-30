@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import EntityList from '../components/entities/EntityList';
 import TaskForm from '../components/entities/TaskForm';
-import { tasksService, contractsService, contractRatesService } from '../services/entityService';
-import { Task, Contract, ContractRate } from '../types';
+import { tasksService, contractsService, contractRatesService, userContractRatesService } from '../services/entityService';
+import { Task, Contract, ContractRate, UserContractRate } from '../types';
 import { useContractSelection } from '../contexts/ContractSelectionContext';
 
 const TasksPage: React.FC = () => {
@@ -11,17 +11,20 @@ const TasksPage: React.FC = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [contractRates, setContractRates] = useState<ContractRate[]>([]);
+  const [userContractRates, setUserContractRates] = useState<UserContractRate[]>([]);
   const { selectedContractId } = useContractSelection();
 
   const loadRelatedData = useCallback(async () => {
     try {
       const filterParams = selectedContractId ? { contractId: selectedContractId } : undefined;
-      const [contractsData, ratesData] = await Promise.all([
+      const [contractsData, ratesData, userRatesData] = await Promise.all([
         contractsService.getAll(),
         contractRatesService.getAll(filterParams),
+        userContractRatesService.getAll(filterParams),
       ]);
       setContracts(contractsData);
       setContractRates(ratesData);
+      setUserContractRates(userRatesData);
     } catch (err) {
       console.error('Failed to load related data', err);
     }
@@ -54,12 +57,14 @@ const TasksPage: React.FC = () => {
     },
     { 
       key: 'taskContractRates' as keyof Task, 
-      label: 'Contract Rates',
+      label: 'Assignments',
       render: (item: Task) => {
         if (item.taskContractRates && item.taskContractRates.length > 0) {
           return item.taskContractRates.map(tcr => {
-            const rate = tcr.contractRate || contractRates.find(r => r.id === tcr.contractRateId);
-            return rate?.description || `Rate ${tcr.contractRateId}`;
+            const ucr = tcr.userContractRate || userContractRates.find(u => u.id === tcr.userContractRateId);
+            const rate = ucr?.contractRate || contractRates.find(r => r.id === ucr?.contractRateId);
+            const userName = ucr?.applicationUser?.userName || ucr?.applicationUser?.email || 'User';
+            return `${userName} - ${rate?.description || 'Rate'}`;
           }).join(', ');
         }
         return 'None';
@@ -90,6 +95,13 @@ const TasksPage: React.FC = () => {
     await tasksService.delete(id);
   };
 
+  const handleDuplicate = async (id: number) => {
+    const duplicatedItem = await tasksService.duplicate(id);
+    setSelectedItem(duplicatedItem);
+    setShowForm(true);
+    setRefreshKey((prev) => prev + 1);
+  };
+
   return (
     <>
       <EntityList
@@ -100,6 +112,7 @@ const TasksPage: React.FC = () => {
         onEdit={handleEdit}
         onCreate={handleCreate}
         onDelete={handleDelete}
+        onDuplicate={handleDuplicate}
         queryParams={queryParams}
       />
       {showForm && (
@@ -107,6 +120,7 @@ const TasksPage: React.FC = () => {
           task={selectedItem}
           contracts={contracts}
           contractRates={contractRates}
+          userContractRates={userContractRates}
           onClose={handleClose}
           onSave={handleSave}
           defaultContractId={selectedContractId || undefined}

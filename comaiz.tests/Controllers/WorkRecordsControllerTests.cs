@@ -262,5 +262,137 @@ namespace comaiz.tests.Controllers
             // Assert
             Assert.IsType<NotFoundResult>(result);
         }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PostWorkRecord_ToCompleteTask_ReturnsBadRequest()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var task = new comaiz.data.Models.Task { Id = 1, Name = "Complete Task", State = RecordState.Complete };
+            context.Tasks!.Add(task);
+            await context.SaveChangesAsync();
+
+            var startDate = DateOnly.FromDateTime(DateTime.Now);
+            var endDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
+            var workRecord = new WorkRecord { StartDate = startDate, EndDate = endDate, Hours = 8m, ApplicationUserId = "user-1", TaskId = 1 };
+            var controller = new WorkRecordsController(context);
+
+            // Act
+            var result = await controller.PostWorkRecord(workRecord);
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("Cannot add work records to a complete task.", badRequestResult.Value);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PostWorkRecord_ToTaskWithCompleteContract_ReturnsBadRequest()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var contract = new Contract { Id = 1, ClientId = 1, Description = "Complete Contract", State = RecordState.Complete };
+            context.Contracts!.Add(contract);
+            
+            var task = new comaiz.data.Models.Task { Id = 1, Name = "Active Task", ContractId = 1, State = RecordState.Active };
+            context.Tasks!.Add(task);
+            await context.SaveChangesAsync();
+
+            var startDate = DateOnly.FromDateTime(DateTime.Now);
+            var endDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
+            var workRecord = new WorkRecord { StartDate = startDate, EndDate = endDate, Hours = 8m, ApplicationUserId = "user-1", TaskId = 1 };
+            var controller = new WorkRecordsController(context);
+
+            // Act
+            var result = await controller.PostWorkRecord(workRecord);
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("Cannot add work records to a task whose contract is complete.", badRequestResult.Value);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PostWorkRecord_ToActiveTask_Succeeds()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var contract = new Contract { Id = 1, ClientId = 1, Description = "Active Contract", State = RecordState.Active };
+            context.Contracts!.Add(contract);
+            
+            var task = new comaiz.data.Models.Task { Id = 1, Name = "Active Task", ContractId = 1, State = RecordState.Active };
+            context.Tasks!.Add(task);
+            await context.SaveChangesAsync();
+
+            var startDate = DateOnly.FromDateTime(DateTime.Now);
+            var endDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
+            var workRecord = new WorkRecord { StartDate = startDate, EndDate = endDate, Hours = 8m, ApplicationUserId = "user-1", TaskId = 1 };
+            var controller = new WorkRecordsController(context);
+
+            // Act
+            var result = await controller.PostWorkRecord(workRecord);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<WorkRecord>>(result);
+            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
+            Assert.Equal("GetWorkRecord", createdAtActionResult.ActionName);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task DuplicateWorkRecord_WithValidId_ReturnsCreatedAtAction()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var startDate = DateOnly.FromDateTime(DateTime.Now);
+            var endDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
+            
+            var workRecord = new WorkRecord 
+            { 
+                Id = 1, 
+                StartDate = startDate, 
+                EndDate = endDate, 
+                Hours = 8m, 
+                ApplicationUserId = "user-1",
+                TaskId = 1,
+                InvoiceItemId = 5
+            };
+            context.WorkRecords!.Add(workRecord);
+            await context.SaveChangesAsync();
+            
+            var controller = new WorkRecordsController(context);
+
+            // Act
+            var result = await controller.DuplicateWorkRecord(1);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<WorkRecord>>(result);
+            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
+            Assert.Equal("GetWorkRecord", createdAtActionResult.ActionName);
+            
+            var duplicatedWorkRecord = Assert.IsType<WorkRecord>(createdAtActionResult.Value);
+            Assert.NotEqual(1, duplicatedWorkRecord.Id);
+            Assert.Equal(startDate, duplicatedWorkRecord.StartDate);
+            Assert.Equal(endDate, duplicatedWorkRecord.EndDate);
+            Assert.Equal(8m, duplicatedWorkRecord.Hours);
+            Assert.Equal("user-1", duplicatedWorkRecord.ApplicationUserId);
+            Assert.Equal(1, duplicatedWorkRecord.TaskId);
+            Assert.Null(duplicatedWorkRecord.InvoiceItemId); // Should not copy invoice item association
+            
+            // Verify both work records exist in the database
+            var allWorkRecords = await context.WorkRecords.ToListAsync();
+            Assert.Equal(2, allWorkRecords.Count);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task DuplicateWorkRecord_WithInvalidId_ReturnsNotFound()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var controller = new WorkRecordsController(context);
+
+            // Act
+            var result = await controller.DuplicateWorkRecord(999);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
     }
 }

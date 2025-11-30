@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { tasksService } from '../../services/entityService';
-import { Task, Contract, ContractRate, TaskContractRate } from '../../types';
+import { Task, Contract, ContractRate, UserContractRate, TaskContractRate } from '../../types';
 import './EntityForm.css';
 
 interface TaskFormProps {
   task: Task | null;
   contracts: Contract[];
   contractRates: ContractRate[];
+  userContractRates: UserContractRate[];
   onClose: () => void;
   onSave: () => void;
   defaultContractId?: number;
@@ -16,6 +17,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
   task,
   contracts,
   contractRates,
+  userContractRates,
   onClose,
   onSave,
   defaultContractId,
@@ -25,14 +27,17 @@ const TaskForm: React.FC<TaskFormProps> = ({
     contractId: defaultContractId,
     taskContractRates: [],
   });
-  const [selectedContractRateId, setSelectedContractRateId] = useState<number | ''>('');
+  const [selectedUserContractRateId, setSelectedUserContractRateId] = useState<number | ''>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Filter contract rates based on selected contract
-  const filteredContractRates = formData.contractId
-    ? contractRates.filter(cr => cr.contractId === formData.contractId)
-    : contractRates;
+  // Filter user contract rates based on selected contract
+  const filteredUserContractRates = formData.contractId
+    ? userContractRates.filter(ucr => {
+        const contractRate = contractRates.find(cr => cr.id === ucr.contractRateId);
+        return contractRate?.contractId === formData.contractId;
+      })
+    : userContractRates;
 
   useEffect(() => {
     if (task) {
@@ -60,24 +65,24 @@ const TaskForm: React.FC<TaskFormProps> = ({
     });
   };
 
-  const handleAddContractRate = () => {
-    if (!selectedContractRateId) return;
+  const handleAddUserContractRate = () => {
+    if (!selectedUserContractRateId) return;
 
-    const contractRateId = Number(selectedContractRateId);
+    const userContractRateId = Number(selectedUserContractRateId);
     
     // Check if already added
     const alreadyAdded = formData.taskContractRates?.some(
-      tcr => tcr.contractRateId === contractRateId
+      tcr => tcr.userContractRateId === userContractRateId
     );
     
     if (alreadyAdded) {
-      setError('This contract rate has already been added');
+      setError('This user/rate combination has already been added');
       return;
     }
 
     const newTaskContractRate: TaskContractRate = {
-      contractRateId,
-      contractRate: contractRates.find(cr => cr.id === contractRateId),
+      userContractRateId,
+      userContractRate: userContractRates.find(ucr => ucr.id === userContractRateId),
     };
 
     setFormData(prev => ({
@@ -85,15 +90,15 @@ const TaskForm: React.FC<TaskFormProps> = ({
       taskContractRates: [...(prev.taskContractRates || []), newTaskContractRate],
     }));
     
-    setSelectedContractRateId('');
+    setSelectedUserContractRateId('');
     setError('');
   };
 
-  const handleRemoveContractRate = (contractRateId: number) => {
+  const handleRemoveUserContractRate = (userContractRateId: number) => {
     setFormData(prev => ({
       ...prev,
       taskContractRates: prev.taskContractRates?.filter(
-        tcr => tcr.contractRateId !== contractRateId
+        tcr => tcr.userContractRateId !== userContractRateId
       ),
     }));
   };
@@ -166,15 +171,17 @@ const TaskForm: React.FC<TaskFormProps> = ({
             </div>
 
             <div className="form-field">
-              <label>Contract Rates</label>
+              <label>User/Rate Assignments</label>
               <div style={{ marginBottom: '10px' }}>
                 {formData.taskContractRates && formData.taskContractRates.length > 0 ? (
                   <ul style={{ listStyle: 'none', padding: 0 }}>
                     {formData.taskContractRates.map((tcr) => {
-                      const rate = tcr.contractRate || contractRates.find(cr => cr.id === tcr.contractRateId);
+                      const ucr = tcr.userContractRate || userContractRates.find(u => u.id === tcr.userContractRateId);
+                      const rate = ucr?.contractRate || contractRates.find(cr => cr.id === ucr?.contractRateId);
+                      const userName = ucr?.applicationUser?.userName || ucr?.applicationUser?.email || 'Unknown User';
                       return (
                         <li
-                          key={tcr.contractRateId}
+                          key={tcr.userContractRateId}
                           style={{
                             display: 'flex',
                             justifyContent: 'space-between',
@@ -185,10 +192,10 @@ const TaskForm: React.FC<TaskFormProps> = ({
                             borderRadius: '4px',
                           }}
                         >
-                          <span>{rate?.description || `Rate ${tcr.contractRateId}`}</span>
+                          <span>{userName} - {rate?.description || `Rate ${ucr?.contractRateId}`}</span>
                           <button
                             type="button"
-                            onClick={() => handleRemoveContractRate(tcr.contractRateId)}
+                            onClick={() => handleRemoveUserContractRate(tcr.userContractRateId)}
                             style={{
                               padding: '4px 8px',
                               backgroundColor: '#dc3545',
@@ -206,29 +213,32 @@ const TaskForm: React.FC<TaskFormProps> = ({
                     })}
                   </ul>
                 ) : (
-                  <p style={{ color: '#666', fontSize: '14px' }}>No contract rates added</p>
+                  <p style={{ color: '#666', fontSize: '14px' }}>No user/rate assignments added</p>
                 )}
               </div>
               
               <div style={{ display: 'flex', gap: '8px' }}>
                 <select
-                  value={selectedContractRateId}
-                  onChange={(e) => setSelectedContractRateId(e.target.value === '' ? '' : Number(e.target.value))}
+                  value={selectedUserContractRateId}
+                  onChange={(e) => setSelectedUserContractRateId(e.target.value === '' ? '' : Number(e.target.value))}
                   disabled={loading || !formData.contractId}
                   style={{ flex: 1 }}
                 >
-                  <option value="">Select contract rate...</option>
-                  {filteredContractRates.map((cr) => (
-                    <option key={cr.id} value={cr.id}>
-                      {cr.description}
-                      {cr.applicationUser && ` (${cr.applicationUser.userName})`}
-                    </option>
-                  ))}
+                  <option value="">Select user and rate...</option>
+                  {filteredUserContractRates.map((ucr) => {
+                    const rate = contractRates.find(cr => cr.id === ucr.contractRateId);
+                    const userName = ucr.applicationUser?.userName || ucr.applicationUser?.email || 'Unknown User';
+                    return (
+                      <option key={ucr.id} value={ucr.id}>
+                        {userName} - {rate?.description || `Rate ${ucr.contractRateId}`}
+                      </option>
+                    );
+                  })}
                 </select>
                 <button
                   type="button"
-                  onClick={handleAddContractRate}
-                  disabled={loading || !selectedContractRateId || !formData.contractId}
+                  onClick={handleAddUserContractRate}
+                  disabled={loading || !selectedUserContractRateId || !formData.contractId}
                   style={{
                     padding: '8px 16px',
                     backgroundColor: '#007bff',

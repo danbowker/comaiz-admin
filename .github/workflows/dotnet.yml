@@ -5,12 +5,12 @@ on:
     branches: ["master"]
     paths-ignore:
       - 'powershell/**'
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
   pull_request:
     branches: ["master"]
     paths-ignore:
       - 'powershell/**'
-  release:
-    types: [created]
 
 jobs:
   build:
@@ -84,16 +84,26 @@ jobs:
       - name: Test
         run: dotnet test --no-build --verbosity normal
       - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }} .
+        run: |
+          docker build \
+            --build-arg VERSION="${{ steps.version.outputs.VERSION }}" \
+            --build-arg COMMIT="${{ github.sha }}" \
+            --build-arg BUILD_TIME="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+            --build-arg BRANCH="${{ github.ref_name }}" \
+            -t ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }} \
+            .
       - name: Log in to GitHub Container Registry
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Push Docker image
         if: github.event_name != 'pull_request'
         run: docker push ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }}
-      - name: Tag and push latest
-        if: github.event_name == 'release'
+      - name: Tag and push version and latest
+        if: startsWith(github.ref, 'refs/tags/v')
         run: |
+          VERSION_TAG=${GITHUB_REF#refs/tags/}
+          docker tag ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }} ghcr.io/${{ github.repository }}/comaiz-admin:${VERSION_TAG}
           docker tag ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }} ghcr.io/${{ github.repository }}/comaiz-admin:latest
+          docker push ghcr.io/${{ github.repository }}/comaiz-admin:${VERSION_TAG}
           docker push ghcr.io/${{ github.repository }}/comaiz-admin:latest
 
   deploy-staging:
@@ -146,7 +156,7 @@ jobs:
 
   deploy-production:
     needs: build
-    if: github.event_name == 'release'
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
       contents: read

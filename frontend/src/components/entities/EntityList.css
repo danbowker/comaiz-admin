@@ -79,6 +79,7 @@ tbody tr:hover {
 }
 
 .btn-edit,
+.btn-duplicate,
 .btn-delete {
   padding: 0.5rem 1rem;
   border: none;
@@ -95,6 +96,15 @@ tbody tr:hover {
 }
 
 .btn-edit:hover {
+  opacity: 0.8;
+}
+
+.btn-duplicate {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.btn-duplicate:hover {
   opacity: 0.8;
 }
 

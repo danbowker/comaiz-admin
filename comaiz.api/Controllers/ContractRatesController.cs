@@ -22,7 +22,7 @@ namespace comaiz.api.Controllers
         {
             if(dbContext.ContractRates == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var query = dbContext.ContractRates.Include(cr => cr.ApplicationUser).AsQueryable();
+            var query = dbContext.ContractRates.Include(cr => cr.UserContractRates).AsQueryable();
             
             if (contractId.HasValue)
             {
@@ -38,7 +38,7 @@ namespace comaiz.api.Controllers
             if (dbContext.ContractRates == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             var contractRate = await dbContext.ContractRates
-                .Include(cr => cr.ApplicationUser)
+                .Include(cr => cr.UserContractRates)
                 .FirstOrDefaultAsync(cr => cr.Id == id);
 
             if (contractRate == null)
@@ -104,6 +104,31 @@ namespace comaiz.api.Controllers
             await dbContext.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpPost("{id}/duplicate")]
+        public async Task<ActionResult<ContractRate>> DuplicateContractRate(int id)
+        {
+            if (dbContext.ContractRates == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
+            var contractRate = await dbContext.ContractRates.FindAsync(id);
+            if (contractRate == null)
+            {
+                return NotFound();
+            }
+
+            var duplicatedContractRate = new ContractRate
+            {
+                ContractId = contractRate.ContractId,
+                Description = $"{contractRate.Description} (Copy)",
+                InvoiceDescription = contractRate.InvoiceDescription,
+                Rate = contractRate.Rate
+            };
+
+            dbContext.ContractRates.Add(duplicatedContractRate);
+            await dbContext.SaveChangesAsync();
+
+            return CreatedAtAction("GetContractRate", new { id = duplicatedContractRate.Id }, duplicatedContractRate);
         }
     }
 }
