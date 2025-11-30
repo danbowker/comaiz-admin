@@ -84,7 +84,14 @@ jobs:
       - name: Test
         run: dotnet test --no-build --verbosity normal
       - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }} .
+        run: |
+          docker build \
+            --build-arg VERSION="${{ steps.version.outputs.VERSION }}" \
+            --build-arg COMMIT="${{ github.sha }}" \
+            --build-arg BUILD_TIME="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+            --build-arg BRANCH="${{ github.ref_name }}" \
+            -t ghcr.io/${{ github.repository }}/comaiz-admin:${{ github.sha }} \
+            .
       - name: Log in to GitHub Container Registry
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Push Docker image

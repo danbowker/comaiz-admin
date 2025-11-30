@@ -15,6 +15,7 @@ interface EntityListProps<T extends { id: number }> {
   onEdit: (item: T) => void;
   onCreate: () => void;
   onDelete: (id: number) => void;
+  onDuplicate?: (id: number) => void;
   queryParams?: Record<string, any>;
 }
 
@@ -25,6 +26,7 @@ function EntityList<T extends { id: number }>({
   onEdit,
   onCreate,
   onDelete,
+  onDuplicate,
   queryParams,
 }: EntityListProps<T>) {
   const [items, setItems] = useState<T[]>([]);
@@ -55,6 +57,17 @@ function EntityList<T extends { id: number }>({
         await loadItems();
       } catch (err: any) {
         setError(err.response?.data?.message || 'Failed to delete item');
+      }
+    }
+  };
+
+  const handleDuplicate = async (id: number) => {
+    if (onDuplicate) {
+      try {
+        await onDuplicate(id);
+        await loadItems();
+      } catch (err: any) {
+        setError(err.response?.data?.message || 'Failed to duplicate item');
       }
     }
   };
@@ -108,6 +121,14 @@ function EntityList<T extends { id: number }>({
                     >
                       Edit
                     </button>
+                    {onDuplicate && (
+                      <button
+                        className="btn-duplicate"
+                        onClick={() => handleDuplicate(item.id)}
+                      >
+                        Duplicate
+                      </button>
+                    )}
                     <button
                       className="btn-delete"
                       onClick={() => handleDelete(item.id)}

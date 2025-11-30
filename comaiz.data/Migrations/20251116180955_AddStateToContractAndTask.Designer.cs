@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using comaiz.data;
@@ -11,9 +12,11 @@ using comaiz.data;
 namespace comaiz.data.Migrations
 {
     [DbContext(typeof(ComaizContext))]
-    partial class ComaizContextModelSnapshot : ModelSnapshot
+    [Migration("20251116180955_AddStateToContractAndTask")]
+    partial class AddStateToContractAndTask
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -286,12 +289,6 @@ namespace comaiz.data.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
-
-                    b.Property<DateOnly?>("PlannedEnd")
-                        .HasColumnType("date");
-
-                    b.Property<DateOnly?>("PlannedStart")
-                        .HasColumnType("date");
 
                     b.Property<decimal?>("Price")
                         .HasColumnType("numeric");
