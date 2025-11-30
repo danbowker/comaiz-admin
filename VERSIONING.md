@@ -44,12 +44,14 @@ git push --tags
 
 **Important**: Use annotated tags (`-a` flag) instead of lightweight tags for releases.
 
-### 3. Trigger Release
+### 3. Automatic Production Deployment
 
 When you push a tag, GitHub Actions automatically:
 1. Builds the application with the release version
-2. Creates a GitHub Release (if configured)
+2. Tags the Docker image with both the version tag and `latest`
 3. Deploys to production environment
+
+No manual release creation is needed - simply pushing a version tag triggers the entire production deployment.
 
 ## Version Information
 
@@ -93,9 +95,9 @@ The `.github/workflows/dotnet.yml` workflow includes version generation:
 
 ### Workflow Triggers
 
-- **Push to master**: Creates staging build with development version
-- **Create Release/Tag**: Creates production build with release version
-- **Pull Request**: Creates preview build with development version
+- **Push to master**: Creates staging build with development version and deploys to staging
+- **Push version tag** (e.g., `v1.2.3`): Creates production build with release version and deploys to production
+- **Pull Request**: Creates preview build with development version (no deployment)
 
 ## Version Display in UI
 
@@ -212,10 +214,7 @@ git push origin v1.2.3
 
 # 5. Verify CI build and deployment
 # Check GitHub Actions workflow status
-# Verify version in staging/production
-
-# 6. Create release notes
-# Go to GitHub Releases and document the changes
+# Verify version in production
 ```
 
 ## Related Documentation

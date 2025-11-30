@@ -93,7 +93,7 @@ The deployment workflow follows these rules:
    - Uses a separate staging database
    - Runs on port 8081 on the server
 
-2. **Production Deployment**: Only triggered when a GitHub release is created
+2. **Production Deployment**: Automatically triggered when a version tag (e.g., `v1.2.3`) is pushed
    - Accessible at: `https://comaiz.co.uk`
    - Uses the production database
    - Runs on port 8080 on the server
@@ -209,47 +209,31 @@ Configure the following secrets in your repository (**Settings** → **Secrets a
    unset ConnectionStrings__PostgresSQL
    ```
 
-### Creating a Release (Production Deployment)
+### Deploying to Production
 
-To deploy to production, create a GitHub release with a version tag. See [VERSIONING.md](VERSIONING.md) for detailed release process.
+To deploy to production, simply push a version tag following [semantic versioning](https://semver.org/). See [VERSIONING.md](VERSIONING.md) for detailed release process.
 
 #### Quick Steps:
 
-1. Go to your repository on GitHub
-2. Click on **Releases** in the right sidebar
-3. Click **Draft a new release**
-4. Create a new tag (e.g., `v1.0.0`, `v1.1.0`) following [semantic versioning](https://semver.org/)
-5. Enter a release title (e.g., "Version 1.0.0")
-6. Add release notes describing the changes
-7. Click **Publish release**
-
-The workflow will automatically:
-- Build and test the application with the release version
-- Create a Docker image tagged with the commit SHA and `latest`
-- Deploy to the production environment
-- Generate version.json with release information
-
-#### Option 2: Using GitHub CLI
-
 ```bash
-# Install GitHub CLI if you haven't already
-# https://cli.github.com/
+# 1. Ensure you're on master and up to date
+git checkout master
+git pull origin master
 
-# Create and publish a release
-gh release create v1.0.0 --title "Version 1.0.0" --notes "Release notes here"
-```
+# 2. Create an annotated tag (e.g., v1.0.0, v1.1.0, v0.2.0)
+git tag -a v1.0.0 -m "Version 1.0.0: Brief description of changes"
 
-#### Option 3: Using Git Tags
-
-```bash
-# Create a tag
-git tag -a v1.0.0 -m "Version 1.0.0"
-
-# Push the tag
+# 3. Push the tag to GitHub
 git push origin v1.0.0
 ```
 
-**Important**: After pushing the tag, you must create a release from it on GitHub (using the web interface or CLI) to trigger the production deployment. Simply pushing a tag alone will not deploy to production.
+The workflow will automatically:
+- Build and test the application with the release version
+- Create a Docker image tagged with the version, commit SHA, and `latest`
+- Deploy to the production environment
+- Generate version.json with release information
+
+**That's it!** No need to create a GitHub Release manually. The production deployment happens automatically when you push the tag.
 
 ### Server Configuration
 
