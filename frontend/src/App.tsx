@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import ClientsPage from './pages/ClientsPage';
 import ContractsPage from './pages/ContractsPage';
 import ContractRatesPage from './pages/ContractRatesPage';
+import UserContractRatesPage from './pages/UserContractRatesPage';
 import FixedCostsPage from './pages/FixedCostsPage';
 import WorkRecordsPage from './pages/WorkRecordsPage';
 import InvoicesPage from './pages/InvoicesPage';
@@ -35,6 +36,7 @@ function App() {
               <Route path="clients" element={<ClientsPage />} />
               <Route path="contracts" element={<ContractsPage />} />
               <Route path="contract-rates" element={<ContractRatesPage />} />
+              <Route path="user-contract-rates" element={<UserContractRatesPage />} />
               <Route path="fixed-costs" element={<FixedCostsPage />} />
               <Route path="work-records" element={<WorkRecordsPage />} />
               <Route path="invoices" element={<InvoicesPage />} />
