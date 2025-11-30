@@ -15,6 +15,7 @@ import WorkRecordsPage from './pages/WorkRecordsPage';
 import InvoicesPage from './pages/InvoicesPage';
 import InvoiceItemsPage from './pages/InvoiceItemsPage';
 import TasksPage from './pages/TasksPage';
+import WeeklySummaryPage from './pages/WeeklySummaryPage';
 import './App.css';
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
               <Route path="invoices" element={<InvoicesPage />} />
               <Route path="invoice-items" element={<InvoiceItemsPage />} />
               <Route path="tasks" element={<TasksPage />} />
+              <Route path="weekly-summary" element={<WeeklySummaryPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
