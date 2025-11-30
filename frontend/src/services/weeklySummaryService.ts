@@ -14,7 +14,7 @@ export const weeklySummaryService = {
       params.append('weekStartDate', weekStartDate);
     }
     const queryString = params.toString();
-    const url = `/api/WeeklySummary${queryString ? `?${queryString}` : ''}`;
+    const url = `/WeeklySummary${queryString ? `?${queryString}` : ''}`;
     const response = await api.get<WeeklySummaryResponse>(url);
     return response.data;
   },
