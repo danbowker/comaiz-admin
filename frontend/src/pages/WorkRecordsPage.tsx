@@ -78,7 +78,6 @@ const WorkRecordsPage: React.FC = () => {
 
   const handleSave = () => {
     setRefreshKey((prev) => prev + 1);
-    loadRelatedData();
   };
 
   const handleDelete = async (id: number) => {

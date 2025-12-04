@@ -101,6 +101,10 @@ const WorkRecordForm: React.FC<WorkRecordFormProps> = ({
     ? isTaskEffectivelyActive(selectedTask, contracts)
     : true;
 
+  // Whether to disable inactive task options and show warnings (only for new records)
+  const isCreatingNewRecord = !workRecord;
+  const shouldWarnAboutInactiveTask = isCreatingNewRecord && formData.taskId && !isSelectedTaskEffectivelyActive;
+
   const handleChange = (name: keyof WorkRecord, value: any) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     setError('');
@@ -112,7 +116,7 @@ const WorkRecordForm: React.FC<WorkRecordFormProps> = ({
     setError('');
 
     // Validation: don't allow adding work to inactive tasks (for new records)
-    if (!workRecord && formData.taskId && !isSelectedTaskEffectivelyActive) {
+    if (isCreatingNewRecord && formData.taskId && !isSelectedTaskEffectivelyActive) {
       setError('Cannot add work records to an inactive task. Please select an active task.');
       setLoading(false);
       return;
@@ -185,7 +189,7 @@ const WorkRecordForm: React.FC<WorkRecordFormProps> = ({
                       <option
                         key={t.id}
                         value={t.id}
-                        disabled={!workRecord && !effectivelyActive}
+                        disabled={isCreatingNewRecord && !effectivelyActive}
                       >
                         {label}
                       </option>
@@ -200,7 +204,7 @@ const WorkRecordForm: React.FC<WorkRecordFormProps> = ({
                   />
                   Show complete tasks
                 </label>
-                {!isSelectedTaskEffectivelyActive && formData.taskId && !workRecord && (
+                {shouldWarnAboutInactiveTask && (
                   <div style={{ color: '#dc3545', fontSize: '13px' }}>
                     ⚠ Cannot add work records to an inactive task
                   </div>
