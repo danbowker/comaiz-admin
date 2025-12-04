@@ -66,6 +66,16 @@ const InvoiceItemsPage: React.FC = () => {
     { key: 'quantity' as keyof InvoiceItem, label: 'Quantity' },
     { key: 'rate' as keyof InvoiceItem, label: 'Rate' },
     { key: 'price' as keyof InvoiceItem, label: 'Price' },
+    { 
+      key: 'startDate' as keyof InvoiceItem, 
+      label: 'Start Date',
+      render: (item: InvoiceItem) => item.startDate ? new Date(item.startDate).toLocaleDateString() : ''
+    },
+    { 
+      key: 'endDate' as keyof InvoiceItem, 
+      label: 'End Date',
+      render: (item: InvoiceItem) => item.endDate ? new Date(item.endDate).toLocaleDateString() : ''
+    },
   ];
 
   const fields: FormField<InvoiceItem>[] = [
@@ -89,6 +99,8 @@ const InvoiceItemsPage: React.FC = () => {
     { name: 'rate', label: 'Rate', type: 'number', required: true },
     { name: 'vatRate', label: 'VAT Rate', type: 'number', required: true },
     { name: 'price', label: 'Price', type: 'number', required: true },
+    { name: 'startDate', label: 'Start Date', type: 'date' },
+    { name: 'endDate', label: 'End Date', type: 'date' },
   ];
 
   const handleEdit = (item: InvoiceItem) => {

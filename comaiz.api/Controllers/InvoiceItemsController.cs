@@ -131,7 +131,9 @@ namespace comaiz.api.Controllers
                 Unit = invoiceItem.Unit,
                 Rate = invoiceItem.Rate,
                 VATRate = invoiceItem.VATRate,
-                Price = invoiceItem.Price
+                Price = invoiceItem.Price,
+                StartDate = invoiceItem.StartDate,
+                EndDate = invoiceItem.EndDate
             };
 
             dbContext.InvoiceItems.Add(duplicatedInvoiceItem);

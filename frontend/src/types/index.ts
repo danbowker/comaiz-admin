@@ -34,6 +34,12 @@ export enum RecordState {
   Complete = 1,
 }
 
+export enum InvoiceState {
+  Draft = 0,
+  Issued = 1,
+  Paid = 2,
+}
+
 export interface ContractRate {
   id: number;
   contractId: number;
@@ -90,6 +96,7 @@ export interface Invoice {
   date: string;
   purchaseOrder?: string;
   clientId: number;
+  state: InvoiceState;
 }
 
 export interface InvoiceItem {
@@ -102,6 +109,8 @@ export interface InvoiceItem {
   rate: number;
   vatRate: number;
   price: number;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface LoginRequest {
