@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using comaiz.data;
 using comaiz.data.Models;
+using comaiz.api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 
@@ -131,6 +132,92 @@ namespace comaiz.api.Controllers
             await dbContext.SaveChangesAsync();
 
             return CreatedAtAction("GetContract", new { id = duplicatedContract.Id }, duplicatedContract);
+        }
+
+        [HttpGet("{id}/details")]
+        public async Task<ActionResult<ContractDetailsDto>> GetContractDetailsAsync(int id)
+        {
+            if (dbContext.Contracts == null || dbContext.Tasks == null || dbContext.InvoiceItems == null || dbContext.Invoices == null)
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            var contract = await dbContext.Contracts.FindAsync(id);
+            if (contract == null)
+            {
+                return NotFound();
+            }
+
+            // Get all tasks for this contract
+            var tasks = await dbContext.Tasks
+                .Where(t => t.ContractId == id)
+                .ToListAsync();
+
+            var taskIds = tasks.Select(t => t.Id).ToList();
+
+            // Get all invoice items for these tasks, including the invoice to check state
+            var invoiceItems = await dbContext.InvoiceItems
+                .Include(ii => ii.Invoice)
+                .Where(ii => ii.TaskId != null && taskIds.Contains(ii.TaskId.Value))
+                .ToListAsync();
+
+            var taskDetails = new List<TaskDetailsDto>();
+
+            foreach (var task in tasks)
+            {
+                var taskInvoiceItems = invoiceItems.Where(ii => ii.TaskId == task.Id).ToList();
+                
+                var taskTotalInvoiced = taskInvoiceItems
+                    .Where(ii => ii.Invoice != null && ii.Invoice.State == InvoiceState.Issued)
+                    .Sum(ii => ii.Price);
+
+                var taskTotalPaid = taskInvoiceItems
+                    .Where(ii => ii.Invoice != null && ii.Invoice.State == InvoiceState.Paid)
+                    .Sum(ii => ii.Price);
+
+                var taskLastEndDate = taskInvoiceItems
+                    .Where(ii => ii.EndDate.HasValue)
+                    .Select(ii => ii.EndDate!.Value)
+                    .DefaultIfEmpty()
+                    .Max();
+
+                taskDetails.Add(new TaskDetailsDto
+                {
+                    TaskId = task.Id,
+                    Name = task.Name,
+                    TotalInvoiced = taskTotalInvoiced,
+                    TotalPaid = taskTotalPaid,
+                    LastInvoiceEndDate = taskLastEndDate == default ? null : taskLastEndDate
+                });
+            }
+
+            // Calculate contract-level totals
+            var contractTotalInvoiced = taskDetails.Sum(t => t.TotalInvoiced);
+            var contractTotalPaid = taskDetails.Sum(t => t.TotalPaid);
+            
+            // For the contract's last invoice end date, get the earliest of all task last end dates
+            // (per the requirement: "For a contract, this is the earliest of all 'Last invoice end dates' for the tasks")
+            var taskLastEndDates = taskDetails
+                .Where(t => t.LastInvoiceEndDate.HasValue)
+                .Select(t => t.LastInvoiceEndDate!.Value)
+                .ToList();
+            
+            DateOnly? contractLastEndDate = taskLastEndDates.Any() ? taskLastEndDates.Min() : null;
+
+            // Calculate remaining (only if contract has a price)
+            decimal? remaining = contract.Price.HasValue 
+                ? contract.Price.Value - contractTotalPaid 
+                : null;
+
+            return new ContractDetailsDto
+            {
+                ContractId = contract.Id,
+                Description = contract.Description,
+                Price = contract.Price,
+                TotalInvoiced = contractTotalInvoiced,
+                TotalPaid = contractTotalPaid,
+                Remaining = remaining,
+                LastInvoiceEndDate = contractLastEndDate,
+                Tasks = taskDetails
+            };
         }
     }
 }

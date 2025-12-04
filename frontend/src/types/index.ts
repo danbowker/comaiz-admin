@@ -145,3 +145,22 @@ export interface WeeklySummaryResponse {
   taskWeeklyTotals: TaskHours[];
   weekTotalHours: number;
 }
+
+export interface TaskDetails {
+  taskId: number;
+  name: string;
+  totalInvoiced: number;
+  totalPaid: number;
+  lastInvoiceEndDate?: string;
+}
+
+export interface ContractDetails {
+  contractId: number;
+  description?: string;
+  price?: number;
+  totalInvoiced: number;
+  totalPaid: number;
+  remaining?: number;
+  lastInvoiceEndDate?: string;
+  tasks: TaskDetails[];
+}

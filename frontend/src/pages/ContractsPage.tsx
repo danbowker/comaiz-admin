@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
 import { contractsService, clientsService } from '../services/entityService';
@@ -49,6 +50,15 @@ const ContractsPage: React.FC = () => {
       key: 'plannedEnd' as keyof Contract, 
       label: 'Planned End',
       render: (item: Contract) => item.plannedEnd ? new Date(item.plannedEnd).toLocaleDateString() : ''
+    },
+    { 
+      key: 'details' as keyof Contract, 
+      label: 'Details',
+      render: (item: Contract) => (
+        <Link to={`/contracts/${item.id}`} style={{ color: '#2563eb', textDecoration: 'none' }}>
+          View Details
+        </Link>
+      )
     },
   ];
 

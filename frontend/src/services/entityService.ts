@@ -9,7 +9,8 @@ import {
   WorkRecord, 
   Invoice, 
   InvoiceItem,
-  Task
+  Task,
+  ContractDetails
 } from '../types';
 
 // Generic CRUD service for all entities
@@ -70,4 +71,10 @@ export const workRecordsService = new EntityService<WorkRecord>('workrecords');
 export const invoicesService = new EntityService<Invoice>('invoices');
 export const invoiceItemsService = new EntityService<InvoiceItem>('invoiceitems');
 export const tasksService = new EntityService<Task>('tasks');
+
+// Contract details service
+export const getContractDetails = async (contractId: number): Promise<ContractDetails> => {
+  const response = await api.get<ContractDetails>(`/contracts/${contractId}/details`);
+  return response.data;
+};
 

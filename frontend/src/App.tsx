@@ -8,6 +8,7 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import ClientsPage from './pages/ClientsPage';
 import ContractsPage from './pages/ContractsPage';
+import ContractDetailsPage from './pages/ContractDetailsPage';
 import ContractRatesPage from './pages/ContractRatesPage';
 import UserContractRatesPage from './pages/UserContractRatesPage';
 import FixedCostsPage from './pages/FixedCostsPage';
@@ -36,6 +37,7 @@ function App() {
               <Route index element={<Dashboard />} />
               <Route path="clients" element={<ClientsPage />} />
               <Route path="contracts" element={<ContractsPage />} />
+              <Route path="contracts/:id" element={<ContractDetailsPage />} />
               <Route path="contract-rates" element={<ContractRatesPage />} />
               <Route path="user-contract-rates" element={<UserContractRatesPage />} />
               <Route path="fixed-costs" element={<FixedCostsPage />} />
