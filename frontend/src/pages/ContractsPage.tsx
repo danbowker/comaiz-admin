@@ -99,6 +99,17 @@ const ContractsPage: React.FC = () => {
     },
     { name: 'plannedStart', label: 'Planned Start', type: 'date' },
     { name: 'plannedEnd', label: 'Planned End', type: 'date' },
+    {
+      name: 'state',
+      label: 'Status',
+      type: 'select',
+      required: true,
+      options: [
+        { value: RecordState.Active, label: 'Active' },
+        { value: RecordState.Complete, label: 'Complete' },
+      ],
+      defaultValue: RecordState.Active,
+    },
   ];
 
   const handleEdit = (item: Contract) => {

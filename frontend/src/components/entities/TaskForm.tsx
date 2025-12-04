@@ -28,6 +28,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
     name: '',
     contractId: defaultContractId,
     taskContractRates: [],
+    state: RecordState.Active,
   });
   const [selectedUserContractRateId, setSelectedUserContractRateId] = useState<number | ''>('');
   const [loading, setLoading] = useState(false);
@@ -67,6 +68,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
         name: '',
         contractId: defaultContractId,
         taskContractRates: [],
+        state: RecordState.Active,
       });
     }
   }, [task, defaultContractId]);
@@ -295,6 +297,19 @@ const TaskForm: React.FC<TaskFormProps> = ({
                   Add
                 </button>
               </div>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="state">Status</label>
+              <select
+                id="state"
+                value={formData.state ?? RecordState.Active}
+                onChange={(e) => handleChange('state', Number(e.target.value))}
+                disabled={loading}
+              >
+                <option value={RecordState.Active}>Active</option>
+                <option value={RecordState.Complete}>Complete</option>
+              </select>
             </div>
           </div>
 
