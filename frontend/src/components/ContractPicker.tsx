@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useContractSelection } from '../contexts/ContractSelectionContext';
 import { contractsService } from '../services/entityService';
-import { Contract } from '../types';
+import { Contract, RecordState } from '../types';
+import { useShowCompleteContracts } from '../hooks/useFilterPreferences';
+import { isContractActive } from '../utils/stateFilter';
 import './ContractPicker.css';
 
 const ContractPicker: React.FC = () => {
@@ -11,6 +13,7 @@ const ContractPicker: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { showComplete, toggleShowComplete } = useShowCompleteContracts();
 
   useEffect(() => {
     loadContracts();
@@ -44,7 +47,14 @@ const ContractPicker: React.FC = () => {
   const filteredContracts = contracts.filter((contract) => {
     const description = contract.description?.toLowerCase() || '';
     const search = searchTerm.toLowerCase();
-    return description.includes(search) || contract.id.toString().includes(search);
+    const matchesSearch = description.includes(search) || contract.id.toString().includes(search);
+    
+    // Filter by state unless showComplete is enabled
+    if (!showComplete && !isContractActive(contract)) {
+      return false;
+    }
+    
+    return matchesSearch;
   });
 
   const handleSelect = (contract: Contract) => {
@@ -102,6 +112,17 @@ const ContractPicker: React.FC = () => {
               autoFocus
             />
           </div>
+          <div className="contract-picker-filter">
+            <label className="contract-picker-filter-toggle">
+              <input
+                type="checkbox"
+                checked={showComplete}
+                onChange={toggleShowComplete}
+                aria-label="Show complete contracts"
+              />
+              <span>Show complete</span>
+            </label>
+          </div>
           <div className="contract-picker-list">
             {loading ? (
               <div className="contract-picker-loading">Loading...</div>
@@ -113,11 +134,14 @@ const ContractPicker: React.FC = () => {
                   key={contract.id}
                   className={`contract-picker-item ${
                     selectedContract?.id === contract.id ? 'selected' : ''
-                  }`}
+                  } ${contract.state === RecordState.Complete ? 'complete' : ''}`}
                   onClick={() => handleSelect(contract)}
                 >
                   <div className="contract-picker-item-name">
                     {contract.description || `Contract ${contract.id}`}
+                    {contract.state === RecordState.Complete && (
+                      <span className="contract-picker-badge">Complete</span>
+                    )}
                   </div>
                   <div className="contract-picker-item-meta">
                     ID: {contract.id}

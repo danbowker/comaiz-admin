@@ -133,3 +133,78 @@ tbody tr:hover {
   border-radius: 4px;
   margin-bottom: 1rem;
 }
+
+/* Filter toggle styles */
+.entity-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.filter-toggle:hover {
+  background-color: #e9ecef;
+}
+
+.filter-toggle:focus-within {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+.filter-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.filter-toggle span {
+  font-size: 0.875rem;
+  color: #555;
+}
+
+/* Complete badge styles */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.status-badge.complete {
+  background-color: #e9ecef;
+  color: #6c757d;
+}
+
+.status-badge.active {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+/* Muted row styles for complete items */
+tbody tr.row-complete {
+  background-color: #f8f9fa;
+}
+
+tbody tr.row-complete td {
+  color: #999;
+}
+
+tbody tr.row-complete:hover {
+  background-color: #e9ecef;
+}

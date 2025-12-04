@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { tasksService } from '../../services/entityService';
-import { Task, Contract, ContractRate, UserContractRate, TaskContractRate } from '../../types';
+import { Task, Contract, ContractRate, UserContractRate, TaskContractRate, RecordState } from '../../types';
+import { isContractActive } from '../../utils/stateFilter';
+import { useShowCompleteContracts } from '../../hooks/useFilterPreferences';
 import './EntityForm.css';
 
 interface TaskFormProps {
@@ -26,10 +28,26 @@ const TaskForm: React.FC<TaskFormProps> = ({
     name: '',
     contractId: defaultContractId,
     taskContractRates: [],
+    state: RecordState.Active,
   });
   const [selectedUserContractRateId, setSelectedUserContractRateId] = useState<number | ''>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { showComplete, toggleShowComplete } = useShowCompleteContracts();
+
+  // Filter contracts based on showComplete preference
+  const availableContracts = useMemo(() => {
+    if (showComplete) {
+      return contracts;
+    }
+    return contracts.filter(isContractActive);
+  }, [contracts, showComplete]);
+
+  // Check if the selected contract is complete (for validation)
+  const selectedContract = formData.contractId
+    ? contracts.find((c) => c.id === formData.contractId)
+    : null;
+  const isSelectedContractComplete = selectedContract?.state === RecordState.Complete;
 
   // Filter user contract rates based on selected contract
   const filteredUserContractRates = formData.contractId
@@ -50,6 +68,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
         name: '',
         contractId: defaultContractId,
         taskContractRates: [],
+        state: RecordState.Active,
       });
     }
   }, [task, defaultContractId]);
@@ -108,6 +127,13 @@ const TaskForm: React.FC<TaskFormProps> = ({
     setLoading(true);
     setError('');
 
+    // Validate: don't allow creating new tasks on complete contracts
+    if (!task && isSelectedContractComplete) {
+      setError('Cannot add tasks to a complete contract. Please select an active contract.');
+      setLoading(false);
+      return;
+    }
+
     try {
       if (formData.id) {
         await tasksService.update(formData as Task);
@@ -117,7 +143,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
       onSave();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to save task');
+      setError(err.response?.data?.message || err.response?.data || 'Failed to save task');
     } finally {
       setLoading(false);
     }
@@ -153,21 +179,41 @@ const TaskForm: React.FC<TaskFormProps> = ({
 
             <div className="form-field">
               <label htmlFor="contractId">Contract</label>
-              <select
-                id="contractId"
-                value={formData.contractId || ''}
-                onChange={(e) =>
-                  handleChange('contractId', e.target.value === '' ? null : Number(e.target.value))
-                }
-                disabled={loading}
-              >
-                <option value="">Select...</option>
-                {contracts.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.description || `Contract ${c.id}`}
-                  </option>
-                ))}
-              </select>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <select
+                  id="contractId"
+                  value={formData.contractId || ''}
+                  onChange={(e) =>
+                    handleChange('contractId', e.target.value === '' ? null : Number(e.target.value))
+                  }
+                  disabled={loading}
+                >
+                  <option value="">Select...</option>
+                  {availableContracts.map((c) => (
+                    <option 
+                      key={c.id} 
+                      value={c.id}
+                      disabled={!task && c.state === RecordState.Complete}
+                    >
+                      {c.description || `Contract ${c.id}`}
+                      {c.state === RecordState.Complete ? ' (Complete)' : ''}
+                    </option>
+                  ))}
+                </select>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#666', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={showComplete}
+                    onChange={toggleShowComplete}
+                  />
+                  Show complete contracts
+                </label>
+                {isSelectedContractComplete && !task && (
+                  <div style={{ color: '#dc3545', fontSize: '13px' }}>
+                    ⚠ Cannot add new tasks to a complete contract
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="form-field">
@@ -251,6 +297,19 @@ const TaskForm: React.FC<TaskFormProps> = ({
                   Add
                 </button>
               </div>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="state">Status</label>
+              <select
+                id="state"
+                value={formData.state ?? RecordState.Active}
+                onChange={(e) => handleChange('state', Number(e.target.value))}
+                disabled={loading}
+              >
+                <option value={RecordState.Active}>Active</option>
+                <option value={RecordState.Complete}>Complete</option>
+              </select>
             </div>
           </div>
 

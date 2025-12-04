@@ -7,7 +7,7 @@ export interface FormField<T> {
   label: string;
   type: 'text' | 'number' | 'date' | 'select';
   required?: boolean;
-  options?: { value: any; label: string }[];
+  options?: { value: any; label: string; disabled?: boolean }[];
   defaultValue?: any;
 }
 
@@ -124,7 +124,11 @@ function EntityForm<T extends { id?: number }>({
                   >
                     <option value="">Select...</option>
                     {field.options?.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                      <option 
+                        key={opt.value} 
+                        value={opt.value}
+                        disabled={opt.disabled}
+                      >
                         {opt.label}
                       </option>
                     ))}
