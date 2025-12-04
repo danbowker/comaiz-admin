@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import EntityList from '../components/entities/EntityList';
-import EntityForm, { FormField } from '../components/entities/EntityForm';
+import WorkRecordForm from '../components/entities/WorkRecordForm';
 import { workRecordsService, usersService, tasksService } from '../services/entityService';
 import { WorkRecord, ApplicationUser, Task } from '../types';
-import { useAuth } from '../contexts/AuthContext';
 import { useContractSelection } from '../contexts/ContractSelectionContext';
 
 const WorkRecordsPage: React.FC = () => {
@@ -12,7 +11,6 @@ const WorkRecordsPage: React.FC = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<ApplicationUser[]>([]);
-  const { user } = useAuth();
   const { selectedContractId } = useContractSelection();
 
   const loadRelatedData = useCallback(async () => {
@@ -63,36 +61,6 @@ const WorkRecordsPage: React.FC = () => {
     { key: 'hours' as keyof WorkRecord, label: 'Hours' },
   ];
 
-  // Get current user's ID for defaulting
-  const getCurrentUserId = (): string | undefined => {
-    if (user && users.length > 0) {
-      const currentUser = users.find(u => u.userName === user.username || u.email === user.email);
-      return currentUser?.id;
-    }
-    return undefined;
-  };
-
-  const fields: FormField<WorkRecord>[] = [
-    {
-      name: 'taskId',
-      label: 'Task',
-      type: 'select',
-      required: false,
-      options: tasks.map((t) => ({ value: t.id, label: t.name })),
-    },
-    {
-      name: 'applicationUserId',
-      label: 'User',
-      type: 'select',
-      required: false,
-      options: users.map((u) => ({ value: u.id, label: u.userName || u.email || `User ${u.id}` })),
-      defaultValue: getCurrentUserId(),
-    },
-    { name: 'startDate', label: 'Start Date', type: 'date', required: true },
-    { name: 'endDate', label: 'End Date', type: 'date', required: true },
-    { name: 'hours', label: 'Hours', type: 'number', required: true },
-  ];
-
   const handleEdit = (item: WorkRecord) => {
     setSelectedItem(item);
     setShowForm(true);
@@ -110,6 +78,7 @@ const WorkRecordsPage: React.FC = () => {
 
   const handleSave = () => {
     setRefreshKey((prev) => prev + 1);
+    loadRelatedData();
   };
 
   const handleDelete = async (id: number) => {
@@ -137,11 +106,8 @@ const WorkRecordsPage: React.FC = () => {
         queryParams={queryParams}
       />
       {showForm && (
-        <EntityForm
-          title={selectedItem ? 'Edit Work Record' : 'Create Work Record'}
-          service={workRecordsService}
-          fields={fields}
-          item={selectedItem}
+        <WorkRecordForm
+          workRecord={selectedItem}
           onClose={handleClose}
           onSave={handleSave}
         />

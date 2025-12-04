@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
 import { contractsService, clientsService } from '../services/entityService';
-import { Contract, Client, ChargeType } from '../types';
+import { Contract, Client, ChargeType, RecordState } from '../types';
+import { useShowCompleteContracts } from '../hooks/useFilterPreferences';
 
 const ContractsPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Contract | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [clients, setClients] = useState<Client[]>([]);
+  const { showComplete, toggleShowComplete } = useShowCompleteContracts();
 
   useEffect(() => {
     loadClients();
@@ -50,7 +52,29 @@ const ContractsPage: React.FC = () => {
       label: 'Planned End',
       render: (item: Contract) => item.plannedEnd ? new Date(item.plannedEnd).toLocaleDateString() : ''
     },
+    { 
+      key: 'state' as keyof Contract, 
+      label: 'Status',
+      render: (item: Contract) => (
+        <span className={`status-badge ${item.state === RecordState.Complete ? 'complete' : 'active'}`}>
+          {item.state === RecordState.Complete ? 'Complete' : 'Active'}
+        </span>
+      )
+    },
   ];
+
+  // Query params to filter by state on the backend
+  const queryParams = useMemo(() => {
+    if (!showComplete) {
+      return { state: RecordState.Active };
+    }
+    return {};
+  }, [showComplete]);
+
+  // Row class function to style complete items
+  const getRowClassName = (item: Contract) => {
+    return item.state === RecordState.Complete ? 'row-complete' : '';
+  };
 
   const fields: FormField<Contract>[] = [
     {
@@ -118,6 +142,13 @@ const ContractsPage: React.FC = () => {
         onCreate={handleCreate}
         onDelete={handleDelete}
         onDuplicate={handleDuplicate}
+        queryParams={queryParams}
+        getRowClassName={getRowClassName}
+        filterToggle={{
+          label: 'Show complete contracts',
+          checked: showComplete,
+          onChange: toggleShowComplete,
+        }}
       />
       {showForm && (
         <EntityForm

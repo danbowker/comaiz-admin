@@ -2,8 +2,10 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import EntityList from '../components/entities/EntityList';
 import TaskForm from '../components/entities/TaskForm';
 import { tasksService, contractsService, contractRatesService, userContractRatesService } from '../services/entityService';
-import { Task, Contract, ContractRate, UserContractRate } from '../types';
+import { Task, Contract, ContractRate, UserContractRate, RecordState } from '../types';
 import { useContractSelection } from '../contexts/ContractSelectionContext';
+import { useShowCompleteTasks } from '../hooks/useFilterPreferences';
+import { isTaskEffectivelyActive } from '../utils/stateFilter';
 
 const TasksPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
@@ -13,6 +15,7 @@ const TasksPage: React.FC = () => {
   const [contractRates, setContractRates] = useState<ContractRate[]>([]);
   const [userContractRates, setUserContractRates] = useState<UserContractRate[]>([]);
   const { selectedContractId } = useContractSelection();
+  const { showComplete, toggleShowComplete } = useShowCompleteTasks();
 
   const loadRelatedData = useCallback(async () => {
     try {
@@ -35,11 +38,16 @@ const TasksPage: React.FC = () => {
   }, [loadRelatedData]);
 
   const queryParams = useMemo(() => {
+    const params: Record<string, any> = {};
     if (selectedContractId) {
-      return { contractId: selectedContractId };
+      params.contractId = selectedContractId;
     }
-    return {};
-  }, [selectedContractId]);
+    // Use backend state filtering when not showing complete items
+    if (!showComplete) {
+      params.state = RecordState.Active;
+    }
+    return params;
+  }, [selectedContractId, showComplete]);
 
   const columns = [
     { key: 'id' as keyof Task, label: 'ID' },
@@ -70,7 +78,32 @@ const TasksPage: React.FC = () => {
         return 'None';
       }
     },
+    { 
+      key: 'state' as keyof Task, 
+      label: 'Status',
+      render: (item: Task) => {
+        const effectivelyActive = isTaskEffectivelyActive(item, contracts);
+        if (!effectivelyActive && item.state === RecordState.Active) {
+          // Task is active but contract is complete
+          return (
+            <span className="status-badge complete" title="Contract is complete">
+              Complete (Contract)
+            </span>
+          );
+        }
+        return (
+          <span className={`status-badge ${item.state === RecordState.Complete ? 'complete' : 'active'}`}>
+            {item.state === RecordState.Complete ? 'Complete' : 'Active'}
+          </span>
+        );
+      }
+    },
   ];
+
+  // Row class function to style complete items
+  const getRowClassName = (item: Task) => {
+    return !isTaskEffectivelyActive(item, contracts) ? 'row-complete' : '';
+  };
 
   const handleEdit = (item: Task) => {
     setSelectedItem(item);
@@ -114,6 +147,12 @@ const TasksPage: React.FC = () => {
         onDelete={handleDelete}
         onDuplicate={handleDuplicate}
         queryParams={queryParams}
+        getRowClassName={getRowClassName}
+        filterToggle={{
+          label: 'Show complete tasks',
+          checked: showComplete,
+          onChange: toggleShowComplete,
+        }}
       />
       {showForm && (
         <TaskForm
