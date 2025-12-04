@@ -165,8 +165,9 @@ namespace comaiz.api.Controllers
             {
                 var taskInvoiceItems = invoiceItems.Where(ii => ii.TaskId == task.Id).ToList();
                 
+                // Total Invoiced includes both Issued and Paid invoices (paid invoices were previously issued)
                 var taskTotalInvoiced = taskInvoiceItems
-                    .Where(ii => ii.Invoice != null && ii.Invoice.State == InvoiceState.Issued)
+                    .Where(ii => ii.Invoice != null && (ii.Invoice.State == InvoiceState.Issued || ii.Invoice.State == InvoiceState.Paid))
                     .Sum(ii => ii.Price);
 
                 var taskTotalPaid = taskInvoiceItems

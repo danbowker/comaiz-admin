@@ -384,7 +384,8 @@ namespace comaiz.tests.Controllers
             Assert.Equal(1, details.ContractId);
             Assert.Equal("Test Contract", details.Description);
             Assert.Equal(10000m, details.Price);
-            Assert.Equal(2000m, details.TotalInvoiced); // 1000 + 1000 from Issued invoices
+            // Total Invoiced includes both Issued and Paid: 1000 (issued) + 500 (paid) + 1000 (issued) = 2500
+            Assert.Equal(2500m, details.TotalInvoiced);
             Assert.Equal(500m, details.TotalPaid); // 500 from Paid invoices
             Assert.Equal(9500m, details.Remaining); // 10000 - 500
             Assert.Equal(2, details.Tasks.Count);
