@@ -8,6 +8,12 @@ interface Column<T> {
   render?: (item: T) => React.ReactNode;
 }
 
+interface FilterToggleProps {
+  label: string;
+  checked: boolean;
+  onChange: () => void;
+}
+
 interface EntityListProps<T extends { id: number }> {
   title: string;
   service: EntityService<T>;
@@ -17,6 +23,8 @@ interface EntityListProps<T extends { id: number }> {
   onDelete: (id: number) => void;
   onDuplicate?: (id: number) => void;
   queryParams?: Record<string, any>;
+  getRowClassName?: (item: T) => string;
+  filterToggle?: FilterToggleProps;
 }
 
 function EntityList<T extends { id: number }>({
@@ -28,6 +36,8 @@ function EntityList<T extends { id: number }>({
   onDelete,
   onDuplicate,
   queryParams,
+  getRowClassName,
+  filterToggle,
 }: EntityListProps<T>) {
   const [items, setItems] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,9 +90,22 @@ function EntityList<T extends { id: number }>({
     <div className="entity-list">
       <div className="entity-header">
         <h2>{title}</h2>
-        <button className="btn-primary" onClick={onCreate}>
-          Create New
-        </button>
+        <div className="entity-header-controls">
+          {filterToggle && (
+            <label className="filter-toggle">
+              <input
+                type="checkbox"
+                checked={filterToggle.checked}
+                onChange={filterToggle.onChange}
+                aria-label={filterToggle.label}
+              />
+              <span>{filterToggle.label}</span>
+            </label>
+          )}
+          <button className="btn-primary" onClick={onCreate}>
+            Create New
+          </button>
+        </div>
       </div>
 
       {error && <div className="error-message">{error}</div>}
@@ -106,7 +129,7 @@ function EntityList<T extends { id: number }>({
               </tr>
             ) : (
               items.map((item) => (
-                <tr key={item.id}>
+                <tr key={item.id} className={getRowClassName ? getRowClassName(item) : ''}>
                   {columns.map((col) => (
                     <td key={String(col.key)}>
                       {col.render
