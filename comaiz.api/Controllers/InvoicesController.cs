@@ -134,7 +134,8 @@ namespace comaiz.api.Controllers
             {
                 Date = invoice.Date,
                 PurchaseOrder = invoice.PurchaseOrder,
-                ClientId = invoice.ClientId
+                ClientId = invoice.ClientId,
+                State = InvoiceState.Draft // Duplicated invoices always start as Draft
             };
 
             // Copy invoice items if they exist
@@ -151,7 +152,9 @@ namespace comaiz.api.Controllers
                         Unit = item.Unit,
                         Rate = item.Rate,
                         VATRate = item.VATRate,
-                        Price = item.Price
+                        Price = item.Price,
+                        StartDate = item.StartDate,
+                        EndDate = item.EndDate
                     });
                 }
             }

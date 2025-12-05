@@ -1,0 +1,142 @@
+.contract-details {
+  padding: 20px;
+}
+
+.details-header {
+  margin-bottom: 24px;
+}
+
+.details-header h2 {
+  margin: 16px 0 0 0;
+  color: #333;
+}
+
+.back-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.contract-summary {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.contract-summary h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-item .label {
+  font-size: 12px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summary-item .value {
+  font-size: 16px;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.invoice-tracking {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.invoice-tracking h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.invoice-tracking table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.invoice-tracking th,
+.invoice-tracking td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.invoice-tracking th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #475569;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.invoice-tracking td {
+  color: #1e293b;
+  font-size: 14px;
+}
+
+.contract-row {
+  background-color: #eff6ff;
+}
+
+.contract-row td {
+  font-weight: 600;
+}
+
+.task-row:hover {
+  background-color: #f8fafc;
+}
+
+.task-name {
+  padding-left: 24px !important;
+}
+
+.no-data {
+  text-align: center;
+  color: #64748b;
+  padding: 32px !important;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #64748b;
+}
+
+.error-message {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}

@@ -173,5 +173,110 @@ namespace comaiz.tests.Controllers
             // Assert
             Assert.IsType<NotFoundResult>(result);
         }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PostInvoiceItem_WithDates_SavesDatesCorrectly()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var startDate = new DateOnly(2025, 1, 1);
+            var endDate = new DateOnly(2025, 1, 31);
+            var invoiceItem = new InvoiceItem 
+            { 
+                InvoiceId = 1, 
+                TaskId = 1, 
+                Quantity = 8, 
+                Rate = 60m, 
+                VATRate = 0.20m, 
+                Price = 576m,
+                StartDate = startDate,
+                EndDate = endDate
+            };
+            var controller = new InvoiceItemsController(context);
+
+            // Act
+            var result = await controller.PostInvoiceItem(invoiceItem);
+
+            // Assert
+            var savedInvoiceItem = await context.InvoiceItems!.FindAsync(invoiceItem.Id);
+            Assert.NotNull(savedInvoiceItem);
+            Assert.Equal(startDate, savedInvoiceItem.StartDate);
+            Assert.Equal(endDate, savedInvoiceItem.EndDate);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PutInvoiceItem_UpdatesDates()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var invoiceItem = new InvoiceItem { Id = 1, InvoiceId = 1, TaskId = 1, Quantity = 10, Rate = 50m, VATRate = 0.20m, Price = 600m };
+            context.InvoiceItems!.Add(invoiceItem);
+            await context.SaveChangesAsync();
+            
+            context.Entry(invoiceItem).State = EntityState.Detached;
+            
+            var startDate = new DateOnly(2025, 2, 1);
+            var endDate = new DateOnly(2025, 2, 28);
+            var updatedInvoiceItem = new InvoiceItem 
+            { 
+                Id = 1, 
+                InvoiceId = 1, 
+                TaskId = 1, 
+                Quantity = 15, 
+                Rate = 55m, 
+                VATRate = 0.20m, 
+                Price = 990m,
+                StartDate = startDate,
+                EndDate = endDate
+            };
+            var controller = new InvoiceItemsController(context);
+
+            // Act
+            var result = await controller.PutInvoiceItem(updatedInvoiceItem);
+
+            // Assert
+            Assert.IsType<NoContentResult>(result);
+            
+            var savedInvoiceItem = await context.InvoiceItems.FindAsync(1);
+            Assert.Equal(startDate, savedInvoiceItem!.StartDate);
+            Assert.Equal(endDate, savedInvoiceItem.EndDate);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task DuplicateInvoiceItem_CopiesDates()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var startDate = new DateOnly(2025, 3, 1);
+            var endDate = new DateOnly(2025, 3, 31);
+            var invoiceItem = new InvoiceItem 
+            { 
+                Id = 1, 
+                InvoiceId = 1, 
+                TaskId = 1, 
+                Quantity = 10, 
+                Rate = 50m, 
+                VATRate = 0.20m, 
+                Price = 600m,
+                StartDate = startDate,
+                EndDate = endDate
+            };
+            context.InvoiceItems!.Add(invoiceItem);
+            await context.SaveChangesAsync();
+            
+            var controller = new InvoiceItemsController(context);
+
+            // Act
+            var result = await controller.DuplicateInvoiceItem(1);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<InvoiceItem>>(result);
+            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
+            var duplicatedItem = Assert.IsType<InvoiceItem>(createdAtActionResult.Value);
+            
+            Assert.NotEqual(1, duplicatedItem.Id);
+            Assert.Equal(startDate, duplicatedItem.StartDate);
+            Assert.Equal(endDate, duplicatedItem.EndDate);
+        }
     }
 }

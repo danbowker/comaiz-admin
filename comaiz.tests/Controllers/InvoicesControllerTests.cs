@@ -171,5 +171,98 @@ namespace comaiz.tests.Controllers
             // Assert
             Assert.IsType<NotFoundResult>(result);
         }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PostInvoice_DefaultStateIsDraft()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var invoice = new Invoice { Date = DateOnly.FromDateTime(DateTime.Now), ClientId = 1 };
+            var controller = new InvoicesController(context);
+
+            // Act
+            var result = await controller.PostInvoice(invoice);
+
+            // Assert
+            var savedInvoice = await context.Invoices!.FindAsync(invoice.Id);
+            Assert.NotNull(savedInvoice);
+            Assert.Equal(InvoiceState.Draft, savedInvoice.State);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PostInvoice_WithState_SavesStateCorrectly()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var invoice = new Invoice 
+            { 
+                Date = DateOnly.FromDateTime(DateTime.Now), 
+                ClientId = 1,
+                State = InvoiceState.Issued
+            };
+            var controller = new InvoicesController(context);
+
+            // Act
+            var result = await controller.PostInvoice(invoice);
+
+            // Assert
+            var savedInvoice = await context.Invoices!.FindAsync(invoice.Id);
+            Assert.NotNull(savedInvoice);
+            Assert.Equal(InvoiceState.Issued, savedInvoice.State);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PutInvoice_UpdatesState()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var invoice = new Invoice { Id = 1, Date = DateOnly.FromDateTime(DateTime.Now), ClientId = 1, State = InvoiceState.Draft };
+            context.Invoices!.Add(invoice);
+            await context.SaveChangesAsync();
+            
+            context.Entry(invoice).State = EntityState.Detached;
+            
+            var updatedInvoice = new Invoice { Id = 1, Date = DateOnly.FromDateTime(DateTime.Now), ClientId = 1, State = InvoiceState.Paid };
+            var controller = new InvoicesController(context);
+
+            // Act
+            var result = await controller.PutInvoice(updatedInvoice);
+
+            // Assert
+            Assert.IsType<NoContentResult>(result);
+            
+            var savedInvoice = await context.Invoices.FindAsync(1);
+            Assert.Equal(InvoiceState.Paid, savedInvoice!.State);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task DuplicateInvoice_SetsStateToDraft()
+        {
+            // Arrange
+            using var context = CreateInMemoryContext();
+            var invoice = new Invoice 
+            { 
+                Id = 1, 
+                Date = DateOnly.FromDateTime(DateTime.Now), 
+                ClientId = 1, 
+                State = InvoiceState.Paid,
+                PurchaseOrder = "PO-123"
+            };
+            context.Invoices!.Add(invoice);
+            await context.SaveChangesAsync();
+            
+            var controller = new InvoicesController(context);
+
+            // Act
+            var result = await controller.DuplicateInvoice(1);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<Invoice>>(result);
+            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
+            var duplicatedInvoice = Assert.IsType<Invoice>(createdAtActionResult.Value);
+            
+            // Duplicated invoice should always be in Draft state
+            Assert.Equal(InvoiceState.Draft, duplicatedInvoice.State);
+        }
     }
 }

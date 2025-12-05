@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
 import { invoicesService, clientsService } from '../services/entityService';
-import { Invoice, Client } from '../types';
+import { Invoice, Client, InvoiceState } from '../types';
 import { useContractSelection } from '../contexts/ContractSelectionContext';
 
 const InvoicesPage: React.FC = () => {
@@ -44,6 +44,11 @@ const InvoicesPage: React.FC = () => {
     },
     { key: 'date' as keyof Invoice, label: 'Date' },
     { key: 'purchaseOrder' as keyof Invoice, label: 'Purchase Order' },
+    { 
+      key: 'state' as keyof Invoice, 
+      label: 'State',
+      render: (item: Invoice) => InvoiceState[item.state]
+    },
   ];
 
   const fields: FormField<Invoice>[] = [
@@ -56,6 +61,18 @@ const InvoicesPage: React.FC = () => {
     },
     { name: 'date', label: 'Date', type: 'date', required: true },
     { name: 'purchaseOrder', label: 'Purchase Order', type: 'text' },
+    {
+      name: 'state',
+      label: 'State',
+      type: 'select',
+      required: true,
+      options: [
+        { value: InvoiceState.Draft, label: 'Draft' },
+        { value: InvoiceState.Issued, label: 'Issued' },
+        { value: InvoiceState.Paid, label: 'Paid' },
+      ],
+      defaultValue: InvoiceState.Draft,
+    },
   ];
 
   const handleEdit = (item: Invoice) => {

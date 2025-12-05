@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
-import { invoiceItemsService, tasksService, fixedCostsService } from '../services/entityService';
-import { InvoiceItem, Task, FixedCost } from '../types';
+import { invoiceItemsService, tasksService, fixedCostsService, invoicesService } from '../services/entityService';
+import { InvoiceItem, Task, FixedCost, Invoice, InvoiceState } from '../types';
 import { useContractSelection } from '../contexts/ContractSelectionContext';
 
 const InvoiceItemsPage: React.FC = () => {
@@ -11,17 +11,21 @@ const InvoiceItemsPage: React.FC = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [fixedCosts, setFixedCosts] = useState<FixedCost[]>([]);
+  const [draftInvoices, setDraftInvoices] = useState<Invoice[]>([]);
   const { selectedContractId } = useContractSelection();
 
   const loadRelatedData = useCallback(async () => {
     try {
       const filterParams = selectedContractId ? { contractId: selectedContractId } : undefined;
-      const [tasksData, fixedCostsData] = await Promise.all([
+      const [tasksData, fixedCostsData, invoicesData] = await Promise.all([
         tasksService.getAll(filterParams),
         fixedCostsService.getAll(filterParams),
+        invoicesService.getAll(filterParams),
       ]);
       setTasks(tasksData);
       setFixedCosts(fixedCostsData);
+      // Filter to only show draft invoices for selection
+      setDraftInvoices(invoicesData.filter(inv => inv.state === InvoiceState.Draft));
     } catch (err) {
       console.error('Failed to load related data', err);
     }
@@ -37,6 +41,12 @@ const InvoiceItemsPage: React.FC = () => {
     }
     return {};
   }, [selectedContractId]);
+
+  // Helper function to format invoice label for display
+  const formatInvoiceLabel = (invoice: Invoice) => {
+    const date = new Date(invoice.date).toLocaleDateString();
+    return `Invoice ${invoice.id} - ${date}${invoice.purchaseOrder ? ` (${invoice.purchaseOrder})` : ''}`;
+  };
 
   const columns = [
     { key: 'id' as keyof InvoiceItem, label: 'ID' },
@@ -66,10 +76,26 @@ const InvoiceItemsPage: React.FC = () => {
     { key: 'quantity' as keyof InvoiceItem, label: 'Quantity' },
     { key: 'rate' as keyof InvoiceItem, label: 'Rate' },
     { key: 'price' as keyof InvoiceItem, label: 'Price' },
+    { 
+      key: 'startDate' as keyof InvoiceItem, 
+      label: 'Start Date',
+      render: (item: InvoiceItem) => item.startDate ? new Date(item.startDate).toLocaleDateString() : ''
+    },
+    { 
+      key: 'endDate' as keyof InvoiceItem, 
+      label: 'End Date',
+      render: (item: InvoiceItem) => item.endDate ? new Date(item.endDate).toLocaleDateString() : ''
+    },
   ];
 
   const fields: FormField<InvoiceItem>[] = [
-    { name: 'invoiceId', label: 'Invoice ID', type: 'number', required: true },
+    {
+      name: 'invoiceId',
+      label: 'Invoice (Draft)',
+      type: 'select',
+      required: true,
+      options: draftInvoices.map((inv) => ({ value: inv.id, label: formatInvoiceLabel(inv) })),
+    },
     {
       name: 'taskId',
       label: 'Task',
@@ -89,6 +115,8 @@ const InvoiceItemsPage: React.FC = () => {
     { name: 'rate', label: 'Rate', type: 'number', required: true },
     { name: 'vatRate', label: 'VAT Rate', type: 'number', required: true },
     { name: 'price', label: 'Price', type: 'number', required: true },
+    { name: 'startDate', label: 'Start Date', type: 'date' },
+    { name: 'endDate', label: 'End Date', type: 'date' },
   ];
 
   const handleEdit = (item: InvoiceItem) => {
