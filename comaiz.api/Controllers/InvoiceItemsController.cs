@@ -188,7 +188,7 @@ namespace comaiz.api.Controllers
             if (dbContext.InvoiceItems == null || dbContext.Tasks == null || dbContext.WorkRecords == null) 
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
-            // Get the task
+            // Get the task with related data
             var task = await dbContext.Tasks
                 .Include(t => t.TaskContractRates)
                     .ThenInclude(tcr => tcr.UserContractRate)
@@ -203,24 +203,9 @@ namespace comaiz.api.Controllers
                 return BadRequest("Task not found");
             }
 
-            decimal quantity = 0m;
-            decimal rate = 0m;
-            string? description = dto.Description;
-            string? workerName = null;
-
             // Calculate quantity from work records if date range is provided
-            if (dto.StartDate.HasValue && dto.EndDate.HasValue && !string.IsNullOrEmpty(dto.ApplicationUserId))
-            {
-                var workRecords = await dbContext.WorkRecords
-                    .Where(wr => wr.TaskId == dto.TaskId 
-                        && wr.ApplicationUserId == dto.ApplicationUserId
-                        && wr.StartDate >= dto.StartDate.Value
-                        && wr.EndDate <= dto.EndDate.Value)
-                    .ToListAsync();
-                
-                quantity = workRecords.Sum(wr => wr.Hours);
-            }
-
+            decimal quantity = await CalculateQuantityFromWorkRecords(dto);
+            
             // If quantity was provided manually, use that instead
             if (dto.Quantity.HasValue)
             {
@@ -228,42 +213,23 @@ namespace comaiz.api.Controllers
             }
 
             // Get rate from user contract rate for the task
-            if (!string.IsNullOrEmpty(dto.ApplicationUserId))
-            {
-                var taskContractRate = task.TaskContractRates?
-                    .FirstOrDefault(tcr => tcr.UserContractRate?.ApplicationUserId == dto.ApplicationUserId);
-                
-                if (taskContractRate?.UserContractRate?.ContractRate?.Rate.HasValue == true)
-                {
-                    rate = taskContractRate.UserContractRate.ContractRate.Rate.Value;
-                }
-
-                // Get worker name
-                var user = await dbContext.Users.FindAsync(dto.ApplicationUserId);
-                workerName = user?.UserName;
-            }
-
+            decimal rate = GetRateFromTaskContractRate(task, dto.ApplicationUserId);
+            
             // If rate was provided manually, use that instead
             if (dto.Rate.HasValue)
             {
                 rate = dto.Rate.Value;
             }
 
-            // Generate description if not provided
-            if (string.IsNullOrEmpty(description))
+            // Get worker name and generate description if not provided
+            string? workerName = null;
+            if (!string.IsNullOrEmpty(dto.ApplicationUserId))
             {
-                var parts = new List<string>();
-                parts.Add(task.Name);
-                if (!string.IsNullOrEmpty(workerName))
-                {
-                    parts.Add(workerName);
-                }
-                if (dto.StartDate.HasValue && dto.EndDate.HasValue)
-                {
-                    parts.Add($"{dto.StartDate.Value:yyyy-MM-dd} to {dto.EndDate.Value:yyyy-MM-dd}");
-                }
-                description = string.Join(" - ", parts);
+                var user = await dbContext.Users.FindAsync(dto.ApplicationUserId);
+                workerName = user?.UserName;
             }
+
+            string description = GenerateLabourDescription(dto.Description, task.Name, workerName, dto.StartDate, dto.EndDate);
 
             var price = quantity * rate;
             var priceIncVAT = price * (1 + dto.VATRate);
@@ -287,6 +253,59 @@ namespace comaiz.api.Controllers
             await dbContext.SaveChangesAsync();
 
             return CreatedAtAction("GetInvoiceItem", new { id = invoiceItem.Id }, invoiceItem);
+        }
+
+        private async Task<decimal> CalculateQuantityFromWorkRecords(CreateLabourCostInvoiceItemDto dto)
+        {
+            if (dto.StartDate.HasValue && dto.EndDate.HasValue && !string.IsNullOrEmpty(dto.ApplicationUserId))
+            {
+                var workRecords = await dbContext.WorkRecords!
+                    .Where(wr => wr.TaskId == dto.TaskId 
+                        && wr.ApplicationUserId == dto.ApplicationUserId
+                        && wr.StartDate >= dto.StartDate.Value
+                        && wr.EndDate <= dto.EndDate.Value)
+                    .ToListAsync();
+                
+                return workRecords.Sum(wr => wr.Hours);
+            }
+            return 0m;
+        }
+
+        private decimal GetRateFromTaskContractRate(comaiz.data.Models.Task task, string? applicationUserId)
+        {
+            if (!string.IsNullOrEmpty(applicationUserId))
+            {
+                var taskContractRate = task.TaskContractRates?
+                    .FirstOrDefault(tcr => tcr.UserContractRate?.ApplicationUserId == applicationUserId);
+                
+                if (taskContractRate?.UserContractRate?.ContractRate?.Rate.HasValue == true)
+                {
+                    return taskContractRate.UserContractRate.ContractRate.Rate.Value;
+                }
+            }
+            return 0m;
+        }
+
+        private string GenerateLabourDescription(string? providedDescription, string taskName, string? workerName, DateOnly? startDate, DateOnly? endDate)
+        {
+            if (!string.IsNullOrEmpty(providedDescription))
+            {
+                return providedDescription;
+            }
+
+            var parts = new List<string> { taskName };
+            
+            if (!string.IsNullOrEmpty(workerName))
+            {
+                parts.Add(workerName);
+            }
+            
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                parts.Add($"{startDate.Value:yyyy-MM-dd} to {endDate.Value:yyyy-MM-dd}");
+            }
+            
+            return string.Join(" - ", parts);
         }
 
         [HttpPost("create-mileage-cost")]

@@ -63,7 +63,7 @@ const CreateLabourCostForm: React.FC<CreateLabourCostFormProps> = ({
   }, [formData.taskId, users, workRecords]);
 
   // Calculate quantity from work records when dates and user are selected
-  useEffect(() => {
+  const calculatedQuantity = useMemo(() => {
     if (formData.taskId && formData.applicationUserId && formData.startDate && formData.endDate) {
       const startDate = new Date(formData.startDate);
       const endDate = new Date(formData.endDate);
@@ -77,10 +77,16 @@ const CreateLabourCostForm: React.FC<CreateLabourCostFormProps> = ({
         return wrStart >= startDate && wrEnd <= endDate;
       });
       
-      const totalHours = relevantRecords.reduce((sum, wr) => sum + wr.hours, 0);
-      setFormData((prev) => ({ ...prev, quantity: totalHours }));
+      return relevantRecords.reduce((sum, wr) => sum + wr.hours, 0);
     }
+    return undefined;
   }, [formData.taskId, formData.applicationUserId, formData.startDate, formData.endDate, workRecords]);
+
+  useEffect(() => {
+    if (calculatedQuantity !== undefined) {
+      setFormData((prev) => ({ ...prev, quantity: calculatedQuantity }));
+    }
+  }, [calculatedQuantity]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,7 +161,15 @@ const CreateLabourCostForm: React.FC<CreateLabourCostFormProps> = ({
             <select
               id="taskId"
               value={formData.taskId}
-              onChange={(e) => setFormData({ ...formData, taskId: Number(e.target.value), applicationUserId: undefined })}
+              onChange={(e) => {
+                const newTaskId = Number(e.target.value);
+                setFormData({ 
+                  ...formData, 
+                  taskId: newTaskId, 
+                  applicationUserId: undefined,
+                  quantity: undefined
+                });
+              }}
               required
             >
               <option value={0}>Select a task</option>
