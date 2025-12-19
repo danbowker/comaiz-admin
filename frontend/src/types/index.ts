@@ -40,6 +40,11 @@ export enum InvoiceState {
   Paid = 2,
 }
 
+export enum Unit {
+  Hours = 0,
+  Miles = 1,
+}
+
 export interface ContractRate {
   id: number;
   contractId: number;
@@ -105,12 +110,42 @@ export interface InvoiceItem {
   taskId?: number;
   fixedCostId?: number;
   quantity: number;
-  unit: number;
+  unit: Unit;
   rate: number;
   vatRate: number;
   price: number;
+  priceIncVAT: number;
+  description?: string;
   startDate?: string;
   endDate?: string;
+}
+
+export interface CreateFixedCostInvoiceItemDto {
+  invoiceId: number;
+  fixedCostId: number;
+  vatRate: number;
+}
+
+export interface CreateLabourCostInvoiceItemDto {
+  invoiceId: number;
+  contractId?: number;
+  taskId: number;
+  applicationUserId?: string;
+  startDate?: string;
+  endDate?: string;
+  quantity?: number;
+  rate?: number;
+  vatRate: number;
+  description?: string;
+}
+
+export interface CreateMileageCostInvoiceItemDto {
+  invoiceId: number;
+  contractId?: number;
+  quantity: number;
+  rate: number;
+  vatRate: number;
+  description?: string;
 }
 
 export interface LoginRequest {
