@@ -400,6 +400,9 @@ namespace comaiz.data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
                     b.Property<DateOnly?>("EndDate")
                         .HasColumnType("date");
 
@@ -412,8 +415,11 @@ namespace comaiz.data.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
+                    b.Property<decimal>("PriceIncVAT")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("numeric");
 
                     b.Property<decimal>("Rate")
                         .HasColumnType("numeric");
