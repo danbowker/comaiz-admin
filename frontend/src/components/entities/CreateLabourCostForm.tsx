@@ -88,6 +88,29 @@ const CreateLabourCostForm: React.FC<CreateLabourCostFormProps> = ({
     }
   }, [calculatedQuantity]);
 
+  // Calculate rate from task contract rates when task and user are selected
+  const calculatedRate = useMemo(() => {
+    if (formData.taskId && formData.applicationUserId) {
+      const selectedTask = tasks.find((t) => t.id === formData.taskId);
+      if (selectedTask?.taskContractRates) {
+        const taskContractRate = selectedTask.taskContractRates.find(
+          (tcr) => tcr.userContractRate?.applicationUserId === formData.applicationUserId
+        );
+        
+        if (taskContractRate?.userContractRate?.contractRate?.rate) {
+          return taskContractRate.userContractRate.contractRate.rate;
+        }
+      }
+    }
+    return undefined;
+  }, [formData.taskId, formData.applicationUserId, tasks]);
+
+  useEffect(() => {
+    if (calculatedRate !== undefined) {
+      setFormData((prev) => ({ ...prev, rate: calculatedRate }));
+    }
+  }, [calculatedRate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -167,7 +190,8 @@ const CreateLabourCostForm: React.FC<CreateLabourCostFormProps> = ({
                   ...formData, 
                   taskId: newTaskId, 
                   applicationUserId: undefined,
-                  quantity: undefined
+                  quantity: undefined,
+                  rate: undefined
                 });
               }}
               required
