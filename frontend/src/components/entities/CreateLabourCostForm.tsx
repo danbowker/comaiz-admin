@@ -151,157 +151,160 @@ const CreateLabourCostForm: React.FC<CreateLabourCostFormProps> = ({
   const calculatedPriceIncVAT = calculatedPrice * (1 + formData.vatRate);
 
   return (
-    <div className="entity-form-overlay">
-      <div className="entity-form-container" style={{ maxWidth: '600px' }}>
-        <div className="entity-form-header">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
           <h2>Create Labour Cost Invoice Item</h2>
-          <button className="close-button" onClick={onClose} aria-label="Close">
+          <button className="close-btn" onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="entity-form-body">
-          {error && <div className="error-message">{error}</div>}
-          
-          <div className="form-field">
-            <label htmlFor="invoiceId">Invoice (Draft) *</label>
-            <select
-              id="invoiceId"
-              value={formData.invoiceId}
-              onChange={(e) => setFormData({ ...formData, invoiceId: Number(e.target.value) })}
-              required
-            >
-              <option value={0}>Select an invoice</option>
-              {invoices.map((inv) => (
-                <option key={inv.id} value={inv.id}>
-                  {formatInvoiceLabel(inv)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="taskId">Task *</label>
-            <select
-              id="taskId"
-              value={formData.taskId}
-              onChange={(e) => {
-                const newTaskId = Number(e.target.value);
-                setFormData({ 
-                  ...formData, 
-                  taskId: newTaskId, 
-                  applicationUserId: undefined,
-                  quantity: undefined,
-                  rate: undefined
-                });
-              }}
-              required
-            >
-              <option value={0}>Select a task</option>
-              {filteredTasks.map((task) => (
-                <option key={task.id} value={task.id}>
-                  {task.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="applicationUserId">Worker (optional)</label>
-            <select
-              id="applicationUserId"
-              value={formData.applicationUserId || ''}
-              onChange={(e) => setFormData({ ...formData, applicationUserId: e.target.value || undefined })}
-            >
-              <option value="">Select a worker</option>
-              {filteredUsers.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.userName || user.email}
-                </option>
-              ))}
-            </select>
-            <small>Filtered to workers who have worked on the selected task</small>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+        <form onSubmit={handleSubmit}>
+          <div className="form-body">
+            {error && <div className="error-message">{error}</div>}
+            
             <div className="form-field">
-              <label htmlFor="startDate">Start Date</label>
-              <input
-                type="date"
-                id="startDate"
-                value={formData.startDate || ''}
-                onChange={(e) => setFormData({ ...formData, startDate: e.target.value || undefined })}
-              />
+              <label htmlFor="invoiceId">Invoice (Draft) <span className="required">*</span></label>
+              <select
+                id="invoiceId"
+                value={formData.invoiceId}
+                onChange={(e) => setFormData({ ...formData, invoiceId: Number(e.target.value) })}
+                required
+              >
+                <option value={0}>Select an invoice</option>
+                {invoices.map((inv) => (
+                  <option key={inv.id} value={inv.id}>
+                    {formatInvoiceLabel(inv)}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="form-field">
-              <label htmlFor="endDate">End Date</label>
+              <label htmlFor="taskId">Task <span className="required">*</span></label>
+              <select
+                id="taskId"
+                value={formData.taskId}
+                onChange={(e) => {
+                  const newTaskId = Number(e.target.value);
+                  setFormData({ 
+                    ...formData, 
+                    taskId: newTaskId, 
+                    applicationUserId: undefined,
+                    quantity: undefined,
+                    rate: undefined
+                  });
+                }}
+                required
+              >
+                <option value={0}>Select a task</option>
+                {filteredTasks.map((task) => (
+                  <option key={task.id} value={task.id}>
+                    {task.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="applicationUserId">Worker (optional)</label>
+              <select
+                id="applicationUserId"
+                value={formData.applicationUserId || ''}
+                onChange={(e) => setFormData({ ...formData, applicationUserId: e.target.value || undefined })}
+              >
+                <option value="">Select a worker</option>
+                {filteredUsers.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.userName || user.email}
+                  </option>
+                ))}
+              </select>
+              <small>Filtered to workers who have worked on the selected task</small>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="form-field">
+                <label htmlFor="startDate">Start Date</label>
+                <input
+                  type="date"
+                  id="startDate"
+                  value={formData.startDate || ''}
+                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value || undefined })}
+                />
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="endDate">End Date</label>
+                <input
+                  type="date"
+                  id="endDate"
+                  value={formData.endDate || ''}
+                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value || undefined })}
+                />
+              </div>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="quantity">Quantity (Hours) <span className="required">*</span></label>
               <input
-                type="date"
-                id="endDate"
-                value={formData.endDate || ''}
-                onChange={(e) => setFormData({ ...formData, endDate: e.target.value || undefined })}
+                type="number"
+                id="quantity"
+                step="0.01"
+                value={formData.quantity || ''}
+                onChange={(e) => setFormData({ ...formData, quantity: e.target.value ? Number(e.target.value) : undefined })}
+                required
               />
+              <small>Auto-calculated from work records if dates and worker are selected</small>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="rate">Hourly Rate <span className="required">*</span></label>
+              <input
+                type="number"
+                id="rate"
+                step="0.01"
+                value={formData.rate || ''}
+                onChange={(e) => setFormData({ ...formData, rate: e.target.value ? Number(e.target.value) : undefined })}
+                required
+              />
+              <small>Auto-populated from user contract rate when worker is selected</small>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="vatRate">VAT Rate (decimal)</label>
+              <input
+                type="number"
+                id="vatRate"
+                step="0.01"
+                value={formData.vatRate}
+                onChange={(e) => setFormData({ ...formData, vatRate: Number(e.target.value) })}
+              />
+              <small>e.g., 0.20 for 20%</small>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="description">Description / Notes</label>
+              <textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={2}
+              />
+              <small>Auto-generated from task, worker and dates if left blank</small>
+            </div>
+
+            <div className="form-field" style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '4px' }}>
+              <strong>Calculated Price:</strong> £{calculatedPrice.toFixed(2)}<br />
+              <strong>Price Inc VAT:</strong> £{calculatedPriceIncVAT.toFixed(2)}
             </div>
           </div>
 
-          <div className="form-field">
-            <label htmlFor="quantity">Quantity (Hours) *</label>
-            <input
-              type="number"
-              id="quantity"
-              step="0.01"
-              value={formData.quantity || ''}
-              onChange={(e) => setFormData({ ...formData, quantity: e.target.value ? Number(e.target.value) : undefined })}
-              required
-            />
-            <small>Auto-calculated from work records if dates and worker are selected</small>
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="rate">Hourly Rate *</label>
-            <input
-              type="number"
-              id="rate"
-              step="0.01"
-              value={formData.rate || ''}
-              onChange={(e) => setFormData({ ...formData, rate: e.target.value ? Number(e.target.value) : undefined })}
-              required
-            />
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="vatRate">VAT Rate (decimal)</label>
-            <input
-              type="number"
-              id="vatRate"
-              step="0.01"
-              value={formData.vatRate}
-              onChange={(e) => setFormData({ ...formData, vatRate: Number(e.target.value) })}
-            />
-            <small>e.g., 0.20 for 20%</small>
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="description">Description / Notes</label>
-            <textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={2}
-            />
-            <small>Auto-generated from task, worker and dates if left blank</small>
-          </div>
-
-          <div className="form-field" style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '4px' }}>
-            <strong>Calculated Price:</strong> £{calculatedPrice.toFixed(2)}<br />
-            <strong>Price Inc VAT:</strong> £{calculatedPriceIncVAT.toFixed(2)}
-          </div>
-
-          <div className="form-actions">
-            <button type="button" onClick={onClose} disabled={loading}>
+          <div className="form-footer">
+            <button type="button" className="btn-cancel" onClick={onClose} disabled={loading}>
               Cancel
             </button>
-            <button type="submit" className="button-primary" disabled={loading}>
+            <button type="submit" className="btn-submit" disabled={loading}>
               {loading ? 'Creating...' : 'Create'}
             </button>
           </div>

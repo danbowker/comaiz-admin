@@ -73,19 +73,19 @@ const CreateInvoiceItemMenu: React.FC<CreateInvoiceItemMenuProps> = ({
 
   // Menu selection
   return (
-    <div className="entity-form-overlay">
-      <div className="entity-form-container">
-        <div className="entity-form-header">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
           <h2>Create New Invoice Item</h2>
-          <button className="close-button" onClick={onClose} aria-label="Close">
+          <button className="close-btn" onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>
-        <div className="entity-form-body">
+        <div className="form-body">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <button
               type="button"
-              className="button button-primary"
+              className="btn-submit"
               onClick={() => setFormType('fixed-cost')}
               style={{ padding: '1rem', fontSize: '1rem' }}
             >
@@ -93,7 +93,7 @@ const CreateInvoiceItemMenu: React.FC<CreateInvoiceItemMenuProps> = ({
             </button>
             <button
               type="button"
-              className="button button-primary"
+              className="btn-submit"
               onClick={() => setFormType('labour-cost')}
               style={{ padding: '1rem', fontSize: '1rem' }}
             >
@@ -101,7 +101,7 @@ const CreateInvoiceItemMenu: React.FC<CreateInvoiceItemMenuProps> = ({
             </button>
             <button
               type="button"
-              className="button button-primary"
+              className="btn-submit"
               onClick={() => setFormType('mileage-cost')}
               style={{ padding: '1rem', fontSize: '1rem' }}
             >

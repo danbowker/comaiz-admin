@@ -58,68 +58,70 @@ const CreateFixedCostForm: React.FC<CreateFixedCostFormProps> = ({
   };
 
   return (
-    <div className="entity-form-overlay">
-      <div className="entity-form-container">
-        <div className="entity-form-header">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
           <h2>Create Fixed Cost Invoice Item</h2>
-          <button className="close-button" onClick={onClose} aria-label="Close">
+          <button className="close-btn" onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="entity-form-body">
-          {error && <div className="error-message">{error}</div>}
-          
-          <div className="form-field">
-            <label htmlFor="invoiceId">Invoice (Draft) *</label>
-            <select
-              id="invoiceId"
-              value={formData.invoiceId}
-              onChange={(e) => setFormData({ ...formData, invoiceId: Number(e.target.value) })}
-              required
-            >
-              <option value={0}>Select an invoice</option>
-              {invoices.map((inv) => (
-                <option key={inv.id} value={inv.id}>
-                  {formatInvoiceLabel(inv)}
-                </option>
-              ))}
-            </select>
+        <form onSubmit={handleSubmit}>
+          <div className="form-body">
+            {error && <div className="error-message">{error}</div>}
+            
+            <div className="form-field">
+              <label htmlFor="invoiceId">Invoice (Draft) <span className="required">*</span></label>
+              <select
+                id="invoiceId"
+                value={formData.invoiceId}
+                onChange={(e) => setFormData({ ...formData, invoiceId: Number(e.target.value) })}
+                required
+              >
+                <option value={0}>Select an invoice</option>
+                {invoices.map((inv) => (
+                  <option key={inv.id} value={inv.id}>
+                    {formatInvoiceLabel(inv)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="fixedCostId">Fixed Cost <span className="required">*</span></label>
+              <select
+                id="fixedCostId"
+                value={formData.fixedCostId}
+                onChange={(e) => setFormData({ ...formData, fixedCostId: Number(e.target.value) })}
+                required
+              >
+                <option value={0}>Select a fixed cost</option>
+                {filteredFixedCosts.map((fc) => (
+                  <option key={fc.id} value={fc.id}>
+                    {fc.name || `Fixed Cost ${fc.id}`} {fc.amount ? `(£${fc.amount})` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="vatRate">VAT Rate (decimal)</label>
+              <input
+                type="number"
+                id="vatRate"
+                step="0.01"
+                value={formData.vatRate}
+                onChange={(e) => setFormData({ ...formData, vatRate: Number(e.target.value) })}
+              />
+              <small>e.g., 0 for 0%, 0.20 for 20%</small>
+            </div>
           </div>
 
-          <div className="form-field">
-            <label htmlFor="fixedCostId">Fixed Cost *</label>
-            <select
-              id="fixedCostId"
-              value={formData.fixedCostId}
-              onChange={(e) => setFormData({ ...formData, fixedCostId: Number(e.target.value) })}
-              required
-            >
-              <option value={0}>Select a fixed cost</option>
-              {filteredFixedCosts.map((fc) => (
-                <option key={fc.id} value={fc.id}>
-                  {fc.name || `Fixed Cost ${fc.id}`} {fc.amount ? `(£${fc.amount})` : ''}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="vatRate">VAT Rate (decimal)</label>
-            <input
-              type="number"
-              id="vatRate"
-              step="0.01"
-              value={formData.vatRate}
-              onChange={(e) => setFormData({ ...formData, vatRate: Number(e.target.value) })}
-            />
-            <small>e.g., 0 for 0%, 0.20 for 20%</small>
-          </div>
-
-          <div className="form-actions">
-            <button type="button" onClick={onClose} disabled={loading}>
+          <div className="form-footer">
+            <button type="button" className="btn-cancel" onClick={onClose} disabled={loading}>
               Cancel
             </button>
-            <button type="submit" className="button-primary" disabled={loading}>
+            <button type="submit" className="btn-submit" disabled={loading}>
               {loading ? 'Creating...' : 'Create'}
             </button>
           </div>
