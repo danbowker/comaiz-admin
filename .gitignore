@@ -496,3 +496,14 @@ frontend/.env.production.local
 frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
+
+# E2E Testing
+frontend/playwright-report/
+frontend/test-results/
+frontend/screenshots/
+frontend/.playwright/
+
+# Test orchestration logs
+backend.log
+frontend.log
+*.log
