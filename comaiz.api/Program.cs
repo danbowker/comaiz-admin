@@ -163,10 +163,10 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        // Apply pending migrations
-        var context = services.GetRequiredService<ComaizContext>();
         var logger = services.GetRequiredService<ILogger<Program>>();
         
+        // Apply pending migrations
+        var context = services.GetRequiredService<ComaizContext>();
         logger.LogInformation("Applying database migrations...");
         await context.Database.MigrateAsync();
         logger.LogInformation("Database migrations applied successfully.");
