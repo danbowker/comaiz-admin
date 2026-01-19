@@ -18,6 +18,21 @@ jobs:
     permissions:
       contents: read
       packages: write
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: comaiz_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
       - uses: actions/checkout@v4
@@ -93,6 +108,7 @@ jobs:
         env:
           CI: true
           PLAYWRIGHT_BASE_URL: http://localhost:3000
+          ConnectionStrings__PostgresSQL: "Host=localhost;Port=5432;Database=comaiz_test;Username=postgres;Password=postgres"
         run: |
           # Start backend in background
           cd comaiz.api
