@@ -324,11 +324,12 @@ For more examples, see `powershell/Examples.ps1`.
 
 ## Testing
 
-The project includes both unit tests and integration tests.
+The project includes unit tests, integration tests, and end-to-end (E2E) tests.
 
 ### Running Tests
 
-Run all tests:
+#### Backend Tests
+Run all backend tests (unit + integration):
 ```bash
 dotnet test
 ```
@@ -338,13 +339,35 @@ Run only integration tests:
 dotnet test --filter "FullyQualifiedName~IntegrationTests"
 ```
 
+#### End-to-End Tests
+Run complete test suite (backend + frontend + E2E):
+```bash
+./run-tests.sh
+```
+
+Or run E2E tests manually:
+```bash
+cd frontend
+npm run test:e2e
+```
+
+📚 **For comprehensive testing documentation, see [TESTING.md](TESTING.md)**
+
 📚 **For detailed information about integration tests, see [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md)**
 
-The integration tests:
-- Use PostgreSQL test containers with Docker
-- Test API CRUD operations (Create, Read, Update, Delete)
-- Initialize and seed a fresh database for each test
-- Clean up test data automatically
-- Run as part of CI/CD pipeline
+### Test Coverage
+
+- **Unit Tests**: Test individual components and functions
+- **Integration Tests**: Test API endpoints with real PostgreSQL database
+  - Use PostgreSQL test containers with Docker
+  - Test API CRUD operations (Create, Read, Update, Delete)
+  - Initialize and seed a fresh database for each test
+  - Clean up test data automatically
+- **E2E Tests**: Test full user workflows with Playwright
+  - Test authentication flows
+  - Test navigation between pages
+  - Test CRUD operations from UI
+  - Capture screenshots for visual verification
+- All tests run automatically in CI/CD pipeline
 
 ## Contributing
