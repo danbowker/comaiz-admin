@@ -157,12 +157,21 @@ if (args.Length >= 4 && args[0] == "--create-user")
     }
 }
 
-// Seed database with roles and default users (only in Development)
+// Apply database migrations and seed database
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
+        // Apply pending migrations
+        var context = services.GetRequiredService<ComaizContext>();
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        
+        logger.LogInformation("Applying database migrations...");
+        await context.Database.MigrateAsync();
+        logger.LogInformation("Database migrations applied successfully.");
+        
+        // Seed database with roles and default users (only in Development)
         var environment = services.GetRequiredService<IWebHostEnvironment>();
         var isDevelopment = environment.IsDevelopment();
         
@@ -171,7 +180,7 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database.");
+        logger.LogError(ex, "An error occurred while initializing the database.");
     }
 }
 
