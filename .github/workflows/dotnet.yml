@@ -116,14 +116,20 @@ jobs:
           BACKEND_PID=$!
           cd ..
           
-          # Wait for backend to be ready
+          # Wait for backend to be ready (check health endpoint)
           echo "Waiting for backend to start..."
-          for i in {1..30}; do
+          for i in {1..60}; do
             if curl -k -s -f https://localhost:7057/health > /dev/null 2>&1; then
               echo "Backend is ready!"
               break
             fi
-            echo "Waiting... ($i/30)"
+            if [ $i -eq 60 ]; then
+              echo "Backend failed to start in time. Logs:"
+              cat comaiz.api/backend.log
+              kill $BACKEND_PID || true
+              exit 1
+            fi
+            echo "Waiting... ($i/60)"
             sleep 2
           done
           
@@ -141,9 +147,18 @@ jobs:
               echo "Frontend is ready!"
               break
             fi
+            if [ $i -eq 30 ]; then
+              echo "Frontend failed to start in time. Logs:"
+              cat frontend.log
+              kill $BACKEND_PID $FRONTEND_PID || true
+              exit 1
+            fi
             echo "Waiting... ($i/30)"
             sleep 2
           done
+          
+          # Give the app a few more seconds to fully initialize
+          sleep 5
           
           # Run E2E tests
           npx playwright test || E2E_FAILED=1
