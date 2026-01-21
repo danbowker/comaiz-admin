@@ -89,6 +89,9 @@ builder.Services.AddCors(options =>
 // Register Token Service
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+// Add health checks
+builder.Services.AddHealthChecks();
+
 // Configure forwarded headers for reverse proxy
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -202,6 +205,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Health check endpoint for CI/CD (before authentication to ensure it's always accessible)
+app.MapHealthChecks("/health");
+
 // Enable CORS in development
 if (app.Environment.IsDevelopment())
 {
@@ -210,9 +216,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Health check endpoint for CI/CD
-app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 app.MapControllers();
 
