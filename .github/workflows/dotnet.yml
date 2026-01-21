@@ -103,7 +103,7 @@ jobs:
       - name: Create .env.local for E2E tests
         run: |
           cd frontend
-          echo "REACT_APP_API_URL=https://localhost:7057/api" > .env.local
+          echo "REACT_APP_API_URL=http://localhost:7057/api" > .env.local
       - name: Run E2E tests
         env:
           CI: true
@@ -119,7 +119,7 @@ jobs:
           # Wait for backend to be ready (check health endpoint)
           echo "Waiting for backend to start..."
           for i in {1..60}; do
-            if curl -k -s -f https://localhost:7057/health > /dev/null 2>&1; then
+            if curl -s -f http://localhost:7057/health > /dev/null 2>&1; then
               echo "Backend is ready!"
               break
             fi
