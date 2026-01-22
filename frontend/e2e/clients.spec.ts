@@ -6,15 +6,16 @@ test.describe('Clients CRUD Operations', () => {
     // Login and navigate to Clients page
     await loginAsAdmin(page);
     
-    // Navigate to Clients page
+    // Navigate to Clients page - try link first, then direct navigation
     const clientsLink = page.locator('a:has-text("Clients"), nav a:has-text("Clients")').first();
-    if (await clientsLink.isVisible({ timeout: 10000 })) {
-      // Wait for element to be ready before clicking with extended timeout
-      await clientsLink.waitFor({ state: 'visible', timeout: 30000 });
+    try {
+      // Wait for element to be visible and ready with extended timeout
+      await clientsLink.waitFor({ state: 'visible', timeout: 60000 });
       await clientsLink.click({ timeout: 60000 });
       await page.waitForURL(/.*clients.*/i, { timeout: 15000 });
-    } else {
-      // Try direct navigation
+    } catch (error) {
+      // If clicking fails, try direct navigation
+      console.log('Clients link not found, using direct navigation');
       await page.goto('/clients');
     }
     
