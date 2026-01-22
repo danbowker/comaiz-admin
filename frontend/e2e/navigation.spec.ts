@@ -85,7 +85,8 @@ test.describe('Navigation', () => {
     
     // Count navigation links - wait for them to load
     const navLinks = page.locator('nav a, header a');
-    await page.waitForTimeout(2000); // Give time for links to render
+    // Wait for at least one link to be present
+    await page.locator('nav a, header a').first().waitFor({ state: 'visible', timeout: 10000 });
     const linkCount = await navLinks.count();
     
     expect(linkCount).toBeGreaterThan(0);

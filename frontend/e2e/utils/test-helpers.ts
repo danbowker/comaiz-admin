@@ -74,12 +74,9 @@ export async function logout(page: Page) {
   // Wait for button to be visible and clickable
   await logoutButton.waitFor({ state: 'visible', timeout: 10000 });
   
-  if (await logoutButton.isVisible({ timeout: 5000 }).catch(() => false)) {
-    // Wait for element to be ready for interaction
-    await logoutButton.click({ timeout: 30000 });
-    // Wait for redirect to login page
-    await page.waitForURL((url) => url.pathname.includes('login') || url.pathname === '/', { timeout: 10000 });
-  }
+  // Click and wait for redirect to login page
+  await logoutButton.click({ timeout: 30000 });
+  await page.waitForURL((url) => url.pathname.includes('login') || url.pathname === '/', { timeout: 10000 });
 }
 
 /**
