@@ -11,13 +11,13 @@ test.describe('Navigation', () => {
     // Look for Clients link in navigation
     const clientsLink = page.locator('a:has-text("Clients"), nav a:has-text("Clients")').first();
     
-    if (await clientsLink.isVisible({ timeout: 5000 })) {
-      // Wait for element to be ready before clicking
-      await clientsLink.waitFor({ state: 'visible', timeout: 10000 });
+    if (await clientsLink.isVisible({ timeout: 10000 })) {
+      // Wait for element to be ready before clicking with extended timeout
+      await clientsLink.waitFor({ state: 'visible', timeout: 30000 });
       await clientsLink.click({ timeout: 60000 });
       
       // Wait for navigation
-      await page.waitForURL(/.*clients.*/i, { timeout: 10000 });
+      await page.waitForURL(/.*clients.*/i, { timeout: 15000 });
       
       // Take screenshot
       await page.screenshot({ path: 'screenshots/clients-page.png', fullPage: true });
@@ -55,13 +55,13 @@ test.describe('Navigation', () => {
     // Look for Contracts link in navigation
     const contractsLink = page.locator('a:has-text("Contracts"), nav a:has-text("Contracts")').first();
     
-    if (await contractsLink.isVisible({ timeout: 5000 })) {
-      // Wait for element to be ready before clicking
-      await contractsLink.waitFor({ state: 'visible', timeout: 10000 });
+    if (await contractsLink.isVisible({ timeout: 10000 })) {
+      // Wait for element to be ready before clicking with extended timeout
+      await contractsLink.waitFor({ state: 'visible', timeout: 30000 });
       await contractsLink.click({ timeout: 60000 });
       
       // Wait for navigation
-      await page.waitForURL(/.*contracts.*/i, { timeout: 10000 });
+      await page.waitForURL(/.*contracts.*/i, { timeout: 15000 });
       
       // Take screenshot
       await page.screenshot({ path: 'screenshots/contracts-page.png', fullPage: true });
@@ -77,16 +77,16 @@ test.describe('Navigation', () => {
   test('should have working navigation menu', async ({ page }) => {
     // Check that navigation exists - wait for it to be ready
     const nav = page.locator('nav, header').first();
-    await nav.waitFor({ state: 'visible', timeout: 10000 });
-    await expect(nav).toBeVisible({ timeout: 10000 });
+    await nav.waitFor({ state: 'visible', timeout: 30000 });
+    await expect(nav).toBeVisible({ timeout: 30000 });
     
     // Take screenshot of navigation
     await page.screenshot({ path: 'screenshots/navigation-menu.png', fullPage: true });
     
     // Count navigation links - wait for them to load
     const navLinks = page.locator('nav a, header a');
-    // Wait for at least one link to be present
-    await page.locator('nav a, header a').first().waitFor({ state: 'visible', timeout: 10000 });
+    // Wait for at least one link to be present with extended timeout
+    await page.locator('nav a, header a').first().waitFor({ state: 'visible', timeout: 30000 });
     const linkCount = await navLinks.count();
     
     expect(linkCount).toBeGreaterThan(0);

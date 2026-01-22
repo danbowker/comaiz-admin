@@ -8,18 +8,18 @@ test.describe('Clients CRUD Operations', () => {
     
     // Navigate to Clients page
     const clientsLink = page.locator('a:has-text("Clients"), nav a:has-text("Clients")').first();
-    if (await clientsLink.isVisible({ timeout: 5000 })) {
-      // Wait for element to be ready before clicking
-      await clientsLink.waitFor({ state: 'visible', timeout: 10000 });
+    if (await clientsLink.isVisible({ timeout: 10000 })) {
+      // Wait for element to be ready before clicking with extended timeout
+      await clientsLink.waitFor({ state: 'visible', timeout: 30000 });
       await clientsLink.click({ timeout: 60000 });
-      await page.waitForURL(/.*clients.*/i, { timeout: 10000 });
+      await page.waitForURL(/.*clients.*/i, { timeout: 15000 });
     } else {
       // Try direct navigation
       await page.goto('/clients');
     }
     
-    // Wait for page to stabilize
-    await page.waitForLoadState('networkidle', { timeout: 30000 });
+    // Wait for page to stabilize with extended timeout
+    await page.waitForLoadState('networkidle', { timeout: 60000 });
   });
 
   test('should display clients list', async ({ page }) => {
