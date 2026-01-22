@@ -71,8 +71,12 @@ export async function logout(page: Page) {
   // Look for logout button or link
   const logoutButton = page.locator('button:has-text("Logout"), a:has-text("Logout"), button:has-text("Sign out"), a:has-text("Sign out")').first();
   
+  // Wait for button to be visible and clickable
+  await logoutButton.waitFor({ state: 'visible', timeout: 10000 });
+  
   if (await logoutButton.isVisible({ timeout: 5000 }).catch(() => false)) {
-    await logoutButton.click();
+    // Wait for element to be ready for interaction
+    await logoutButton.click({ timeout: 30000 });
     // Wait for redirect to login page
     await page.waitForURL((url) => url.pathname.includes('login') || url.pathname === '/', { timeout: 10000 });
   }

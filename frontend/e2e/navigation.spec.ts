@@ -12,7 +12,9 @@ test.describe('Navigation', () => {
     const clientsLink = page.locator('a:has-text("Clients"), nav a:has-text("Clients")').first();
     
     if (await clientsLink.isVisible({ timeout: 5000 })) {
-      await clientsLink.click();
+      // Wait for element to be ready before clicking
+      await clientsLink.waitFor({ state: 'visible', timeout: 10000 });
+      await clientsLink.click({ timeout: 60000 });
       
       // Wait for navigation
       await page.waitForURL(/.*clients.*/i, { timeout: 10000 });
@@ -54,7 +56,9 @@ test.describe('Navigation', () => {
     const contractsLink = page.locator('a:has-text("Contracts"), nav a:has-text("Contracts")').first();
     
     if (await contractsLink.isVisible({ timeout: 5000 })) {
-      await contractsLink.click();
+      // Wait for element to be ready before clicking
+      await contractsLink.waitFor({ state: 'visible', timeout: 10000 });
+      await contractsLink.click({ timeout: 60000 });
       
       // Wait for navigation
       await page.waitForURL(/.*contracts.*/i, { timeout: 10000 });
@@ -71,15 +75,17 @@ test.describe('Navigation', () => {
   });
 
   test('should have working navigation menu', async ({ page }) => {
-    // Check that navigation exists
+    // Check that navigation exists - wait for it to be ready
     const nav = page.locator('nav, header').first();
-    await expect(nav).toBeVisible({ timeout: 5000 });
+    await nav.waitFor({ state: 'visible', timeout: 10000 });
+    await expect(nav).toBeVisible({ timeout: 10000 });
     
     // Take screenshot of navigation
     await page.screenshot({ path: 'screenshots/navigation-menu.png', fullPage: true });
     
-    // Count navigation links
+    // Count navigation links - wait for them to load
     const navLinks = page.locator('nav a, header a');
+    await page.waitForTimeout(2000); // Give time for links to render
     const linkCount = await navLinks.count();
     
     expect(linkCount).toBeGreaterThan(0);

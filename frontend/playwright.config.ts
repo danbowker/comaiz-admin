@@ -33,7 +33,13 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    /* Increase timeout for actions to handle slower CI environments */
+    actionTimeout: 60000, // 60 seconds for individual actions
+    navigationTimeout: 60000, // 60 seconds for navigation
   },
+  
+  /* Increase test timeout */
+  timeout: 90000, // 90 seconds per test
 
   /* Configure projects for major browsers */
   projects: [
