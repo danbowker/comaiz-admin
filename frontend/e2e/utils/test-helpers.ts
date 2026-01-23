@@ -90,11 +90,10 @@ export async function logout(page: Page) {
   
   if (userMenuExists) {
     await userMenu.click({ timeout: 10000 });
-    // Wait a bit for dropdown to appear
-    await page.waitForTimeout(500);
-    // Now try logout button again
+    // Wait for logout button to appear in dropdown
     const logoutInMenu = page.locator('button:has-text("Logout"), a:has-text("Logout"), button:has-text("Sign out"), a:has-text("Sign out"), button:has-text("Log out"), a:has-text("Log out")').first();
-    const logoutInMenuExists = await logoutInMenu.isVisible({ timeout: 5000 }).catch(() => false);
+    await logoutInMenu.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
+    const logoutInMenuExists = await logoutInMenu.isVisible({ timeout: 1000 }).catch(() => false);
     if (logoutInMenuExists) {
       await logoutInMenu.click({ timeout: 10000 });
       await page.waitForURL((url) => url.pathname.includes('login') || url.pathname === '/', { timeout: 15000 });

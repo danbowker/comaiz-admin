@@ -30,20 +30,26 @@ test.describe('Clients CRUD Operations', () => {
     // Take screenshot of clients list
     await page.screenshot({ path: 'screenshots/clients-list.png', fullPage: true });
     
-    // Check if we can see client-related content (table, list, or "no clients" message) with extended timeout
-    // Be more flexible - look for any indication we're on clients page
-    const hasContent = await page.locator('table, .client, .clients, div[role="table"], [data-testid*="client"], ul, ol, .list, .grid, .card').first().isVisible({ timeout: 30000 }).catch(() => false);
+    // Check for client-specific content first
+    const hasClientContent = await page.locator('table, .client, .clients, div[role="table"], [data-testid*="client"]').first().isVisible({ timeout: 30000 }).catch(() => false);
+    
+    // Check for no data messages
     const hasNoDataMessage = await page.locator(':text("No clients"), :text("no data"), :text("empty"), :text("No records"), :text("0 records")').first().isVisible({ timeout: 30000 }).catch(() => false);
+    
+    // Check for generic list/grid structures (fallback)
+    const hasGenericContent = await page.locator('ul, ol, [role="list"], [role="grid"]').first().isVisible({ timeout: 10000 }).catch(() => false);
+    
+    // Check for page heading as last resort
     const hasHeading = await page.locator('h1, h2, h3').first().isVisible({ timeout: 5000 }).catch(() => false);
     
-    // Either we have content, a "no data" message, or at least a heading showing we're on the right page
-    if (!hasContent && !hasNoDataMessage && !hasHeading) {
+    // Prefer specific client content, then no-data message, then generic structures, then heading
+    if (!hasClientContent && !hasNoDataMessage && !hasGenericContent && !hasHeading) {
       console.log('Clients list page appears to be empty or not fully implemented');
       test.skip();
     }
     
     // If we got here, we have something on the page
-    expect(hasContent || hasNoDataMessage || hasHeading).toBeTruthy();
+    expect(hasClientContent || hasNoDataMessage || hasGenericContent || hasHeading).toBeTruthy();
   });
 
   test('should open create client form', async ({ page }) => {

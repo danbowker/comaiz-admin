@@ -88,10 +88,10 @@ test.describe('Navigation', () => {
       // Take screenshot of navigation
       await page.screenshot({ path: 'screenshots/navigation-menu.png', fullPage: true });
       
-      // Count navigation links - wait for them to load
-      const navLinks = page.locator('nav a, header a, [role="navigation"] a, a');
-      // Wait for at least one link to be present with extended timeout
-      await page.locator('a').first().waitFor({ state: 'visible', timeout: 60000 });
+      // Count navigation links - be specific about navigation-related links
+      const navLinks = page.locator('nav a, header a, [role="navigation"] a');
+      // Wait for at least one navigation link to be present with extended timeout
+      await navLinks.first().waitFor({ state: 'visible', timeout: 60000 });
       const linkCount = await navLinks.count();
       
       expect(linkCount).toBeGreaterThan(0);
