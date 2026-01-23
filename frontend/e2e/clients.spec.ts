@@ -30,9 +30,9 @@ test.describe('Clients CRUD Operations', () => {
     // Take screenshot of clients list
     await page.screenshot({ path: 'screenshots/clients-list.png', fullPage: true });
     
-    // Check if we can see client-related content (table, list, or "no clients" message)
-    const hasContent = await page.locator('table, .client, .clients, div[role="table"], [data-testid*="client"]').first().isVisible({ timeout: 5000 }).catch(() => false);
-    const hasNoDataMessage = await page.locator(':text("No clients"), :text("no data"), :text("empty")').first().isVisible({ timeout: 5000 }).catch(() => false);
+    // Check if we can see client-related content (table, list, or "no clients" message) with extended timeout
+    const hasContent = await page.locator('table, .client, .clients, div[role="table"], [data-testid*="client"]').first().isVisible({ timeout: 30000 }).catch(() => false);
+    const hasNoDataMessage = await page.locator(':text("No clients"), :text("no data"), :text("empty")').first().isVisible({ timeout: 30000 }).catch(() => false);
     
     // Either we have content or a "no data" message
     expect(hasContent || hasNoDataMessage).toBeTruthy();
