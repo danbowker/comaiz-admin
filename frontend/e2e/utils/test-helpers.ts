@@ -64,24 +64,46 @@ export async function loginAsTestUser(page: Page) {
 }
 
 /**
- * Logout helper function
+ * Logout helper function - attempts multiple strategies to log out
  * @param page - Playwright page object
  */
 export async function logout(page: Page) {
-  // Look for logout button or link
-  const logoutButton = page.locator('button:has-text("Logout"), a:has-text("Logout"), button:has-text("Sign out"), a:has-text("Sign out")').first();
+  // Strategy 1: Look for visible logout button/link directly
+  const logoutButton = page.locator('button:has-text("Logout"), a:has-text("Logout"), button:has-text("Sign out"), a:has-text("Sign out"), button:has-text("Log out"), a:has-text("Log out")').first();
   
-  // Wait for button to be visible and in an actionable state with extended timeout
-  await logoutButton.waitFor({ state: 'visible', timeout: 60000 });
+  // Check if logout button exists with reasonable timeout
+  const logoutExists = await logoutButton.isVisible({ timeout: 5000 }).catch(() => false);
   
-  // Scroll element into view if needed with extended timeout
-  await logoutButton.scrollIntoViewIfNeeded({ timeout: 30000 });
+  if (logoutExists) {
+    // Scroll element into view if needed
+    await logoutButton.scrollIntoViewIfNeeded({ timeout: 30000 });
+    // Click with extended timeout
+    await logoutButton.click({ timeout: 60000, force: false });
+    // Wait for redirect to login page
+    await page.waitForURL((url) => url.pathname.includes('login') || url.pathname === '/', { timeout: 15000 });
+    return;
+  }
   
-  // Click with extended timeout and retry
-  await logoutButton.click({ timeout: 60000, force: false });
+  // Strategy 2: Try to find and click user menu/profile dropdown first
+  const userMenu = page.locator('[aria-label="User menu"], [aria-label="Profile"], button:has-text("Profile"), div:has-text("Profile"), .user-menu, .profile-menu').first();
+  const userMenuExists = await userMenu.isVisible({ timeout: 5000 }).catch(() => false);
   
-  // Wait for redirect to login page
-  await page.waitForURL((url) => url.pathname.includes('login') || url.pathname === '/', { timeout: 15000 });
+  if (userMenuExists) {
+    await userMenu.click({ timeout: 10000 });
+    // Wait a bit for dropdown to appear
+    await page.waitForTimeout(500);
+    // Now try logout button again
+    const logoutInMenu = page.locator('button:has-text("Logout"), a:has-text("Logout"), button:has-text("Sign out"), a:has-text("Sign out"), button:has-text("Log out"), a:has-text("Log out")').first();
+    const logoutInMenuExists = await logoutInMenu.isVisible({ timeout: 5000 }).catch(() => false);
+    if (logoutInMenuExists) {
+      await logoutInMenu.click({ timeout: 10000 });
+      await page.waitForURL((url) => url.pathname.includes('login') || url.pathname === '/', { timeout: 15000 });
+      return;
+    }
+  }
+  
+  // If we get here, logout button doesn't exist - throw error so test can handle it
+  throw new Error('Logout button not found - UI may not have logout functionality');
 }
 
 /**
