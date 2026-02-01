@@ -105,15 +105,15 @@ const CreateFixedCostForm: React.FC<CreateFixedCostFormProps> = ({
             </div>
 
             <div className="form-field">
-              <label htmlFor="vatRate">VAT Rate (decimal)</label>
+              <label htmlFor="vatRate">VAT Rate (%)</label>
               <input
                 type="number"
                 id="vatRate"
-                step="0.01"
-                value={formData.vatRate}
-                onChange={(e) => setFormData({ ...formData, vatRate: Number(e.target.value) })}
+                step="1"
+                value={(formData.vatRate * 100).toFixed(0)}
+                onChange={(e) => setFormData({ ...formData, vatRate: Number(e.target.value) / 100 })}
               />
-              <small>e.g., 0 for 0%, 0.20 for 20%</small>
+              <small>e.g., 0 for 0%, 20 for 20%</small>
             </div>
           </div>
 

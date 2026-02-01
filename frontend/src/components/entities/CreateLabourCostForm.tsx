@@ -111,6 +111,45 @@ const CreateLabourCostForm: React.FC<CreateLabourCostFormProps> = ({
     }
   }, [calculatedRate]);
 
+  // Auto-generate description when task, worker, or dates change
+  const generatedDescription = useMemo(() => {
+    if (formData.description) {
+      // User has entered a description, don't override
+      return formData.description;
+    }
+
+    const parts: string[] = [];
+    
+    // Add task name
+    if (formData.taskId) {
+      const selectedTask = tasks.find((t) => t.id === formData.taskId);
+      if (selectedTask) {
+        parts.push(selectedTask.name);
+      }
+    }
+    
+    // Add worker name
+    if (formData.applicationUserId) {
+      const selectedUser = users.find((u) => u.id === formData.applicationUserId);
+      if (selectedUser) {
+        parts.push(selectedUser.userName || selectedUser.email || '');
+      }
+    }
+    
+    // Add date range
+    if (formData.startDate && formData.endDate) {
+      parts.push(`${formData.startDate} to ${formData.endDate}`);
+    }
+    
+    return parts.length > 0 ? parts.join(' - ') : '';
+  }, [formData.taskId, formData.applicationUserId, formData.startDate, formData.endDate, formData.description, tasks, users]);
+
+  useEffect(() => {
+    if (generatedDescription && !formData.description) {
+      setFormData((prev) => ({ ...prev, description: generatedDescription }));
+    }
+  }, [generatedDescription, formData.description]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -272,15 +311,15 @@ const CreateLabourCostForm: React.FC<CreateLabourCostFormProps> = ({
             </div>
 
             <div className="form-field">
-              <label htmlFor="vatRate">VAT Rate (decimal)</label>
+              <label htmlFor="vatRate">VAT Rate (%)</label>
               <input
                 type="number"
                 id="vatRate"
-                step="0.01"
-                value={formData.vatRate}
-                onChange={(e) => setFormData({ ...formData, vatRate: Number(e.target.value) })}
+                step="1"
+                value={(formData.vatRate * 100).toFixed(0)}
+                onChange={(e) => setFormData({ ...formData, vatRate: Number(e.target.value) / 100 })}
               />
-              <small>e.g., 0.20 for 20%</small>
+              <small>e.g., 20 for 20%</small>
             </div>
 
             <div className="form-field">
