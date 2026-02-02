@@ -347,4 +347,48 @@ The integration tests:
 - Clean up test data automatically
 - Run as part of CI/CD pipeline
 
+## 🤖 Automated PR Workflow Management
+
+This repository includes **automated PR workflow management** powered by GitHub Copilot. When Copilot makes changes to a pull request, it will automatically:
+
+1. ✅ **Trigger the PR workflow** after committing changes
+2. 🔍 **Monitor workflow execution** until completion
+3. 📊 **Check for success or failure**
+4. 🔧 **Apply fixes** if tests fail or build breaks
+5. 🔄 **Iterate** until all checks pass (max 3 attempts)
+
+### How It Works
+
+The automation is configured through custom agent instructions in `.github/`:
+
+- **`.github/copilot-instructions.md`** - Repository-wide Copilot behavior
+- **`.github/agents/pr-workflow-automation.md`** - PR workflow automation agent
+- **`.github/WORKFLOW_MANAGEMENT.md`** - Manual workflow reference
+
+When Copilot commits code changes using `report_progress`, it will:
+
+```
+Make changes → Commit → Trigger workflow → Monitor → 
+   ↓ (if failure)
+Get logs → Analyze errors → Apply fix → Re-trigger → Monitor →
+   ↓ (iterate until success)
+All tests pass! ✅
+```
+
+### Benefits
+
+- 🚀 **Faster PR turnaround** - No waiting for manual CI checks
+- 🔧 **Auto-fix common issues** - Test failures, build errors, linting
+- 📊 **Consistent process** - Same workflow pattern every time
+- 🎯 **Developer productivity** - Focus on features, not CI babysitting
+
+### Requirements
+
+Requires GitHub MCP server configured with Actions API permissions:
+- `actions:read` - Read workflow runs and jobs
+- `actions:write` - Trigger workflow runs
+- `contents:read` - Read repository contents
+
+📚 **For detailed information, see [.github/agents/README.md](.github/agents/README.md)**
+
 ## Contributing
