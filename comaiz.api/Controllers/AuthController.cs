@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace comaiz.api.Controllers;
 
+// Test comment added by GitHub Copilot to verify automated workflow triggering
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController : ControllerBase
