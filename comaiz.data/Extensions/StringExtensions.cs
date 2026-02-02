@@ -13,7 +13,7 @@ namespace comaiz.Extensions
             {
                 connStringBuilder = new NpgsqlConnectionStringBuilder
                 {
-                    SslMode = SslMode.VerifyFull
+                    SslMode = SslMode.VerifyFull  // FIXED: Changed back from Require to VerifyFull
                 };
 
                 connStringBuilder.Host = databaseUrl.Host;
