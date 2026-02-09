@@ -18,6 +18,21 @@ jobs:
     permissions:
       contents: read
       packages: write
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: comaiz_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
       - uses: actions/checkout@v4
@@ -83,6 +98,96 @@ jobs:
         run: dotnet build --no-restore
       - name: Test
         run: dotnet test --no-build --verbosity normal
+      - name: Install Playwright browsers
+        run: cd frontend && npx playwright install --with-deps chromium
+      - name: Create .env.local for E2E tests
+        run: |
+          cd frontend
+          echo "REACT_APP_API_URL=http://localhost:7057/api" > .env.local
+      - name: Run E2E tests
+        env:
+          CI: true
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+          ConnectionStrings__PostgresSQL: "Host=localhost;Port=5432;Database=comaiz_test;Username=postgres;Password=postgres"
+        run: |
+          # Start backend in background
+          cd comaiz.api
+          ASPNETCORE_ENVIRONMENT=Development dotnet run --no-build > backend.log 2>&1 &
+          BACKEND_PID=$!
+          cd ..
+          
+          # Wait for backend to be ready (check health endpoint)
+          echo "Waiting for backend to start..."
+          for i in {1..60}; do
+            if curl -s -f http://localhost:7057/health > /dev/null 2>&1; then
+              echo "Backend is ready!"
+              break
+            fi
+            if [ $i -eq 60 ]; then
+              echo "Backend failed to start in time. Logs:"
+              cat comaiz.api/backend.log
+              kill $BACKEND_PID || true
+              exit 1
+            fi
+            echo "Waiting... ($i/60)"
+            sleep 2
+          done
+          
+          # Build and serve frontend
+          cd frontend
+          # Use serve to host the built frontend
+          npm install -g serve
+          serve -s build -l 3000 > frontend.log 2>&1 &
+          FRONTEND_PID=$!
+          
+          # Wait for frontend to be ready
+          echo "Waiting for frontend to start..."
+          for i in {1..30}; do
+            if curl -s -f http://localhost:3000 > /dev/null 2>&1; then
+              echo "Frontend is ready!"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Frontend failed to start in time. Logs:"
+              cat frontend.log
+              kill $BACKEND_PID $FRONTEND_PID || true
+              exit 1
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 2
+          done
+          
+          # Give the app a few more seconds to fully initialize
+          sleep 5
+          
+          # Run E2E tests
+          npx playwright test || E2E_FAILED=1
+          
+          # Cleanup
+          kill $BACKEND_PID $FRONTEND_PID || true
+          
+          # Show logs if tests failed
+          if [ "$E2E_FAILED" = "1" ]; then
+            echo "=== Backend Logs ==="
+            cat ../comaiz.api/backend.log || true
+            echo "=== Frontend Logs ==="
+            cat frontend.log || true
+            exit 1
+          fi
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 30
+      - name: Upload E2E screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-screenshots
+          path: frontend/screenshots/
+          retention-days: 30
       - name: Build Docker image
         run: |
           docker build \
