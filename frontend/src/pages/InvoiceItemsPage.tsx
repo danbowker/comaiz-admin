@@ -1,29 +1,37 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import EntityList from '../components/entities/EntityList';
 import EntityForm, { FormField } from '../components/entities/EntityForm';
-import { invoiceItemsService, tasksService, fixedCostsService, invoicesService } from '../services/entityService';
-import { InvoiceItem, Task, FixedCost, Invoice, InvoiceState } from '../types';
+import CreateInvoiceItemMenu from '../components/entities/CreateInvoiceItemMenu';
+import { invoiceItemsService, tasksService, fixedCostsService, invoicesService, usersService, workRecordsService } from '../services/entityService';
+import { InvoiceItem, Task, FixedCost, Invoice, InvoiceState, ApplicationUser, WorkRecord, Unit } from '../types';
 import { useContractSelection } from '../contexts/ContractSelectionContext';
 
 const InvoiceItemsPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
+  const [showCreateMenu, setShowCreateMenu] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InvoiceItem | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [fixedCosts, setFixedCosts] = useState<FixedCost[]>([]);
   const [draftInvoices, setDraftInvoices] = useState<Invoice[]>([]);
+  const [users, setUsers] = useState<ApplicationUser[]>([]);
+  const [workRecords, setWorkRecords] = useState<WorkRecord[]>([]);
   const { selectedContractId } = useContractSelection();
 
   const loadRelatedData = useCallback(async () => {
     try {
       const filterParams = selectedContractId ? { contractId: selectedContractId } : undefined;
-      const [tasksData, fixedCostsData, invoicesData] = await Promise.all([
+      const [tasksData, fixedCostsData, invoicesData, usersData, workRecordsData] = await Promise.all([
         tasksService.getAll(filterParams),
         fixedCostsService.getAll(filterParams),
         invoicesService.getAll(filterParams),
+        usersService.getAll(),
+        workRecordsService.getAll(filterParams),
       ]);
       setTasks(tasksData);
       setFixedCosts(fixedCostsData);
+      setUsers(usersData);
+      setWorkRecords(workRecordsData);
       // Filter to only show draft invoices for selection
       setDraftInvoices(invoicesData.filter(inv => inv.state === InvoiceState.Draft));
     } catch (err) {
@@ -74,8 +82,19 @@ const InvoiceItemsPage: React.FC = () => {
       }
     },
     { key: 'quantity' as keyof InvoiceItem, label: 'Quantity' },
+    { 
+      key: 'unit' as keyof InvoiceItem, 
+      label: 'Unit',
+      render: (item: InvoiceItem) => item.unit === Unit.Hours ? 'Hours' : 'Miles'
+    },
     { key: 'rate' as keyof InvoiceItem, label: 'Rate' },
     { key: 'price' as keyof InvoiceItem, label: 'Price' },
+    { key: 'priceIncVAT' as keyof InvoiceItem, label: 'Price Inc VAT' },
+    { 
+      key: 'description' as keyof InvoiceItem, 
+      label: 'Description',
+      render: (item: InvoiceItem) => item.description || 'N/A'
+    },
     { 
       key: 'startDate' as keyof InvoiceItem, 
       label: 'Start Date',
@@ -111,10 +130,21 @@ const InvoiceItemsPage: React.FC = () => {
       options: fixedCosts.map((fc) => ({ value: fc.id, label: fc.name || `Fixed Cost ${fc.id}` })),
     },
     { name: 'quantity', label: 'Quantity', type: 'number', required: true },
-    { name: 'unit', label: 'Unit', type: 'number', required: true },
+    { 
+      name: 'unit', 
+      label: 'Unit', 
+      type: 'select',
+      required: true,
+      options: [
+        { value: Unit.Hours, label: 'Hours' },
+        { value: Unit.Miles, label: 'Miles' },
+      ],
+    },
     { name: 'rate', label: 'Rate', type: 'number', required: true },
-    { name: 'vatRate', label: 'VAT Rate', type: 'number', required: true },
+    { name: 'vatRate', label: 'VAT Rate (decimal)', type: 'number', required: true },
     { name: 'price', label: 'Price', type: 'number', required: true },
+    { name: 'priceIncVAT', label: 'Price Inc VAT (read-only)', type: 'number', required: true },
+    { name: 'description', label: 'Description', type: 'text', required: false },
     { name: 'startDate', label: 'Start Date', type: 'date' },
     { name: 'endDate', label: 'End Date', type: 'date' },
   ];
@@ -125,8 +155,16 @@ const InvoiceItemsPage: React.FC = () => {
   };
 
   const handleCreate = () => {
-    setSelectedItem(null);
-    setShowForm(true);
+    setShowCreateMenu(true);
+  };
+
+  const handleCreateMenuClose = () => {
+    setShowCreateMenu(false);
+  };
+
+  const handleCreateMenuSave = () => {
+    setShowCreateMenu(false);
+    setRefreshKey((prev) => prev + 1);
   };
 
   const handleClose = () => {
@@ -164,12 +202,24 @@ const InvoiceItemsPage: React.FC = () => {
       />
       {showForm && (
         <EntityForm
-          title={selectedItem ? 'Edit Invoice Item' : 'Create Invoice Item'}
+          title="Edit Invoice Item"
           service={invoiceItemsService}
           fields={fields}
           item={selectedItem}
           onClose={handleClose}
           onSave={handleSave}
+        />
+      )}
+      {showCreateMenu && (
+        <CreateInvoiceItemMenu
+          onClose={handleCreateMenuClose}
+          onSave={handleCreateMenuSave}
+          invoices={draftInvoices}
+          fixedCosts={fixedCosts}
+          tasks={tasks}
+          users={users}
+          workRecords={workRecords}
+          defaultContractId={selectedContractId ?? undefined}
         />
       )}
     </>

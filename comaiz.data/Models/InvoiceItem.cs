@@ -10,12 +10,13 @@
         public Task? Task { get; set; }
         public int? FixedCostId { get; set; }
         public FixedCost? FixedCost { get; set; }
-        public int Quantity { get; set; }
-        //TODO, Unit table or enum
-        public int Unit { get; set; }
+        public decimal Quantity { get; set; }
+        public Unit Unit { get; set; }
         public decimal Rate { get; set; }
         public decimal VATRate { get; set; }
         public decimal Price { get; set; }
+        public decimal PriceIncVAT { get; set; }
+        public string? Description { get; set; }
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
     }
