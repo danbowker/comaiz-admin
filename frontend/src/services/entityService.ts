@@ -10,12 +10,15 @@ import {
   Invoice, 
   InvoiceItem,
   Task,
-  ContractDetails
+  ContractDetails,
+  CreateFixedCostInvoiceItemDto,
+  CreateLabourCostInvoiceItemDto,
+  CreateMileageCostInvoiceItemDto
 } from '../types';
 
 // Generic CRUD service for all entities
 export class EntityService<T> {
-  private endpoint: string;
+  protected endpoint: string;
 
   constructor(endpoint: string) {
     this.endpoint = endpoint;
@@ -60,6 +63,24 @@ export class EntityService<T> {
   }
 }
 
+// Extended InvoiceItemsService with specialized creation methods
+class InvoiceItemsService extends EntityService<InvoiceItem> {
+  async createFixedCost(dto: CreateFixedCostInvoiceItemDto): Promise<InvoiceItem> {
+    const response = await api.post<InvoiceItem>(`/${this.endpoint}/create-fixed-cost`, dto);
+    return response.data;
+  }
+
+  async createLabourCost(dto: CreateLabourCostInvoiceItemDto): Promise<InvoiceItem> {
+    const response = await api.post<InvoiceItem>(`/${this.endpoint}/create-labour-cost`, dto);
+    return response.data;
+  }
+
+  async createMileageCost(dto: CreateMileageCostInvoiceItemDto): Promise<InvoiceItem> {
+    const response = await api.post<InvoiceItem>(`/${this.endpoint}/create-mileage-cost`, dto);
+    return response.data;
+  }
+}
+
 // Export services for all entities with proper types
 export const clientsService = new EntityService<Client>('clients');
 export const usersService = new EntityService<ApplicationUser>('users');
@@ -69,7 +90,7 @@ export const userContractRatesService = new EntityService<UserContractRate>('use
 export const fixedCostsService = new EntityService<FixedCost>('fixedcosts');
 export const workRecordsService = new EntityService<WorkRecord>('workrecords');
 export const invoicesService = new EntityService<Invoice>('invoices');
-export const invoiceItemsService = new EntityService<InvoiceItem>('invoiceitems');
+export const invoiceItemsService = new InvoiceItemsService('invoiceitems');
 export const tasksService = new EntityService<Task>('tasks');
 
 // Contract details service
