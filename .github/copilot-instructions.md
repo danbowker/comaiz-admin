@@ -131,7 +131,7 @@ github-mcp-server-get_job_logs({
 - **Triggers:** push, pull_request_target, workflow_dispatch
 - **Steps:** Build frontend, restore dependencies, build .NET, run tests, build Docker image
 - **Note:** `pull_request_target` triggers automatically without approval for same-repo PRs;
-  `workflow_dispatch` also triggers immediately and is the preferred way to run CI from Copilot
+  `workflow_dispatch` also triggers immediately and is the preferred way to run CI from Copilot.
 
 **Common Failure Scenarios:**
 
