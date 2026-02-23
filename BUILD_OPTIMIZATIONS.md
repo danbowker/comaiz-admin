@@ -4,7 +4,7 @@ This document describes the build optimizations implemented to speed up the GitH
 
 ## Summary
 
-Implemented multiple caching and conditional execution strategies to reduce build times by **20-40%**.
+Implemented caching and conditional execution strategies to reduce build times by **15-30%**.
 
 ## Optimizations Implemented
 
@@ -22,16 +22,10 @@ Implemented multiple caching and conditional execution strategies to reduce buil
 - Caches `node_modules` based on `package-lock.json`
 - Saves ~30-60s on subsequent runs
 
-**.NET NuGet Cache** (`.github/workflows/dotnet.yml` line 43)
-```yaml
-- name: Setup .NET
-  uses: actions/setup-dotnet@v4
-  with:
-    dotnet-version: 9.0.x
-    cache: true
-```
-- Caches NuGet packages automatically
-- Saves ~20-40s on subsequent runs
+**.NET NuGet Cache** - Not implemented
+- The repository doesn't use `packages.lock.json`
+- .NET dependency caching requires NuGet lock files
+- To enable: run `dotnet restore --use-lock-file` to generate lock files
 
 **Playwright Browser Cache** (`.github/workflows/dotnet.yml` lines 104-117)
 ```yaml
@@ -89,7 +83,7 @@ sleep 3
 | Scenario | Time Saved | Total Build Time |
 |----------|------------|------------------|
 | **First run** (cold cache) | ~1-2 min | ~6-13 min (was 8-15 min) |
-| **Subsequent runs** (warm cache) | ~3-4 min | ~5-11 min (was 8-15 min) |
+| **Subsequent runs** (warm cache) | ~2-3 min | ~6-12 min (was 8-15 min) |
 | **Draft PRs** | ~5-8 min | ~3-7 min (was 8-15 min) |
 
 ### Breakdown by Stage
