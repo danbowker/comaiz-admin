@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, Outlet, useNavigate, useSearchParams } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ContractPicker from './ContractPicker';
 import VersionInfo from './VersionInfo';
@@ -24,6 +24,9 @@ const Layout: React.FC = () => {
     return path;
   };
 
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    isActive ? 'nav-link active' : 'nav-link';
+
   return (
     <div className="layout">
       <nav className="navbar">
@@ -31,17 +34,17 @@ const Layout: React.FC = () => {
           <h1>Comaiz Admin</h1>
         </div>
         <div className="navbar-menu">
-          <Link to={buildLink('/')}>Dashboard</Link>
-          <Link to={buildLink('/clients')}>Clients</Link>
-          <Link to={buildLink('/contracts')}>Contracts</Link>
-          <Link to={buildLink('/contract-rates')}>Contract Rates</Link>
-          <Link to={buildLink('/user-contract-rates')}>User Contract Rates</Link>
-          <Link to={buildLink('/fixed-costs')}>Fixed Costs</Link>
-          <Link to={buildLink('/tasks')}>Tasks</Link>
-          <Link to={buildLink('/work-records')}>Work Records</Link>
-          <Link to={buildLink('/weekly-summary')}>Weekly Summary</Link>
-          <Link to={buildLink('/invoices')}>Invoices</Link>
-          <Link to={buildLink('/invoice-items')}>Invoice Items</Link>
+          <NavLink to={buildLink('/')} end className={navLinkClass}>Dashboard</NavLink>
+          <NavLink to={buildLink('/clients')} className={navLinkClass}>Clients</NavLink>
+          <NavLink to={buildLink('/contracts')} className={navLinkClass}>Contracts</NavLink>
+          <NavLink to={buildLink('/contract-rates')} className={navLinkClass}>Contract Rates</NavLink>
+          <NavLink to={buildLink('/user-contract-rates')} className={navLinkClass}>User Contract Rates</NavLink>
+          <NavLink to={buildLink('/fixed-costs')} className={navLinkClass}>Fixed Costs</NavLink>
+          <NavLink to={buildLink('/tasks')} className={navLinkClass}>Tasks</NavLink>
+          <NavLink to={buildLink('/work-records')} className={navLinkClass}>Work Records</NavLink>
+          <NavLink to={buildLink('/weekly-summary')} className={navLinkClass}>Weekly Summary</NavLink>
+          <NavLink to={buildLink('/invoices')} className={navLinkClass}>Invoices</NavLink>
+          <NavLink to={buildLink('/invoice-items')} className={navLinkClass}>Invoice Items</NavLink>
         </div>
         <div className="navbar-controls">
           <ContractPicker />
