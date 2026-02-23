@@ -1,6 +1,6 @@
-# Manual PR Workflow Management
+# PR Workflow Management
 
-This document describes how to manually trigger and monitor PR workflows using GitHub Copilot's MCP server tools.
+This document describes how to trigger and monitor PR workflows using GitHub Copilot's MCP server tools.
 
 ## Prerequisites
 
@@ -9,12 +9,26 @@ Ensure you have:
 - Access to the repository via Copilot
 - Current PR branch checked out
 
-## Step-by-Step Manual Process
+## Step-by-Step Process
 
-### 1. Find the Current PR Workflow Run
+### 1. Trigger the Workflow (Immediately after pushing)
+
+Use `workflow_dispatch` to trigger CI immediately — no approval required:
 
 ```javascript
-// List recent workflow runs for the .NET workflow
+github-mcp-server-actions_run_trigger({
+  method: "run_workflow",
+  owner: "danbowker",
+  repo: "comaiz-admin",
+  workflow_id: "91065693",
+  ref: "<current-branch-name>"
+})
+// Response: 204 No Content (success)
+```
+
+### 2. Find the Triggered Run
+
+```javascript
 github-mcp-server-actions_list({
   method: "list_workflow_runs",
   owner: "danbowker",
@@ -23,22 +37,7 @@ github-mcp-server-actions_list({
   per_page: 10
 })
 
-// Look for the run matching your current commit SHA
-// Filter by event="pull_request" and head_sha="<your-commit-sha>"
-```
-
-### 2. Trigger the Workflow
-
-```javascript
-// If the workflow status is "action_required":
-github-mcp-server-actions_run_trigger({
-  method: "rerun_workflow_run",
-  owner: "danbowker",
-  repo: "comaiz-admin",
-  run_id: <workflow_run_id>  // From step 1
-})
-
-// Response: {"message":"Workflow run has been queued for re-run",...}
+// Filter by: head_branch == "<current-branch>" AND event == "workflow_dispatch"
 ```
 
 ### 3. Monitor Workflow Execution
@@ -119,17 +118,19 @@ gh run view <run-id> --log-failed
 
 ## Common Scenarios
 
-### Scenario 1: Workflow Needs Approval
+### Scenario 1: No Workflow Run Visible on PR
 
-**Problem:** Workflow shows status="action_required"
+**Problem:** PR has no CI run showing — happens when the PR modifies `.github/workflows/*.yml`
+or when GitHub hasn't automatically triggered a run yet.
 
-**Solution:**
+**Solution:** Trigger manually via workflow_dispatch:
 ```javascript
 github-mcp-server-actions_run_trigger({
-  method: "rerun_workflow_run",
+  method: "run_workflow",
   owner: "danbowker",
   repo: "comaiz-admin",
-  run_id: <run_id>
+  workflow_id: "91065693",
+  ref: "<branch-name>"
 })
 ```
 
@@ -142,7 +143,7 @@ github-mcp-server-actions_run_trigger({
 2. Find failing test(s)
 3. Fix the issue
 4. Commit and push
-5. Workflow auto-triggers
+5. Trigger new workflow_dispatch run (step 1 above)
 
 ### Scenario 3: Build Failed
 
