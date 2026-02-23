@@ -112,7 +112,7 @@ jobs:
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: cd frontend && npx playwright install --with-deps chromium
-      - name: Install Playwright system dependencies (if cache hit)
+      - name: Install Playwright system dependencies
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: cd frontend && npx playwright install-deps chromium
       - name: Create .env.local for E2E tests
@@ -172,7 +172,7 @@ jobs:
             sleep 2
           done
           
-          # Give the app a moment to fully initialize
+          # Reduced from 5s to 3s - services stabilize quickly after health checks pass
           sleep 3
           
           # Run E2E tests
