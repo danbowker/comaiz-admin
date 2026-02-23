@@ -40,10 +40,13 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
+          cache: true
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
       - name: Generate version information
         id: version
         run: |
@@ -98,13 +101,27 @@ jobs:
         run: dotnet build --no-restore
       - name: Test
         run: dotnet test --no-build --verbosity normal
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
       - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: cd frontend && npx playwright install --with-deps chromium
+      - name: Install Playwright system dependencies (if cache hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: cd frontend && npx playwright install-deps chromium
       - name: Create .env.local for E2E tests
         run: |
           cd frontend
           echo "REACT_APP_API_URL=http://localhost:7057/api" > .env.local
       - name: Run E2E tests
+        # Skip E2E tests for draft PRs to speed up feedback loop
+        if: github.event.pull_request.draft != true
         env:
           CI: true
           PLAYWRIGHT_BASE_URL: http://localhost:3000
@@ -129,7 +146,6 @@ jobs:
               kill $BACKEND_PID || true
               exit 1
             fi
-            echo "Waiting... ($i/60)"
             sleep 2
           done
           
@@ -153,12 +169,11 @@ jobs:
               kill $BACKEND_PID $FRONTEND_PID || true
               exit 1
             fi
-            echo "Waiting... ($i/30)"
             sleep 2
           done
           
-          # Give the app a few more seconds to fully initialize
-          sleep 5
+          # Give the app a moment to fully initialize
+          sleep 3
           
           # Run E2E tests
           npx playwright test || E2E_FAILED=1
@@ -189,6 +204,8 @@ jobs:
           path: frontend/screenshots/
           retention-days: 30
       - name: Build Docker image
+        # Skip Docker build for draft PRs
+        if: github.event.pull_request.draft != true
         run: |
           docker build \
             --build-arg VERSION="${{ steps.version.outputs.VERSION }}" \
